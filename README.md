@@ -2,6 +2,8 @@
 
 Modlishka is a flexible and powerful reverse proxy, that will take your phishing campaigns to the next level with minimal effort required. Enjoy :-)
 
+To be release shortly. Stay tuned.
+
 Features
 --------
 
@@ -15,7 +17,7 @@ Some of the most important 'Modlishka' features :
 -   User credential harvesting (context based on user identifiers).
 -   Easy TLS certificate generation through 'Acme.sh' wrapper plugin.
 -   Can be extended with your custom ideas through plugins.
--   Written in GO :-) 
+-   Written in GO.
 
 
 Action
@@ -24,12 +26,11 @@ _"A picture is worth a thousand words":_
 
  Modlishka in action against an example 2FA (SMS) enabled authentication scheme:
 
-[![Watch the video](https://i.vimeocdn.com/video/747311222_200x150.web)](https://vimeo.com/307369775)
+[![Watch the video](https://i.vimeocdn.com/video/747376704.jpg)](https://vimeo.com/307422738)
 
 
 
-Note: google.com was chosen for this POC, due to the complexity of the whole authentication flow. 
-
+Note: google.com was chosen here this just for a POC.
 
 Installation
 ------------
