@@ -62,82 +62,82 @@ Compile the binary and you are ready to go:
     Usage of ./dist/proxy:
     
       -acmeDNSMethod string
-        	Acme.sh DNS verification method to use (default "dns_aws")
+          Acme.sh DNS verification method to use (default "dns_aws")
       
       -acmeDomain string
-        	Phishing domain for which we want to grab the LetsEncrypt certificate
+          Phishing domain for which we want to grab the LetsEncrypt certificate
       
       -acmeOuput string
-        	Output directory for the generated json config file (default "/tmp/")
+          Output directory for the generated json config file (default "/tmp/")
       
       -acmePath string
-        	Path to the Acme.sh executable
+          Path to the Acme.sh executable
       
       -cert string
-        	base64 encoded TLS certificate
+          base64 encoded TLS certificate
       
       -certKey string
-        	base64 encoded TLS certificate key
+          base64 encoded TLS certificate key
       
       -certPool string
-        	base64 encoded Certification Authority certificate
+          base64 encoded Certification Authority certificate
       
       -config string
-        	JSON configuration file. Convenient instead of using command line switches.
+          JSON configuration file. Convenient instead of using command line switches.
       
       -credParams string
-          	Credential regexp collector with matching groups. Example: baase64(username_regex),baase64(password_regex)
+            Credential regexp collector with matching groups. Example: baase64(username_regex),baase64(password_regex)
 
       -debug
-        	Print debug information
+          Print debug information
       
       -disableSecurity
-        	Disable security features like anti-SSRF. Disable at your own risk.
+          Disable security features like anti-SSRF. Disable at your own risk.
       
       -jsRules string
-        	Comma separated list of URL patterns and JS base64 encoded payloads that will be injected. 
+          Comma separated list of URL patterns and JS base64 encoded payloads that will be injected. 
       
       -listeningAddress string
-        	Listening address (default "127.0.0.1")
+          Listening address (default "127.0.0.1")
       
       -listeningPort string
-        	Listening port (default "443")
+          Listening port (default "443")
       
       -log string
-        	Local file to which fetched requests will be written (appended)
+          Local file to which fetched requests will be written (appended)
       
       -phishing string
-        	Phishing domain to create - Ex.: target.co
+          Phishing domain to create - Ex.: target.co
       
       -plugins string
-        	Comma seperated list of enabled plugin names (default "all")
+          Comma seperated list of enabled plugin names (default "all")
       
       -postOnly
-        	Log only HTTP POST requests
+          Log only HTTP POST requests
       
       -rules string
-        	Comma separated list of 'string' patterns and their replacements. 
+          Comma separated list of 'string' patterns and their replacements. 
       
       -target string
-        	Main target to proxy - Ex.: https://target.com
+          Main target to proxy - Ex.: https://target.com
       
       -targetRes string
-        	Comma separated list of target subdomains that need to pass through the  proxy 
+          Comma separated list of target subdomains that need to pass through the  proxy 
       
       -terminateTriggers string
-        	Comma separated list of URLs from target's origin which will trigger session termination
+          Comma separated list of URLs from target's origin which will trigger session termination
       
       -terminateUrl string
-        	URL to redirect the client after session termination triggers
+          URL to redirect the client after session termination triggers
       
       -tls
-        	Enable TLS (default false)
+          Enable TLS (default false)
       
       -trackingCookie string
-        	Name of the HTTP cookie used to track the victim (default "id")
+          Name of the HTTP cookie used to track the victim (default "id")
       
       -trackingParam string
-        	Name of the HTTP parameter used to track the victim (default "id")
+          Name of the HTTP parameter used to track the victim (default "id")
 
 
 
