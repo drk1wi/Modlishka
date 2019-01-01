@@ -1,0 +1,24 @@
+{
+  "phishingDomain": "loopback.modlishka.io",
+  "listeningPort": "443",
+  "listeningAddress": "127.0.0.1",
+  "target": "https://google.com",
+  "targetResources": "content.googleapis.com,www.gstatic.com,ssl.gstatic.com,ogs.google.com,accounts.google.com,clients1.google.com,clients2.google.com,clients3.google.com,clients4.google.com,clients5.google.com,clients6.google.com",
+  "targetRules": "",
+  "terminateTriggers": "",
+  "terminateRedirectUrl": "",
+  "trackingCookie": "ident",
+  "trackingParam": "ident",
+  "useTls": true,
+  "jsRules":"",
+  "debug": false,
+  "logPostOnly": false,
+  "disableSecurity": false,
+  "log": "google.log",
+  "plugins": "all",
+  "credParams": "dHJ1ZVxdLCIoW15cV10rKSJd,XGJudWxsLFxbIihbYS16QS1aMC05IiEiIyQlJicoKSorLC0uLzo7PD0+P0BeX2B7fH1+XSspIixudWxsXGI=",
+  "cert": "",
+  "certKey": "",
+  "certPool": ""
+}
+

