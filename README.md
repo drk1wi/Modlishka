@@ -31,6 +31,8 @@ _"A picture is worth a thousand words":_
 
 [![Watch the video](https://i.vimeocdn.com/video/749353683.jpg)](https://vimeo.com/308709275)
 
+[https://vimeo.com/308709275](https://vimeo.com/308709275)
+
 Note: google.com was chosen here just as a POC.
 
 
