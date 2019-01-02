@@ -29,7 +29,7 @@ _"A picture is worth a thousand words":_
 
  Modlishka in action against an example 2FA (SMS) enabled authentication scheme:
 
-[![Watch the video](https://i.vimeocdn.com/video/748924166.jpg)](https://vimeo.com/308709275)
+[![Watch the video](https://i.vimeocdn.com/video/749353683.jpg)](https://vimeo.com/308709275)
 
 Note: google.com was chosen here just as a POC.
 
