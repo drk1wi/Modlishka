@@ -464,7 +464,10 @@ func (s *Settings) NewReverseProxy() *ReverseProxy {
 	// Ignoring invalid target certificates
 	rp.Proxy.Transport = &http.Transport{
 
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+			Renegotiation: tls.RenegotiateFreelyAsClient,
+		},
 		DialContext: (&net.Dialer{
 			Timeout:   10 * time.Second,
 			KeepAlive: 10 * time.Second,
