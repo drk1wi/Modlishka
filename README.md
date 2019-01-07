@@ -136,8 +136,11 @@ Usage
 Credits
 -------
 
-Thanks go to Giuseppe Trotta ([@Giutro](https://twitter.com/giutro)) 
+Thanks for helping with the code go to Giuseppe Trotta ([@Giutro](https://twitter.com/giutro)) 
 
+License
+-------
+Modlishka was made by Piotr Duszyński ([@drk1wi](https://twitter.com/drk1wi)). You can find the license [here](https://github.com/drk1wi/Modlishka/blob/master/LICENSE).
 
 Disclaimer
 ----------
