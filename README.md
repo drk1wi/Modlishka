@@ -150,3 +150,12 @@ This tool is made only for educational purposes and can be only used in legitima
 
 [![Twitter](https://img.shields.io/badge/twitter-drk1wi-blue.svg)](https://twitter.com/drk1wi)
 
+
+### Code Visualization:
+
+Here is a cool visualization of the code evolution
+
+ [![Watch the video](https://img.youtube.com/vi/_TeFoTB_B4I/0.jpg)](https://www.youtube.com/watch?v=_TeFoTB_B4I)
+
+ [https://www.youtube.com/watch?v=_TeFoTB_B4I](https://www.youtube.com/watch?v=_TeFoTB_B4I)
+
