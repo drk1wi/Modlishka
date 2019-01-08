@@ -71,7 +71,7 @@ Compile the binary and you are ready to go:
         	JSON configuration file. Convenient instead of using command line switches.
       
       -credParams string
-          	Credential regexp collector with matching groups. Example: baase64(username_regex),baase64(password_regex)
+          	Credential regexp collector with matching groups. Example: base64(username_regex),base64(password_regex)
 
       -debug
         	Print debug information
