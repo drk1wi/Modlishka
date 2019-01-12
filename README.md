@@ -133,14 +133,14 @@ Usage
  * Check out the [wiki](https://github.com/drk1wi/Modlishka/wiki) page for a more detailed overview of the tool usage.
  *  [FAQ](https://github.com/drk1wi/Modlishka/wiki/FAQ) (Frequently Asked Questions)
 
-Credits
--------
-
-Thanks for helping with the code go to Giuseppe Trotta ([@Giutro](https://twitter.com/giutro)) 
-
 License
 -------
 Modlishka was made by Piotr Duszyński ([@drk1wi](https://twitter.com/drk1wi)). You can find the license [here](https://github.com/drk1wi/Modlishka/blob/master/LICENSE).
+
+Credits
+-------
+Thanks for helping with the code go to Giuseppe Trotta ([@Giutro](https://twitter.com/giutro)) 
+
 
 Disclaimer
 ----------
