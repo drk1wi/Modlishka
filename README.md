@@ -12,7 +12,7 @@ Some of the most important 'Modlishka' features :
 
 -   Support for majority of 2FA authentication schemes (by design).
 -   No website templates (just point Modlishka to the target domain - in most cases, it will be handled automatically).
--   Full control of "cross" origin TLS traffic flow from your victims browsers.
+-   Full control of "cross" origin TLS traffic flow from your victims browsers (through custom new techniques).
 -   Flexible  and easily configurable phishing scenarios through configuration options.
 -   Pattern based JavaScript payload injection.
 -   Striping website from all encryption and security headers (back to 90's MITM style). 
