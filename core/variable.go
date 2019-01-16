@@ -133,19 +133,19 @@ func MakeRegexes() {
 	var err error
 
 	regexpStr := MATCH_URL_REGEXP
-	RegexpUrl, err = regexp.Compile(regexpStr)
+	RegexpUrl, err = regexp.Compile(regexp.QuoteMeta(regexpStr))
 	if err != nil {
 		log.Fatalf(err.Error() + "Terminating.")
 
 	}
 
-	regexpStr = `(([a-z0-9.]+)+` + TopLevelDomain + `)`
+	regexpStr = `(([a-z0-9.]+)+` + regexp.QuoteMeta(TopLevelDomain) + `)`
 	RegexpSubdomainWithoutScheme, err = regexp.Compile(regexpStr)
 	if err != nil {
 		log.Fatalf(err.Error() + "Terminating.")
 	}
 
-	regexpStr = `(?:([a-z0-9-]+|\*)\.)?` + PhishingDomain + `\b`
+	regexpStr = `(?:([a-z0-9-]+|\*)\.)?` + regexp.QuoteMeta(PhishingDomain) + `\b`
 	RegexpPhishSubdomainUrlWithoutScheme, err = regexp.Compile(regexpStr)
 	if err != nil {
 		log.Fatalf(err.Error() + "Terminating.")
