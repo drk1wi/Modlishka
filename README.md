@@ -7,8 +7,6 @@ It was realeased with an aim to:
 - show current 2FA design weaknesses, so adequate security solutions can be created soon.
 - raise community awareness about modern phishing techniques and strategies.
 
-On a side note, this tool is using a similar approach that has exploited over the past years ...
-
 Enjoy :-)
 
 
