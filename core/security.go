@@ -192,7 +192,7 @@ func DecodeSubdomain(encodedDomain string) (domain string, err error) {
 	}
 
 	if RegexpSubdomain.MatchString(string(src)) == false {
-		log.Warningf(" DecodeSubdomain [%s] contains invalid characters : %s", string(src))
+		log.Warningf(" DecodeSubdomain: domain [%s] contains invalid characters", string(src))
 		return "", errors.New("DecodeSubdomain contains invalid characters ")
 	}
 

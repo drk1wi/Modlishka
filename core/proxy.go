@@ -447,6 +447,9 @@ func (p *ReverseProxy) PatchURL(buffer []byte) []byte {
 	return buffer
 }
 
+
+
+
 // ReverseProxy factory
 func (s *Settings) NewReverseProxy() *ReverseProxy {
 
@@ -478,6 +481,7 @@ func (s *Settings) NewReverseProxy() *ReverseProxy {
 		ExpectContinueTimeout: 1 * time.Second,
 		IdleConnTimeout:       5 * time.Second,
 
+
 	}
 
 	// Handling: Request
@@ -490,6 +494,11 @@ func (s *Settings) NewReverseProxy() *ReverseProxy {
 		}
 		director(req)
 	}
+
+	rp.Proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
+		log.Debugf("[Proxy error][Error: %s]", err.Error())
+	}
+
 
 	// Handling: Response
 	rp.Proxy.ModifyResponse = rp.rewriteResponse
