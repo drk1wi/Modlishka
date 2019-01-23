@@ -1,7 +1,12 @@
 # ..Modlishka..
 
-Modlishka is a flexible and powerful reverse proxy, that will take your phishing campaigns to the next level (with minimal effort required from your side). 
- 
+Modlishka is a flexible and powerful reverse proxy, that will take your phishing campaigns to the next level. 
+
+It was realeased with an aim to:
+- help penetration testers to carry out an effective phishing campaign and reinforce the fact that **serious** threat can arise from phishing.
+- show current 2FA weaknesses, so adequate security solutions can be created and implemented soon.
+- raise community awareness about modern phishing techniques and strategies.
+
 Enjoy :-)
 
 
@@ -20,6 +25,7 @@ Some of the most important 'Modlishka' features :
 -   Can be extended with your ideas through plugins.
 -   Stateless design. Can be scaled up easily for an arbitrary number of users - ex. through a DNS load balancer.
 -   Web panel with a summary of collected credentials and user session impersonation (beta).
+-   Backdoor free ;-).
 -   Written in Go.
 
 
