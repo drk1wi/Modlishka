@@ -6,6 +6,7 @@ It was realeased with an aim to:
 - help penetration testers to carry out an effective phishing campaign and reinforce the fact that **serious** threat can arise from phishing.
 - show current 2FA weaknesses, so adequate security solutions can be created and implemented soon.
 - raise community awareness about modern phishing techniques and strategies.
+- support other open source projects that require a universal reverse proxy.
 
 Enjoy :-)
 
