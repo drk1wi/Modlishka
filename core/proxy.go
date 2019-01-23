@@ -49,6 +49,7 @@ type ReverseProxy struct {
 	Config         *config.Options
 
 	IsTLS bool
+	ForceHttps bool
 }
 
 type Settings struct {
@@ -280,7 +281,7 @@ func (httpResponse *HTTPResponse) PatchHeaders(p *ReverseProxy) {
 			}
 		}
 
-		if p.IsTLS == true {
+		if (p.IsTLS == true || p.ForceHttps == true) {
 			newLocation = strings.Replace(newLocation, "http://", "https://", -1)
 		} else {
 			newLocation = strings.Replace(newLocation, "https://", "http://", -1)
@@ -425,7 +426,7 @@ func (p *ReverseProxy) InjectPayloads(buffer []byte) []byte {
 func (p *ReverseProxy) PatchURL(buffer []byte) []byte {
 
 	// Fix protocol
-	if p.IsTLS == false {
+	if (p.IsTLS == false && p.ForceHttps == false) {
 		buffer = bytes.Replace(buffer, []byte("https"), []byte("http"), -1)
 	}
 
@@ -461,6 +462,7 @@ func (s *Settings) NewReverseProxy() *ReverseProxy {
 		Proxy:          httputil.NewSingleHostReverseProxy(targetURL),
 		Config:         &s.Options,
 		IsTLS:          *s.UseTls,
+		ForceHttps:     *s.ForceHttps,
 		OriginalTarget: s.originaltarget,
 	}
 
