@@ -125,7 +125,7 @@ func Enable(conf config.Options) {
 func RegisterHandler(handler *http.ServeMux) {
 	for _, p := range Plugins {
 
-		if p.RegisterHandler != nil {
+		if p.RegisterHandler != nil && p.Active {
 			p.RegisterHandler(handler)
 		}
 
