@@ -1,6 +1,6 @@
 # ..Modlishka..
 
-Modlishka is a flexible and powerful reverse proxy, that will take your phishing campaigns to the next level. 
+Modlishka is a flexible and powerful reverse proxy, that will take your ethical phishing campaigns to the next level. 
 
 It was realeased with an aim to:
 - help penetration testers to carry out an effective phishing campaign and reinforce the fact that **serious** threat can arise from phishing.
