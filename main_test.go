@@ -190,7 +190,7 @@ func TestCmdLineFlags(t *testing.T) {
 		" -targetRes " + in["TargetRes"] +
 		" -terminateTriggers " + in["TerminateTriggers"] +
 		" -terminateUrl " + in["TerminateRedirectUrl"] +
-		" -rules " + in["TargetRules"] +
+		" -targetRules " + in["TargetRules"] +
 		" -trackingCookie " + in["TrackingCookie"] +
 		" -trackingParam " + in["TrackingParam"] +
 		" -log " + in["LogFile"] +
