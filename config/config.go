@@ -35,6 +35,7 @@ type Options struct {
 	TerminateRedirectUrl *string `json:"terminateRedirectUrl"`
 	TrackingCookie       *string `json:"trackingCookie"`
 	TrackingParam        *string `json:"trackingParam"`
+	ForceHttps           *bool   `json:"forceHttps"`
 	UseTls               *bool   `json:"useTls"`
 	Debug                *bool   `json:"debug"`
 	LogPostOnly          *bool   `json:"logPostOnly"`
@@ -71,6 +72,7 @@ var (
 		TrackingParam:  flag.String("trackingParam", "id", "Name of the HTTP parameter used to track the victim"),
 
 		UseTls:          flag.Bool("tls", false, "Enable TLS"),
+		ForceHttps:      flag.Bool("forceHttps", false, "Force convert links from http to https"),
 		Debug:           flag.Bool("debug", false, "Print debug information"),
 		DisableSecurity: flag.Bool("disableSecurity", false, "Disable security features like anti-SSRF. Disable at your own risk."),
 
