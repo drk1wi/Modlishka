@@ -107,11 +107,11 @@ Compile the binary and you are ready to go:
       -postOnly
         	Log only HTTP POST requests
       
-      -rules string
-        	Comma separated list of 'string' patterns and their replacements. 
-      
       -target string
         	Main target to proxy - Ex.: https://target.com
+         
+      -targetRules string
+        	Comma separated list of 'string' patterns and their replacements. 
       
       -targetRes string
         	Comma separated list of target subdomains that need to pass through the  proxy 
