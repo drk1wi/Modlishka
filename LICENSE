@@ -18,14 +18,14 @@ Example cases of commercialization are:
 
  - Using Modlishka to provide commercial managed/Software-as-a-Service services.
  - Distributing Modlishka as a commercial product or as part of one.
- - Using Modlishka as a value added service/product.
+ - Using Modlishka as a part of a commercial service or product.
  - Promoting commercial services or products with Modlishka.
 
 Example cases which do not require a commercial license, and thus fall under the terms set out below, include (but are not limited to):
 
  - Penetration testers (or penetration testing organizations) using Modlishka as part of their assessment toolkit.
  - Penetration Testing Linux Distributions including but not limited to Kali Linux, SamuraiWTF, BackBox Linux.
- - Using Modlishka to test your own systems.
+ - Using standalone Modlishka to test your own systems.
  - Any non-commercial use of Modlishka.
 
 If you need to purchase a commercial license or are unsure whether you need to purchase a commercial license contact us -> piotr[\at]duszynski.eu.
@@ -45,11 +45,11 @@ Redistribution is permitted under the following conditions:
 
 4. Copying
 
-Copying is permitted so long as it does not conflict with the Redistribution clause.
+Copying is permitted so long as it does not conflict with the Redistribution clause (all conditions apply).
 
 5. Modification
 
-Modification is permitted so long as it does not conflict with the Redistribution clause.
+Modification is permitted so long as it does not conflict with the Redistribution clause (all conditions apply).
 
 6. Contributions
 
