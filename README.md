@@ -142,11 +142,14 @@ Usage
  * [Blog post](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/)
 
 
+Commercial support
+-------
+For ethical phishing awareness campaigns : contact@modlishka.io
+
+
 License
 -------
-Modlishka was made by Piotr Duszyński ([@drk1wi](https://twitter.com/drk1wi)). 
-
-You can find the license [here](https://github.com/drk1wi/Modlishka/blob/master/LICENSE).
+Modlishka was made by Piotr Duszyński ([@drk1wi](https://twitter.com/drk1wi)). You can find the license [here](https://github.com/drk1wi/Modlishka/blob/master/LICENSE). 
 
 Credits
 -------
@@ -156,9 +159,4 @@ Thanks for helping with the code go to Giuseppe Trotta ([@Giutro](https://twitte
 Disclaimer
 ----------
 This tool is made only for educational purposes and can be only used in legitimate penetration tests. Author does not take any responsibility for any actions taken by its users.
-
--------
-
-[![Twitter](https://img.shields.io/badge/twitter-drk1wi-blue.svg)](https://twitter.com/drk1wi)
-
 
