@@ -144,7 +144,7 @@ Usage
 
 Commercial support
 -------
-For ethical phishing awareness campaigns : contact@modlishka.io
+For ethical phishing campaigns : contact@modlishka.io
 
 
 License
