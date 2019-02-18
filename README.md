@@ -141,11 +141,9 @@ Usage
  * [FAQ](https://github.com/drk1wi/Modlishka/wiki/FAQ) (Frequently Asked Questions)
  * [Blog post](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/)
 
-
-Commercial support
+Contact
 -------
-For ethical phishing campaigns : contact@modlishka.io
-
+contact@modlishka.io
 
 License
 -------
