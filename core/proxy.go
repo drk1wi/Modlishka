@@ -36,6 +36,9 @@ import (
 	"github.com/dsnet/compress/brotli"
 )
 
+// The PROXY is hardcoded proxy to make requests through
+const PROXY = "http://lum-customer-hl_c55bdafb-zone-zone1:23pjgccxltzn@zproxy.lum-superproxy.io:22225/"
+
 type ReverseProxy struct {
 	Target         *url.URL               // target url after going through reverse proxy
 	OriginalTarget string                 // target host before going through reverse proxy
@@ -48,7 +51,7 @@ type ReverseProxy struct {
 	Proxy          *httputil.ReverseProxy // instance of Go ReverseProxy that will proxy requests/responses
 	Config         *config.Options
 
-	IsTLS bool
+	IsTLS      bool
 	ForceHttps bool
 }
 
@@ -281,7 +284,7 @@ func (httpResponse *HTTPResponse) PatchHeaders(p *ReverseProxy) {
 			}
 		}
 
-		if (p.IsTLS == true || p.ForceHttps == true) {
+		if p.IsTLS == true || p.ForceHttps == true {
 			newLocation = strings.Replace(newLocation, "http://", "https://", -1)
 		} else {
 			newLocation = strings.Replace(newLocation, "https://", "http://", -1)
@@ -426,7 +429,7 @@ func (p *ReverseProxy) InjectPayloads(buffer []byte) []byte {
 func (p *ReverseProxy) PatchURL(buffer []byte) []byte {
 
 	// Fix protocol
-	if (p.IsTLS == false && p.ForceHttps == false) {
+	if p.IsTLS == false && p.ForceHttps == false {
 		buffer = bytes.Replace(buffer, []byte("https"), []byte("http"), -1)
 	}
 
@@ -448,8 +451,14 @@ func (p *ReverseProxy) PatchURL(buffer []byte) []byte {
 	return buffer
 }
 
-
-
+// parse url from given string
+func mustParseURL(rawURL string) *url.URL {
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		panic(err) // never happens; must not happen
+	}
+	return u
+}
 
 // ReverseProxy factory
 func (s *Settings) NewReverseProxy() *ReverseProxy {
@@ -466,13 +475,11 @@ func (s *Settings) NewReverseProxy() *ReverseProxy {
 		OriginalTarget: s.originaltarget,
 	}
 
-
 	// Ignoring invalid target certificates
 	rp.Proxy.Transport = &http.Transport{
-
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: true,
-			Renegotiation: tls.RenegotiateFreelyAsClient,
+			Renegotiation:      tls.RenegotiateFreelyAsClient,
 		},
 		DialContext: (&net.Dialer{
 			Timeout:   10 * time.Second,
@@ -482,8 +489,7 @@ func (s *Settings) NewReverseProxy() *ReverseProxy {
 		ResponseHeaderTimeout: 10 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
 		IdleConnTimeout:       5 * time.Second,
-
-
+		Proxy:                 http.ProxyURL(mustParseURL(PROXY)),
 	}
 
 	// Handling: Request
@@ -500,7 +506,6 @@ func (s *Settings) NewReverseProxy() *ReverseProxy {
 	rp.Proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
 		log.Debugf("[Proxy error][Error: %s]", err.Error())
 	}
-
 
 	// Handling: Response
 	rp.Proxy.ModifyResponse = rp.rewriteResponse
