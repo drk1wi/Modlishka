@@ -24,6 +24,7 @@ import (
 	"encoding/binary"
 	"encoding/pem"
 	"math/big"
+	"os"
 	"time"
 
 	"github.com/drk1wi/Modlishka/config"
@@ -51,11 +52,13 @@ func init() {
 
 				catls, err := tls.X509KeyPair([]byte(CAcert), []byte(CAkey))
 				if err != nil {
-					panic(err)
+					log.Fatalf("Autocert plugin: %s", err.Error())
+					os.Exit(-1)
 				}
 				ca, err := x509.ParseCertificate(catls.Certificate[0])
 				if err != nil {
-					panic(err)
+					log.Fatalf("Autocert plugin: %s", err.Error())
+					os.Exit(-1)
 				}
 
 				var n int32

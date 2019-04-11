@@ -1,6 +1,6 @@
 // +build tools
 
-package base32
+package tools
 
 import (
 	"github.com/alecthomas/gometalinter"

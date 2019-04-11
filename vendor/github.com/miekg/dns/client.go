@@ -3,7 +3,6 @@ package dns
 // A client implementation.
 
 import (
-	"bytes"
 	"context"
 	"crypto/tls"
 	"encoding/binary"
@@ -220,18 +219,15 @@ func (co *Conn) ReadMsgHeader(hdr *Header) ([]byte, error) {
 		n   int
 		err error
 	)
-
-	switch t := co.Conn.(type) {
+	switch co.Conn.(type) {
 	case *net.TCPConn, *tls.Conn:
-		r := t.(io.Reader)
-
-		// First two bytes specify the length of the entire message.
-		l, err := tcpMsgLen(r)
-		if err != nil {
+		var length uint16
+		if err := binary.Read(co.Conn, binary.BigEndian, &length); err != nil {
 			return nil, err
 		}
-		p = make([]byte, l)
-		n, err = tcpRead(r, p)
+
+		p = make([]byte, length)
+		n, err = io.ReadFull(co.Conn, p)
 	default:
 		if co.UDPSize > MinMsgSize {
 			p = make([]byte, co.UDPSize)
@@ -258,78 +254,27 @@ func (co *Conn) ReadMsgHeader(hdr *Header) ([]byte, error) {
 	return p, err
 }
 
-// tcpMsgLen is a helper func to read first two bytes of stream as uint16 packet length.
-func tcpMsgLen(t io.Reader) (int, error) {
-	p := []byte{0, 0}
-	n, err := t.Read(p)
-	if err != nil {
-		return 0, err
-	}
-
-	// As seen with my local router/switch, returns 1 byte on the above read,
-	// resulting a a ShortRead. Just write it out (instead of loop) and read the
-	// other byte.
-	if n == 1 {
-		n1, err := t.Read(p[1:])
-		if err != nil {
-			return 0, err
-		}
-		n += n1
-	}
-
-	if n != 2 {
-		return 0, ErrShortRead
-	}
-	l := binary.BigEndian.Uint16(p)
-	if l == 0 {
-		return 0, ErrShortRead
-	}
-	return int(l), nil
-}
-
-// tcpRead calls TCPConn.Read enough times to fill allocated buffer.
-func tcpRead(t io.Reader, p []byte) (int, error) {
-	n, err := t.Read(p)
-	if err != nil {
-		return n, err
-	}
-	for n < len(p) {
-		j, err := t.Read(p[n:])
-		if err != nil {
-			return n, err
-		}
-		n += j
-	}
-	return n, err
-}
-
 // Read implements the net.Conn read method.
 func (co *Conn) Read(p []byte) (n int, err error) {
 	if co.Conn == nil {
 		return 0, ErrConnEmpty
 	}
-	if len(p) < 2 {
-		return 0, io.ErrShortBuffer
-	}
-	switch t := co.Conn.(type) {
-	case *net.TCPConn, *tls.Conn:
-		r := t.(io.Reader)
 
-		l, err := tcpMsgLen(r)
-		if err != nil {
+	switch co.Conn.(type) {
+	case *net.TCPConn, *tls.Conn:
+		var length uint16
+		if err := binary.Read(co.Conn, binary.BigEndian, &length); err != nil {
 			return 0, err
 		}
-		if l > len(p) {
-			return int(l), io.ErrShortBuffer
+		if int(length) > len(p) {
+			return 0, io.ErrShortBuffer
 		}
-		return tcpRead(r, p[:l])
+
+		return io.ReadFull(co.Conn, p[:length])
 	}
+
 	// UDP connection
-	n, err = co.Conn.Read(p)
-	if err != nil {
-		return n, err
-	}
-	return n, err
+	return co.Conn.Read(p)
 }
 
 // WriteMsg sends a message through the connection co.
@@ -351,33 +296,26 @@ func (co *Conn) WriteMsg(m *Msg) (err error) {
 	if err != nil {
 		return err
 	}
-	if _, err = co.Write(out); err != nil {
-		return err
-	}
-	return nil
+	_, err = co.Write(out)
+	return err
 }
 
 // Write implements the net.Conn Write method.
 func (co *Conn) Write(p []byte) (n int, err error) {
-	switch t := co.Conn.(type) {
+	switch co.Conn.(type) {
 	case *net.TCPConn, *tls.Conn:
-		w := t.(io.Writer)
-
-		lp := len(p)
-		if lp < 2 {
-			return 0, io.ErrShortBuffer
-		}
-		if lp > MaxMsgSize {
+		if len(p) > MaxMsgSize {
 			return 0, &Error{err: "message too large"}
 		}
-		l := make([]byte, 2, lp+2)
-		binary.BigEndian.PutUint16(l, uint16(lp))
-		p = append(l, p...)
-		n, err := io.Copy(w, bytes.NewReader(p))
+
+		l := make([]byte, 2)
+		binary.BigEndian.PutUint16(l, uint16(len(p)))
+
+		n, err := (&net.Buffers{l, p}).WriteTo(co.Conn)
 		return int(n), err
 	}
-	n, err = co.Conn.Write(p)
-	return n, err
+
+	return co.Conn.Write(p)
 }
 
 // Return the appropriate timeout for a specific request
@@ -420,7 +358,7 @@ func ExchangeContext(ctx context.Context, m *Msg, a string) (r *Msg, err error) 
 
 // ExchangeConn performs a synchronous query. It sends the message m via the connection
 // c and waits for a reply. The connection c is not closed by ExchangeConn.
-// This function is going away, but can easily be mimicked:
+// Deprecated: This function is going away, but can easily be mimicked:
 //
 //	co := &dns.Conn{Conn: c} // c is your net.Conn
 //	co.WriteMsg(m)
@@ -444,11 +382,7 @@ func ExchangeConn(c net.Conn, m *Msg) (r *Msg, err error) {
 // DialTimeout acts like Dial but takes a timeout.
 func DialTimeout(network, address string, timeout time.Duration) (conn *Conn, err error) {
 	client := Client{Net: network, Dialer: &net.Dialer{Timeout: timeout}}
-	conn, err = client.Dial(address)
-	if err != nil {
-		return nil, err
-	}
-	return conn, nil
+	return client.Dial(address)
 }
 
 // DialWithTLS connects to the address on the named network with TLS.
@@ -457,12 +391,7 @@ func DialWithTLS(network, address string, tlsConfig *tls.Config) (conn *Conn, er
 		network += "-tls"
 	}
 	client := Client{Net: network, TLSConfig: tlsConfig}
-	conn, err = client.Dial(address)
-
-	if err != nil {
-		return nil, err
-	}
-	return conn, nil
+	return client.Dial(address)
 }
 
 // DialTimeoutWithTLS acts like DialWithTLS but takes a timeout.
@@ -471,11 +400,7 @@ func DialTimeoutWithTLS(network, address string, tlsConfig *tls.Config, timeout 
 		network += "-tls"
 	}
 	client := Client{Net: network, Dialer: &net.Dialer{Timeout: timeout}, TLSConfig: tlsConfig}
-	conn, err = client.Dial(address)
-	if err != nil {
-		return nil, err
-	}
-	return conn, nil
+	return client.Dial(address)
 }
 
 // ExchangeContext acts like Exchange, but honors the deadline on the provided

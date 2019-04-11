@@ -67,6 +67,8 @@ A not-so-up-to-date-list-that-may-be-actually-current:
 * https://github.com/rs/dnstrace
 * https://blitiri.com.ar/p/dnss ([github mirror](https://github.com/albertito/dnss))
 * https://github.com/semihalev/sdns
+* https://render.com
+* https://github.com/peterzen/goresolver
 
 Send pull request if you want to be listed here.
 
@@ -99,8 +101,8 @@ work:
 
 ## Examples
 
-A short "how to use the API" is at the beginning of doc.go (this also will show
-when you call `godoc github.com/miekg/dns`).
+A short "how to use the API" is at the beginning of doc.go (this also will show when you call `godoc
+github.com/miekg/dns`).
 
 Example programs can be found in the `github.com/miekg/exdns` repository.
 
@@ -158,8 +160,9 @@ Example programs can be found in the `github.com/miekg/exdns` repository.
 * 7553 - URI record
 * 7858 - DNS over TLS: Initiation and Performance Considerations
 * 7871 - EDNS0 Client Subnet
-* 7873 - Domain Name System (DNS) Cookies (draft-ietf-dnsop-cookies)
+* 7873 - Domain Name System (DNS) Cookies
 * 8080 - EdDSA for DNSSEC
+* 8499 - DNS Terminology
 
 ## Loosely Based Upon
 
