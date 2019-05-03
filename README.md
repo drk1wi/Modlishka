@@ -133,17 +133,13 @@ Compile the binary and you are ready to go:
 
 
 
-
 Usage
 -----
 
  * Check out the [wiki](https://github.com/drk1wi/Modlishka/wiki) page for a more detailed overview of the tool usage.
  * [FAQ](https://github.com/drk1wi/Modlishka/wiki/FAQ) (Frequently Asked Questions)
  * [Blog post](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/)
-
-Contact
--------
-contact@modlishka.io
+ 
 
 License
 -------
@@ -151,7 +147,7 @@ Modlishka was made by Piotr Duszyński ([@drk1wi](https://twitter.com/drk1wi)). 
 
 Credits
 -------
-Thanks for helping with the code go to Giuseppe Trotta ([@Giutro](https://twitter.com/giutro)) 
+Thanks for helping with the code refactoring to Giuseppe Trotta ([@Giutro](https://twitter.com/giutro)) 
 
 
 Disclaimer
