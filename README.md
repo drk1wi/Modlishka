@@ -137,9 +137,9 @@ URL
 -----
 
  * Check out the [wiki](https://github.com/drk1wi/Modlishka/wiki) page for a more detailed overview of the tool usage.
- * [Blog post](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/): Introduction post
- * [Used Technique](https://blog.duszynski.eu/hijacking-browser-tls-traffic-through-client-domain-hooking/): If you are interested how this tool does handle multiple domains over a single TLS certificate
- * [FAQ](https://github.com/drk1wi/Modlishka/wiki/FAQ) (Frequently Asked Questions)
+ * [Blog post](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/): Introduction post.
+ * [Used Technique](https://blog.duszynski.eu/hijacking-browser-tls-traffic-through-client-domain-hooking/): If you are interested how this tool manages to handle multiple domains over a single TLS certificate.
+ * [FAQ](https://github.com/drk1wi/Modlishka/wiki/FAQ) (Frequently Asked Questions).
 
 License
 -------
