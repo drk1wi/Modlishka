@@ -25,7 +25,6 @@ import (
 
 type Options struct {
 	PhishingDomain       *string `json:"phishingDomain"`
-	ListeningPort        *string `json:"listeningPort"`
 	ListeningAddress     *string `json:"listeningAddress"`
 	Target               *string `json:"target"`
 	TargetRes            *string `json:"targetResources"`
@@ -35,11 +34,12 @@ type Options struct {
 	TerminateRedirectUrl *string `json:"terminateRedirectUrl"`
 	TrackingCookie       *string `json:"trackingCookie"`
 	TrackingParam        *string `json:"trackingParam"`
-	ForceHttps           *bool   `json:"forceHttps"`
-	UseTls               *bool   `json:"useTls"`
 	Debug                *bool   `json:"debug"`
+	ForceHTTPS           *bool   `json:"forceHTTPS"`
+	ForceHTTP            *bool   `json:"forceHTTP"`
 	LogPostOnly          *bool   `json:"logPostOnly"`
 	DisableSecurity      *bool   `json:"disableSecurity"`
+	DynamicMode			 *bool   `json:"dynamicMode"`
 	LogFile              *string `json:"log"`
 	Plugins              *string `json:"plugins"`
 	*TLSConfig
@@ -53,31 +53,31 @@ type TLSConfig struct {
 
 var (
 	C = Options{
-		PhishingDomain:   flag.String("phishingDomain", "", "Phishing domain to create - Ex.: target.co"),
-		ListeningPort:    flag.String("listeningPort", "443", "Listening port"),
-		ListeningAddress: flag.String("listeningAddress", "127.0.0.1", "Listening address"),
-		Target:           flag.String("target", "", "Main target to proxy - Ex.: https://target.com"),
+		PhishingDomain:   flag.String("phishingDomain", "", "Proxy domain name that will be used - e.g.: proxy.tld"),
+		ListeningAddress: flag.String("listeningAddress", "127.0.0.1", "Listening address - e.g.: 0.0.0.0 "),
+		Target:           flag.String("target", "", "Target  domain name  - e.g.: target.tld"),
 		TargetRes: flag.String("targetRes", "",
-			"Comma separated list of extra target subdomains that need to pass through the reverse proxy - example: static.target.com"),
+			"Comma separated list of domains that were not translated automatically. Use this to force domain translation - example: static.target.tld"),
 		TerminateTriggers: flag.String("terminateTriggers", "",
-			"Comma separated list of URLs from target's origin which will trigger session termination"),
+			"Session termination: Comma separated list of URLs from target's origin which will trigger session termination"),
 		TerminateRedirectUrl: flag.String("terminateUrl", "",
-			"URL to redirect the client after session termination triggers"),
-		TargetRules: flag.String("targetRules", "",
-			"Comma separated list of 'string' patterns and their replacements. Example base64(new):base64(old),"+
+			"URL to which a client will be redirected after Session Termination rules trigger"),
+		TargetRules: flag.String("rules", "",
+			"Comma separated list of 'string' patterns and their replacements - e.g.: base64(new):base64(old),"+
 				"base64(newer):base64(older)"),
-		JsRules: flag.String("jsRules", "", "Comma separated list of URL patterns and JS base64 encoded payloads that will be injected. Example google.com:base64(alert(1)),..,etc"),
+		JsRules: flag.String("jsRules", "", "Comma separated list of URL patterns and JS base64 encoded payloads that will be injected - e.g.: target.tld:base64(alert(1)),..,etc"),
 
-		TrackingCookie: flag.String("trackingCookie", "id", "Name of the HTTP cookie used to track the victim"),
-		TrackingParam:  flag.String("trackingParam", "id", "Name of the HTTP parameter used to track the victim"),
+		TrackingCookie: flag.String("trackingCookie", "id", "Name of the HTTP cookie used for track the client"),
+		TrackingParam:  flag.String("trackingParam", "id", "Name of the HTTP parameter used to set up the HTTP cookie tracking of the client"),
+		Debug:           flag.Bool("debug", false, "Print extra debug information"),
+		DisableSecurity: flag.Bool("disableSecurity", false, "Disable proxy security features like anti-SSRF. 'Here be dragons' - disable at your own risk."),
+		DynamicMode: flag.Bool("dynamicMode", false, "Enable dynamic mode for 'Client Domain Hooking'"),
 
-		UseTls:          flag.Bool("tls", false, "Enable TLS"),
-		ForceHttps:      flag.Bool("forceHttps", false, "Force convert links from http to https"),
-		Debug:           flag.Bool("debug", false, "Print debug information"),
-		DisableSecurity: flag.Bool("disableSecurity", false, "Disable security features like anti-SSRF. Disable at your own risk."),
+		ForceHTTP:           flag.Bool("forceHTTP", false, "Strip all TLS from the traffic and proxy through HTTP only"),
+		ForceHTTPS:           flag.Bool("forceHTTPS", false, "Strip all clear-text from the traffic and proxy through HTTPS only"),
 
-		LogPostOnly: flag.Bool("postOnly", false, "Log only HTTP POST requests"),
 		LogFile:     flag.String("log", "", "Local file to which fetched requests will be written (appended)"),
+		LogPostOnly: flag.Bool("postOnly", false, "Log only HTTP POST requests"),
 
 		Plugins: flag.String("plugins", "all", "Comma separated list of enabled plugin names"),
 	}
@@ -107,7 +107,7 @@ func ParseConfiguration() Options {
 	if len(*s.TLSCertificate) > 0 || len(*s.TLSKey) > 0 || len(*s.TLSPool) > 0 {
 
 		// Handle TLS Certificates
-		if *C.UseTls {
+		if *C.ForceHTTP == false {
 			if len(*C.TLSCertificate) > 0 {
 				decodedCertificate, err := base64.StdEncoding.DecodeString(*C.TLSCertificate)
 				if err == nil {
@@ -162,23 +162,41 @@ func (c *Options) parseJSON(file string) {
 
 func (c *Options) VerifyConfiguration() {
 
-	if *c.UseTls == false {
-
+	if *c.ForceHTTP == true {
 		if len(*c.PhishingDomain) == 0 || len(*c.PhishingDomain) == 0 {
-			log.Warningf("Missing required configuration to start the proxy . Terminating.")
+			log.Warningf("Missing required parameters in oder start the proxy. Terminating.")
 			log.Warningf("TIP: You will need to specify at least the following parameters to serve the page over HTTP: phishing and target.")
 			flag.PrintDefaults()
 			os.Exit(1)
 		}
+	} else { 	// default + HTTPS wrapper
+
+			if len(*c.PhishingDomain) == 0 || len(*c.PhishingDomain) == 0 {
+				log.Warningf("Missing required parameters in oder start the proxy. Terminating.")
+				log.Warningf("TIP: You will need to specify at least the following parameters to serve the page over HTTP: phishing and target.")
+				flag.PrintDefaults()
+				os.Exit(1)
+			}
+
+
 	}
 
-	if *c.UseTls == true {
-		if len(*c.PhishingDomain) == 0 || len(*c.PhishingDomain) == 0 || c.TLSCertificate == nil || c.TLSKey == nil {
-			log.Warningf("Missing required configuration to start the proxy . Terminating.")
-			log.Warningf("Tip: You will need to specify at least the following parameters to serve the page over HTTPS : phishing, target, cert and certKey.")
-			flag.PrintDefaults()
-			os.Exit(1)
-		}
+
+	if *c.DynamicMode == true {
+		log.Warningf("Dynamic Mode enabled: Proxy will accept and hook all incoming HTTP requests.")
 	}
+
+
+
+	if *c.ForceHTTP == true {
+		log.Warningf("Force HTTP wrapper enabled: Proxy will strip all TLS traffic and handle requests over HTTP only")
+	}
+
+	if *c.ForceHTTPS == true {
+		log.Warningf("Force HTTPS wrapper enabled: Proxy will strip all clear-text traffic and handle requests over HTTPS only")
+	}
+
+
+
 
 }

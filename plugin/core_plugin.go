@@ -47,7 +47,7 @@ type HTTPContext struct {
 	Origin         string   // Origin before going through the proxy
 	PhishUser      string   // traced victim's identifier
 	IP             string   // victim's IP address
-
+	IsTLS		   bool 	//TLS request
 }
 
 // Add the given Plugin to the list of loaded plugins

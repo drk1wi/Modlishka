@@ -19,6 +19,7 @@ import (
 	"github.com/drk1wi/Modlishka/config"
 	"github.com/drk1wi/Modlishka/log"
 	"github.com/drk1wi/Modlishka/plugin"
+	"github.com/drk1wi/Modlishka/runtime"
 	"io/ioutil"
 	"math/rand"
 	"os"
@@ -34,7 +35,7 @@ import (
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 func init() {
-	core.MakeRegexes()
+	runtime.MakeRegexes()
 	//var f = false
 	//config.C.Debug = &f
 }
@@ -64,15 +65,25 @@ var TestsTranslateURLtoPhish = []struct {
 	{"github.com", "phish-github.dev"},
 }
 
+
+var TestsDynamicTranslateURLHost = []struct {
+	input    string // input
+	expected string // expected result
+}{
+	{"assets-cdn.github.com", "assets-cdn.github.com"},
+	{"accounts.youtube.com", "accounts.youtube.com"},
+	{"github.com", "github.com"},
+}
+
 func TestEncodeDecode(t *testing.T) {
 
 	input := randSeq(20)
-	encoded, err := core.EncodeSubdomain(input)
+	encoded, err := runtime.EncodeSubdomain(input,false)
 	if err != nil {
 		t.Errorf("TestEncodeDecode(%s):  error %s ", "encode", err.Error())
 	}
 
-	decoded, err := core.DecodeSubdomain(encoded)
+	decoded,_,_, err := runtime.DecodeSubdomain(encoded)
 	if err != nil {
 		t.Errorf("TestEncodeDecode(%s):  error %s ", "decode", err.Error())
 	}
@@ -85,32 +96,32 @@ func TestEncodeDecode(t *testing.T) {
 
 func TestRegex(t *testing.T) {
 
-	core.RC4_KEY = `7afa263b3d6efb65dfde80875cf3883cdc4da6cef9b64034a5ba895317e98e39`
-	core.PhishingDomain = "google.dev"
-	core.TopLevelDomain = "google.com"
-	core.MakeRegexes()
+	runtime.RC4_KEY = `7afa263b3d6efb65dfde80875cf3883cdc4da6cef9b64034a5ba895317e98e39`
+	runtime.PhishingDomain = "google.dev"
+	runtime.TopLevelDomain = "google.com"
+	runtime.MakeRegexes()
 
 }
 
 func TestTranslatePhishtoURL(t *testing.T) {
 
-	core.RC4_KEY = `7afa263b3d6efb65dfde80875cf3883cdc4da6cef9b64034a5ba895317e98e39`
+	runtime.RC4_KEY = `7afa263b3d6efb65dfde80875cf3883cdc4da6cef9b64034a5ba895317e98e39`
 	target := "google.com"
 	phishing := "google.dev"
-	core.PhishingDomain = phishing
-	core.TopLevelDomain = target
-	core.MakeRegexes()
+	runtime.PhishingDomain = phishing
+	runtime.TopLevelDomain = target
+	runtime.MakeRegexes()
 
 	domain, _ := publicsuffix.EffectiveTLDPlusOne(target)
-	core.TopLevelDomain = strings.Replace(domain, "https://", "", -1)
-	core.TopLevelDomain = strings.Replace(core.TopLevelDomain, "http://", "", -1)
+	runtime.TopLevelDomain = strings.Replace(domain, "https://", "", -1)
+	runtime.TopLevelDomain = strings.Replace(runtime.TopLevelDomain, "http://", "", -1)
 
-	core.PhishingDomain = string(phishing)
+	runtime.PhishingDomain = string(phishing)
 
 	// core.Logger = core.InitializeLogger(*debugInfo)
 
 	for _, tt := range TestsTranslatePhishtoURL {
-		actual := core.PhishURLToRealURL(tt.input)
+		actual := runtime.PhishURLToRealURL(tt.input)
 		if actual != tt.expected {
 			t.Errorf("TestsTranslatePhishtoURL(%s): expected %s, actual %s", tt.input, tt.expected, actual)
 		}
@@ -118,25 +129,51 @@ func TestTranslatePhishtoURL(t *testing.T) {
 
 }
 
-func TestTranslateURLtoPhish(t *testing.T) {
+func TestDynamicTranslateURLHost(t *testing.T) {
 
-	core.RC4_KEY = `7afa263b3d6efb65dfde80875cf3883cdc4da6cef9b64034a5ba895317e98e39`
+	// configure
+	runtime.RC4_KEY = `7afa263b3d6efb65dfde80875cf3883cdc4da6cef9b64034a5ba895317e98e39`
 	target := "github.com"
 	phishing := "phish-github.dev"
-	core.PhishingDomain = phishing
-	core.TopLevelDomain = target
-	core.MakeRegexes()
+	runtime.PhishingDomain = phishing
+	runtime.TopLevelDomain = target
+	runtime.MakeRegexes()
+	domain, _ := publicsuffix.EffectiveTLDPlusOne(target)
+	runtime.TopLevelDomain = strings.Replace(domain, "https://", "", -1)
+	runtime.TopLevelDomain = strings.Replace(runtime.TopLevelDomain, "http://", "", -1)
+	runtime.PhishingDomain = string(phishing)
+	runtime.DynamicMode = true
+	//
+
+
+	for _, tt := range TestsDynamicTranslateURLHost {
+		actual,_,_ := runtime.TranslateRequestHost(tt.input)
+		if actual != tt.expected {
+			t.Errorf("TestsTranslateURLtoPhish(%s): expected %s, actual %s", tt.input, tt.expected, actual)
+		}
+	}
+
+}
+
+func TestTranslateURLtoPhish(t *testing.T) {
+
+	runtime.RC4_KEY = `7afa263b3d6efb65dfde80875cf3883cdc4da6cef9b64034a5ba895317e98e39`
+	target := "github.com"
+	phishing := "phish-github.dev"
+	runtime.PhishingDomain = phishing
+	runtime.TopLevelDomain = target
+	runtime.MakeRegexes()
 
 	domain, _ := publicsuffix.EffectiveTLDPlusOne(target)
-	core.TopLevelDomain = strings.Replace(domain, "https://", "", -1)
-	core.TopLevelDomain = strings.Replace(core.TopLevelDomain, "http://", "", -1)
+	runtime.TopLevelDomain = strings.Replace(domain, "https://", "", -1)
+	runtime.TopLevelDomain = strings.Replace(runtime.TopLevelDomain, "http://", "", -1)
 
-	core.PhishingDomain = string(phishing)
+	runtime.PhishingDomain = string(phishing)
 
 	// core.Logger = core.InitializeLogger(*debugInfo)
 
 	for _, tt := range TestsTranslateURLtoPhish {
-		actual := core.RealURLtoPhish(tt.input)
+		actual := runtime.RealURLtoPhish(tt.input)
 		if actual != tt.expected {
 			t.Errorf("TestsTranslateURLtoPhish(%s): expected %s, actual %s", tt.input, tt.expected, actual)
 		}
@@ -158,7 +195,6 @@ func TestCmdLineFlags(t *testing.T) {
 
 	in := map[string]string{
 		"PhishingDomain":       "https://google.dev",
-		"ListeningPort":        "443",
 		"ListeningAddress":     "0.0.0.0",
 		"Target":               "google.com",
 		"TargetRes":            "test.google.com,test1.google.com",
@@ -174,7 +210,6 @@ func TestCmdLineFlags(t *testing.T) {
 	}
 
 	in_bool := map[string]bool{
-		"UseTls":          true,
 		"Debug":           true,
 		"DisableSecurity": false,
 		"LogPostOnly":     false,
@@ -185,12 +220,11 @@ func TestCmdLineFlags(t *testing.T) {
 
 	args := "   -phishingDomain " + in["PhishingDomain"] +
 		" -target " + in["Target"] +
-		" -listeningPort " + in["ListeningPort"] +
 		" -listeningAddress " + in["ListeningAddress"] +
 		" -targetRes " + in["TargetRes"] +
 		" -terminateTriggers " + in["TerminateTriggers"] +
 		" -terminateUrl " + in["TerminateRedirectUrl"] +
-		" -targetRules " + in["TargetRules"] +
+		" -rules " + in["TargetRules"] +
 		" -trackingCookie " + in["TrackingCookie"] +
 		" -trackingParam " + in["TrackingParam"] +
 		" -log " + in["LogFile"] +
@@ -202,9 +236,6 @@ func TestCmdLineFlags(t *testing.T) {
 		args += " -debug "
 	}
 
-	if in_bool["UseTls"] {
-		args += " -tls "
-	}
 
 	if in_bool["DisableSecurity"] {
 		args += " -disableSecurity "
@@ -243,39 +274,39 @@ func TestCmdLineFlags(t *testing.T) {
 	}
 
 	// Set up runtime core config
-	core.SetCoreRuntimeConfig(conf.Options)
+	runtime.SetCoreRuntimeConfig(conf.Options)
 
-	if getFieldString(&options, "PhishingDomain") != core.PhishingDomain {
-		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "PhishingDomain", getFieldString(&options, "PhishingDomain"), core.PhishingDomain)
+	if getFieldString(&options, "PhishingDomain") != runtime.PhishingDomain {
+		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "PhishingDomain", getFieldString(&options, "PhishingDomain"), runtime.PhishingDomain)
 	}
 
-	if getFieldString(&options, "TrackingCookie") != core.TrackingCookie {
-		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "TrackingCookie", getFieldString(&options, "TrackingCookie"), core.TrackingCookie)
-
-	}
-
-	if getFieldString(&options, "TrackingParam") != core.TrackingParam {
-		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "TrackingParam", getFieldString(&options, "TrackingParam"), core.TrackingParam)
+	if getFieldString(&options, "TrackingCookie") != runtime.TrackingCookie {
+		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "TrackingCookie", getFieldString(&options, "TrackingCookie"), runtime.TrackingCookie)
 
 	}
 
-	if "google.com" != core.TopLevelDomain {
-		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "TopLevelDomain", "google.com", core.TopLevelDomain)
+	if getFieldString(&options, "TrackingParam") != runtime.TrackingParam {
+		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "TrackingParam", getFieldString(&options, "TrackingParam"), runtime.TrackingParam)
 
 	}
 
-	if "yyy" != core.ReplaceStrings["xxx"] {
-		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "ReplaceStrings", "xxx", core.ReplaceStrings["xxx"])
+	if "google.com" != runtime.TopLevelDomain {
+		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "TopLevelDomain", "google.com", runtime.TopLevelDomain)
 
 	}
 
-	if strings.Join(core.TargetResources, ",") != getFieldString(&options, "TargetRes") {
-		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "TargetResources", getFieldString(&options, "TargetRes"), strings.Join(core.TargetResources, ","))
+	if "yyy" != runtime.ReplaceStrings["xxx"] {
+		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "ReplaceStrings", "xxx", runtime.ReplaceStrings["xxx"])
 
 	}
 
-	if strings.Join(core.TerminateTriggers, ",") != getFieldString(&options, "TerminateTriggers") {
-		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "TerminateTriggers", getFieldString(&options, "TerminateRedirectUrl"), strings.Join(core.TerminateTriggers, ","))
+	if strings.Join(runtime.TargetResources, ",") != getFieldString(&options, "TargetRes") {
+		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "TargetResources", getFieldString(&options, "TargetRes"), strings.Join(runtime.TargetResources, ","))
+
+	}
+
+	if strings.Join(runtime.TerminateTriggers, ",") != getFieldString(&options, "TerminateTriggers") {
+		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "TerminateTriggers", getFieldString(&options, "TerminateRedirectUrl"), strings.Join(runtime.TerminateTriggers, ","))
 
 	}
 
@@ -299,7 +330,6 @@ func TestCmdLineFlags(t *testing.T) {
 
 var jsonfile1 = `{
     "phishingDomain": "https://google.dev",
-    "listeningPort": "443",
     "listeningAddress": "0.0.0.0",
     "target": "google.com",
     "targetResources": "test.google.com,test1.google.com",
@@ -308,7 +338,6 @@ var jsonfile1 = `{
     "terminateUrl": "redirect.google.com",
     "trackingCookie": "id",
     "trackingParam": "id",
-    "useTls": true,
     "debug": true,
     "logPostOnly": false,
     "disableSecurity": false,
@@ -335,7 +364,6 @@ func TestJSONConfig(t *testing.T) {
 
 	in := map[string]string{
 		"PhishingDomain":       "https://google.dev",
-		"ListeningPort":        "443",
 		"ListeningAddress":     "0.0.0.0",
 		"Target":               "google.com",
 		"TargetRes":            "test.google.com,test1.google.com",
@@ -351,7 +379,6 @@ func TestJSONConfig(t *testing.T) {
 	}
 
 	in_bool := map[string]bool{
-		"UseTls":          true,
 		"Debug":           true,
 		"DisableSecurity": false,
 		"LogPostOnly":     false,
@@ -388,39 +415,39 @@ func TestJSONConfig(t *testing.T) {
 	}
 
 	// Set up runtime core config
-	core.SetCoreRuntimeConfig(conf.Options)
+	runtime.SetCoreRuntimeConfig(conf.Options)
 
-	if getFieldString(&options, "PhishingDomain") != core.PhishingDomain {
-		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "PhishingDomain", getFieldString(&options, "PhishingDomain"), core.PhishingDomain)
+	if getFieldString(&options, "PhishingDomain") != runtime.PhishingDomain {
+		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "PhishingDomain", getFieldString(&options, "PhishingDomain"), runtime.PhishingDomain)
 	}
 
-	if getFieldString(&options, "TrackingCookie") != core.TrackingCookie {
-		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "TrackingCookie", getFieldString(&options, "TrackingCookie"), core.TrackingCookie)
-
-	}
-
-	if getFieldString(&options, "TrackingParam") != core.TrackingParam {
-		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "TrackingParam", getFieldString(&options, "TrackingParam"), core.TrackingParam)
+	if getFieldString(&options, "TrackingCookie") != runtime.TrackingCookie {
+		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "TrackingCookie", getFieldString(&options, "TrackingCookie"), runtime.TrackingCookie)
 
 	}
 
-	if "google.com" != core.TopLevelDomain {
-		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "TopLevelDomain", "google.com", core.TopLevelDomain)
+	if getFieldString(&options, "TrackingParam") != runtime.TrackingParam {
+		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "TrackingParam", getFieldString(&options, "TrackingParam"), runtime.TrackingParam)
 
 	}
 
-	if "yyy" != core.ReplaceStrings["xxx"] {
-		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "ReplaceStrings", "xxx", core.ReplaceStrings["xxx"])
+	if "google.com" != runtime.TopLevelDomain {
+		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "TopLevelDomain", "google.com", runtime.TopLevelDomain)
 
 	}
 
-	if strings.Join(core.TargetResources, ",") != getFieldString(&options, "TargetRes") {
-		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "TargetResources", getFieldString(&options, "TargetRes"), strings.Join(core.TargetResources, ","))
+	if "yyy" != runtime.ReplaceStrings["xxx"] {
+		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "ReplaceStrings", "xxx", runtime.ReplaceStrings["xxx"])
 
 	}
 
-	if strings.Join(core.TerminateTriggers, ",") != getFieldString(&options, "TerminateTriggers") {
-		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "TerminateTriggers", getFieldString(&options, "TerminateRedirectUrl"), strings.Join(core.TerminateTriggers, ","))
+	if strings.Join(runtime.TargetResources, ",") != getFieldString(&options, "TargetRes") {
+		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "TargetResources", getFieldString(&options, "TargetRes"), strings.Join(runtime.TargetResources, ","))
+
+	}
+
+	if strings.Join(runtime.TerminateTriggers, ",") != getFieldString(&options, "TerminateTriggers") {
+		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "TerminateTriggers", getFieldString(&options, "TerminateRedirectUrl"), strings.Join(runtime.TerminateTriggers, ","))
 
 	}
 
