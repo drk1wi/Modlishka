@@ -133,26 +133,21 @@ Compile the binary and you are ready to go:
 
 
 
-
-Usage
+URL
 -----
 
  * Check out the [wiki](https://github.com/drk1wi/Modlishka/wiki) page for a more detailed overview of the tool usage.
- * [FAQ](https://github.com/drk1wi/Modlishka/wiki/FAQ) (Frequently Asked Questions)
- * [Blog post](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/)
-
-Contact
--------
-contact@modlishka.io
+ * [Blog post](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/): Introduction post.
+ * [Used Technique](https://blog.duszynski.eu/hijacking-browser-tls-traffic-through-client-domain-hooking/): If you are interested how this tool manages to handle multiple domains over a single TLS certificate.
+ * [FAQ](https://github.com/drk1wi/Modlishka/wiki/FAQ) (Frequently Asked Questions).
 
 License
 -------
-Modlishka was made by Piotr Duszyński ([@drk1wi](https://twitter.com/drk1wi)). You can find the license [here](https://github.com/drk1wi/Modlishka/blob/master/LICENSE). 
+Modlishka was created by Piotr Duszyński ([@drk1wi](https://twitter.com/drk1wi)). You can find the license [here](https://github.com/drk1wi/Modlishka/blob/master/LICENSE). 
 
 Credits
 -------
-Thanks for helping with the code go to Giuseppe Trotta ([@Giutro](https://twitter.com/giutro)) 
-
+Thanks for helping with the final Go code refactoring go to Giuseppe Trotta ([@Giutro](https://twitter.com/giutro)) 
 
 Disclaimer
 ----------
