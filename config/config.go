@@ -57,7 +57,7 @@ var (
 		ListeningAddress: flag.String("listeningAddress", "127.0.0.1", "Listening address - e.g.: 0.0.0.0 "),
 		Target:           flag.String("target", "", "Target  domain name  - e.g.: target.tld"),
 		TargetRes: flag.String("targetRes", "",
-			"Comma separated list of domains that were not translated automatically. Use this to force domain translation - example: static.target.tld"),
+			"Comma separated list of domains that were not translated automatically. Use this to force domain translation - e.g.: static.target.tld"),
 		TerminateTriggers: flag.String("terminateTriggers", "",
 			"Session termination: Comma separated list of URLs from target's origin which will trigger session termination"),
 		TerminateRedirectUrl: flag.String("terminateUrl", "",

@@ -1,15 +1,22 @@
 # ..Modlishka..
 
-Modlishka is a flexible and powerful reverse proxy, that will take your ethical phishing campaigns to the next level. 
+Modlishka is a powerful and flexible HTTP reverse proxy. It implements a new approach of handling HTTP traffic flow, which allows transparent and automated proxying of multi-destination HTTP/S traffic over a single TLS certificate without additional configuration overhead. 
 
-It was realeased with an aim to:
-- help penetration testers to carry out an effective phishing campaign and reinforce the fact that **serious** threat can arise from phishing.
-- higlight current 2FA weaknesses, so adequate security solutions can be created and implemented soon.
-- raise community awareness about modern phishing techniques and strategies.
-- support other open source projects that require a universal reverse proxy.
+Modlishka was primarily written for ethical penetration tests. Nevertheless, it can be helpful in other, non-security related, usage scenarios.
 
-Enjoy :-)
+From a security testing perspective, Modlishka can be used to:
+-	Carry out a modern ethical phishing campaign that requires a universal 2FA “bypass” support.
+-	Diagnose and exploit browser-based applications from a "[Client Domain Hooking](https://blog.duszynski.eu/hijacking-browser-tls-traffic-through-client-domain-hooking/)" attack perspective.  
 
+General aim of this release was to:
+- Highlight currently used two factor authentication ([2FA](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/)) scheme weaknesses, so adequate security solutions can be created and implemented soon. 
+- Create a diagnostic tool for the "Client Domain Hooking' attack.
+- Support projects that could benefit from a universal and automated HTTP reverse proxy.
+- Raise community awareness about modern phishing techniques and strategies.
+- Support penetration testers in their ethical phishing campaigns and help to reinforce the fact that serious threat can arise from modern phishing attacks.
+
+
+Enjoy  :-)
 
 Features
 --------
@@ -17,30 +24,29 @@ Features
 Some of the most important 'Modlishka' features :
 
 -   Support for majority of 2FA authentication schemes (by design).
--   No website templates (just point Modlishka to the target domain - in most cases, it will be handled automatically).
--   Full control of "cross" origin TLS traffic flow from your victims browsers (through custom new techniques).
+-   Practical implementation of the "Client Domain Hooking" attack.
+-   No website templates (just point Modlishka to the target domain - in most cases, it will be handled automatically without any additional manual configuration).
+-   Full control of "cross" origin TLS traffic flow from your users browsers (through custom new techniques).
 -   Flexible and easily configurable phishing scenarios through configuration options.
 -   Pattern based JavaScript payload injection.
+-   Wrapping in-secure websites with TLS and additional security headers.
 -   Striping website from all encryption and security headers (back to 90's MITM style). 
 -   User credential harvesting (with context based on URL parameter passed identifiers).
--   Can be extended with your ideas through plugins.
+-   Can be extended easily with your ideas through modular plugins.
 -   Stateless design. Can be scaled up easily for an arbitrary number of users - ex. through a DNS load balancer.
 -   Web panel with a summary of collected credentials and user session impersonation (beta POC).
--   Backdoor free ;-) ...
--   Written in Go.
+-   Written in Go. 
 
 
-Action
+Proxy In Action (2FA bypass)
 ------
 _"A picture is worth a thousand words":_
 
- Modlishka in action against an example standard 2FA (SMS) enabled authentication scheme:
+ Modlishka in action against an example two factor authentication scheme (SMS based)  :
 
 [![Watch the video](https://i.vimeocdn.com/video/749353683.jpg)](https://vimeo.com/308709275)
 
 [https://vimeo.com/308709275](https://vimeo.com/308709275)
-
-Note: google.com was chosen here just as a proof of concept.
 
 
 Installation
@@ -78,28 +84,34 @@ Compile the binary and you are ready to go:
         	JSON configuration file. Convenient instead of using command line switches.
       
       -credParams string
-          	Credential regexp collector with matching groups. Example: base64(username_regex),base64(password_regex)
+          	Credential regexp with matching groups. e.g. : baase64(username_regex),baase64(password_regex)
 
       -debug
         	Print debug information
       
       -disableSecurity
-        	Disable security features like anti-SSRF. Disable at your own risk.
+        	Disable proxy security features like anti-SSRF. 'Here be dragons' - disable at your own risk.
       
+      -dynamicMode
+          	Enable dynamic mode for 'Client Domain Hooking'
+      
+      -forceHTTP
+         	Strip all TLS from the traffic and proxy through HTTP only
+    
+      -forceHTTPS
+         	Strip all clear-text from the traffic and proxy through HTTPS only
+     
       -jsRules string
         	Comma separated list of URL patterns and JS base64 encoded payloads that will be injected. 
       
       -listeningAddress string
-        	Listening address (default "127.0.0.1")
-      
-      -listeningPort string
-        	Listening port (default "443")
+        	Listening address - e.g.: 0.0.0.0  (default "127.0.0.1")
       
       -log string
         	Local file to which fetched requests will be written (appended)
       
-      -phishing string
-        	Phishing domain to create - Ex.: target.co
+      -phishingDomain string
+        	Proxy domain name that will be used - e.g.: proxy.tld
       
       -plugins string
         	Comma seperated list of enabled plugin names (default "all")
@@ -107,23 +119,20 @@ Compile the binary and you are ready to go:
       -postOnly
         	Log only HTTP POST requests
       
+      -rules string
+          	Comma separated list of 'string' patterns and their replacements - e.g.: base64(new):base64(old),base64(newer):base64(older)
+
       -target string
-        	Main target to proxy - Ex.: https://target.com
+        	Target domain name  - e.g.: target.tld
          
-      -targetRules string
-        	Comma separated list of 'string' patterns and their replacements. 
-      
       -targetRes string
-        	Comma separated list of target subdomains that need to pass through the  proxy 
+        	Comma separated list of domains that were not translated automatically. Use this to force domain translation - e.g.: static.target.tld 
       
       -terminateTriggers string
-        	Comma separated list of URLs from target's origin which will trigger session termination
-      
+        	Session termination: Comma separated list of URLs from target's origin which will trigger session termination
+        		
       -terminateUrl string
-        	URL to redirect the client after session termination triggers
-      
-      -tls
-        	Enable TLS (default false)
+        	URL to which a client will be redirected after Session Termination rules trigger
       
       -trackingCookie string
         	Name of the HTTP cookie used to track the victim (default "id")
@@ -133,12 +142,12 @@ Compile the binary and you are ready to go:
 
 
 
-URL
+References
 -----
 
- * Check out the [wiki](https://github.com/drk1wi/Modlishka/wiki) page for a more detailed overview of the tool usage.
- * [Blog post](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/): Introduction post.
- * [Used Technique](https://blog.duszynski.eu/hijacking-browser-tls-traffic-through-client-domain-hooking/): If you are interested how this tool manages to handle multiple domains over a single TLS certificate.
+ * [WIKI](https://github.com/drk1wi/Modlishka/wiki) pages with detailed description of the tool usage.
+ * Modlishak introduction blog [post](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/).
+ * Implemented technique described in detaild "[Client Domain Hooking](https://blog.duszynski.eu/hijacking-browser-tls-traffic-through-client-domain-hooking/)" - in case you are interested how this tool handles multiple domains over a single TLS certificate.
  * [FAQ](https://github.com/drk1wi/Modlishka/wiki/FAQ) (Frequently Asked Questions).
 
 License
@@ -147,9 +156,9 @@ Modlishka was created by Piotr Duszyński ([@drk1wi](https://twitter.com/drk1wi)
 
 Credits
 -------
-Thanks for helping with the final Go code refactoring go to Giuseppe Trotta ([@Giutro](https://twitter.com/giutro)) 
+Thanks for helping with the code refactoring go to Giuseppe Trotta ([@Giutro](https://twitter.com/giutro)). 
 
 Disclaimer
 ----------
-This tool is made only for educational purposes and can be only used in legitimate penetration tests. Author does not take any responsibility for any actions taken by its users.
+This tool is made only for educational purposes and can be used in legitimate penetration tests, that have all required legal approvals . Author does not take any responsibility for any actions taken by its users.
 
