@@ -97,7 +97,7 @@ func TestEncodeDecode(t *testing.T) {
 func TestRegex(t *testing.T) {
 
 	runtime.RC4_KEY = `7afa263b3d6efb65dfde80875cf3883cdc4da6cef9b64034a5ba895317e98e39`
-	runtime.PhishingDomain = "google.dev"
+	runtime.ProxyDomain = "google.dev"
 	runtime.TopLevelDomain = "google.com"
 	runtime.MakeRegexes()
 
@@ -108,7 +108,7 @@ func TestTranslatePhishtoURL(t *testing.T) {
 	runtime.RC4_KEY = `7afa263b3d6efb65dfde80875cf3883cdc4da6cef9b64034a5ba895317e98e39`
 	target := "google.com"
 	phishing := "google.dev"
-	runtime.PhishingDomain = phishing
+	runtime.ProxyDomain = phishing
 	runtime.TopLevelDomain = target
 	runtime.MakeRegexes()
 
@@ -116,7 +116,7 @@ func TestTranslatePhishtoURL(t *testing.T) {
 	runtime.TopLevelDomain = strings.Replace(domain, "https://", "", -1)
 	runtime.TopLevelDomain = strings.Replace(runtime.TopLevelDomain, "http://", "", -1)
 
-	runtime.PhishingDomain = string(phishing)
+	runtime.ProxyDomain = string(phishing)
 
 	// core.Logger = core.InitializeLogger(*debugInfo)
 
@@ -135,13 +135,13 @@ func TestDynamicTranslateURLHost(t *testing.T) {
 	runtime.RC4_KEY = `7afa263b3d6efb65dfde80875cf3883cdc4da6cef9b64034a5ba895317e98e39`
 	target := "github.com"
 	phishing := "phish-github.dev"
-	runtime.PhishingDomain = phishing
+	runtime.ProxyDomain = phishing
 	runtime.TopLevelDomain = target
 	runtime.MakeRegexes()
 	domain, _ := publicsuffix.EffectiveTLDPlusOne(target)
 	runtime.TopLevelDomain = strings.Replace(domain, "https://", "", -1)
 	runtime.TopLevelDomain = strings.Replace(runtime.TopLevelDomain, "http://", "", -1)
-	runtime.PhishingDomain = string(phishing)
+	runtime.ProxyDomain = string(phishing)
 	runtime.DynamicMode = true
 	//
 
@@ -160,7 +160,7 @@ func TestTranslateURLtoPhish(t *testing.T) {
 	runtime.RC4_KEY = `7afa263b3d6efb65dfde80875cf3883cdc4da6cef9b64034a5ba895317e98e39`
 	target := "github.com"
 	phishing := "phish-github.dev"
-	runtime.PhishingDomain = phishing
+	runtime.ProxyDomain = phishing
 	runtime.TopLevelDomain = target
 	runtime.MakeRegexes()
 
@@ -168,7 +168,7 @@ func TestTranslateURLtoPhish(t *testing.T) {
 	runtime.TopLevelDomain = strings.Replace(domain, "https://", "", -1)
 	runtime.TopLevelDomain = strings.Replace(runtime.TopLevelDomain, "http://", "", -1)
 
-	runtime.PhishingDomain = string(phishing)
+	runtime.ProxyDomain = string(phishing)
 
 	// core.Logger = core.InitializeLogger(*debugInfo)
 
@@ -194,7 +194,7 @@ func getFieldBool(v *config.Options, field string) bool {
 func TestCmdLineFlags(t *testing.T) {
 
 	in := map[string]string{
-		"PhishingDomain":       "https://google.dev",
+		"ProxyDomain":       "https://google.dev",
 		"ListeningAddress":     "0.0.0.0",
 		"Target":               "google.com",
 		"TargetRes":            "test.google.com,test1.google.com",
@@ -218,7 +218,7 @@ func TestCmdLineFlags(t *testing.T) {
 	encodedCert := base64.StdEncoding.EncodeToString([]byte(in["TLSCertificate"]))
 	encodedKey := base64.StdEncoding.EncodeToString([]byte(in["TLSKey"]))
 
-	args := "   -phishingDomain " + in["PhishingDomain"] +
+	args := "   -proxyDomain " + in["ProxyDomain"] +
 		" -target " + in["Target"] +
 		" -listeningAddress " + in["ListeningAddress"] +
 		" -targetRes " + in["TargetRes"] +
@@ -276,8 +276,8 @@ func TestCmdLineFlags(t *testing.T) {
 	// Set up runtime core config
 	runtime.SetCoreRuntimeConfig(conf.Options)
 
-	if getFieldString(&options, "PhishingDomain") != runtime.PhishingDomain {
-		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "PhishingDomain", getFieldString(&options, "PhishingDomain"), runtime.PhishingDomain)
+	if getFieldString(&options, "ProxyDomain") != runtime.ProxyDomain {
+		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "ProxyDomain", getFieldString(&options, "ProxyDomain"), runtime.ProxyDomain)
 	}
 
 	if getFieldString(&options, "TrackingCookie") != runtime.TrackingCookie {
@@ -329,7 +329,7 @@ func TestCmdLineFlags(t *testing.T) {
 }
 
 var jsonfile1 = `{
-    "phishingDomain": "https://google.dev",
+    "proxyDomain": "https://google.dev",
     "listeningAddress": "0.0.0.0",
     "target": "google.com",
     "targetResources": "test.google.com,test1.google.com",
@@ -363,7 +363,7 @@ func TestJSONConfig(t *testing.T) {
 	defer os.Remove(configFile.Name())
 
 	in := map[string]string{
-		"PhishingDomain":       "https://google.dev",
+		"ProxyDomain":       "https://google.dev",
 		"ListeningAddress":     "0.0.0.0",
 		"Target":               "google.com",
 		"TargetRes":            "test.google.com,test1.google.com",
@@ -417,8 +417,8 @@ func TestJSONConfig(t *testing.T) {
 	// Set up runtime core config
 	runtime.SetCoreRuntimeConfig(conf.Options)
 
-	if getFieldString(&options, "PhishingDomain") != runtime.PhishingDomain {
-		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "PhishingDomain", getFieldString(&options, "PhishingDomain"), runtime.PhishingDomain)
+	if getFieldString(&options, "ProxyDomain") != runtime.ProxyDomain {
+		t.Errorf("TestCmdLineFlags SetCoreRuntimeConfig (%s): expected %s, actual %s", "ProxyDomain", getFieldString(&options, "ProxyDomain"), runtime.ProxyDomain)
 	}
 
 	if getFieldString(&options, "TrackingCookie") != runtime.TrackingCookie {

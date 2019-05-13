@@ -166,7 +166,7 @@ func EncodeSubdomain(domain string,TLSValue bool) (encoded string, err error) {
 		return "", err
 	}
 
-	if DynamicMode == true  && ( ForceHTTPS == true || ForceHTTP == true ){
+	if  ForceHTTPS == true || ForceHTTP == true {
 		//check and replace TLS context for TLS and clear-text wrapper mode based on a MAGIC char
 		if TLSValue == true {
 			domain = TLS_DOMAIN_MAGIC_CHAR+domain
@@ -205,16 +205,23 @@ func DecodeSubdomain(encodedDomain string) (domain string, FoundTlsMark bool, is
 		return "",false,false, err
 	}
 
- 	if DynamicMode == true {
+
+	if ForceHTTP == true || ForceHTTPS == true {
  	//check and replace TLS context for TLS and clear-text wrapper mode based on a MAGIC char
  		if TLS_DOMAIN_MAGIC_CHAR == string(src[0]) {
 			new_tls = true
 			tls_value = true
 			src = src[1:]
+			log.Debugf("DecodeSubdomain: TLS_DOMAIN_MAGIC_CHAR found")
+
 		} else if CLEAR_TEXT_DOMAIN_MAGIC_CHAR == string(src[0]) {
 			new_tls = true
 			tls_value = false
 			src = src[1:]
+			log.Debugf("DecodeSubdomain: CLEAR_TEXT_DOMAIN_MAGIC_CHAR found")
+
+		} else {
+		log.Debugf("DecodeSubdomain: NO MAGIC CHAR found")
 		}
 	}
 

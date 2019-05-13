@@ -30,6 +30,9 @@ import (
 	"github.com/drk1wi/Modlishka/log"
 )
 
+// Paste your CA certificate and key in the following format
+// Ref: https://github.com/drk1wi/Modlishka/wiki/Quickstart-tutorial
+
 const CA_CERT = `-----BEGIN CERTIFICATE-----
 MIIDRDCCAiwCCQC/MUuFNX64sjANBgkqhkiG9w0BAQsFADBkMQswCQYDVQQGEwJw
 bDELMAkGA1UECAwCcGwxCzAJBgNVBAcMAnBsMQswCQYDVQQKDAJwbDELMAkGA1UE
@@ -50,6 +53,7 @@ ngLpDX71HyMkgfwK0Nl7XBlT3LrTS8ASugR4Pr4xZVb/ApmIEo5BwEthDiRhwKnS
 oU1HwMCmJWKexXSShADTjcULtlMOL56P36y/fbu5xikEdfURAcIC/+bTqDw+twsN
 sQX5u89N+VCZf3xg5wSxB0shI6WSQX0A
 -----END CERTIFICATE-----`
+
 const CA_CERT_KEY = `-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEAvv+AkWp9ek8jxWqs810X1pYhUZrpUxswfWVFEwmxhMXe5w+0
 Dd5sQPksBUzO9OS58bD1srW+CTa+gL+yUC3xb2lA+5bu4B9kfKO/X5wPx4hEEk1+
@@ -91,7 +95,7 @@ func init() {
 		if *config.C.ForceHTTP == false {
 			if len(*config.C.TLSCertificate) == 0 && len(*config.C.TLSKey) == 0 {
 
-				log.Infof("Autocert plugin: Auto-generating TLS certificate")
+				log.Infof("Autocert plugin: Auto-generating %s domain TLS certificate",*config.C.ProxyDomain)
 
 				CAcert := CA_CERT
 				CAkey := CA_CERT_KEY
@@ -113,11 +117,11 @@ func init() {
 					BasicConstraintsValid: true,
 					SubjectKeyId:          []byte{1, 2, 3},
 					SerialNumber:          big.NewInt(int64(n)),
-					DNSNames:              []string{*config.C.PhishingDomain, "*." + *config.C.PhishingDomain},
+					DNSNames:              []string{*config.C.ProxyDomain, "*." + *config.C.ProxyDomain},
 					Subject: pkix.Name{
 						Country:      []string{"Earth"},
 						Organization: []string{"Mother Nature"},
-						CommonName:   *config.C.PhishingDomain,
+						CommonName:   *config.C.ProxyDomain,
 					},
 					NotBefore: time.Now(),
 					NotAfter:  time.Now().AddDate(5, 5, 5),

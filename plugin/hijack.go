@@ -40,22 +40,26 @@ func init() {
 	//process HTTP request
 	s.HTTPRequest = func(req *http.Request, context HTTPContext) {
 
-		if strings.Contains(context.OriginalTarget,runtime.PhishingDomain) == false && context.IsTLS == false {
+		if runtime.DynamicMode == false {
+			return
+		}
+
+		if strings.Contains(context.OriginalTarget,runtime.ProxyDomain) == false && context.IsTLS == false {
 
 			log.Infof("Clear-text URL %s%s [%s]",context.Target,req.URL.Path,req.Header.Get("User-Agent"))
 		}
 
-		if strings.Contains(context.OriginalTarget,runtime.PhishingDomain) == false && context.IsTLS == true {
+		if strings.Contains(context.OriginalTarget,runtime.ProxyDomain) == false && context.IsTLS == true {
 
 			log.Warningf("TLS URL %s%s [%s]",context.Target,req.URL.Path,req.Header.Get("User-Agent"))
 		}
 
-		if strings.Contains(context.OriginalTarget,runtime.PhishingDomain) &&  context.IsTLS == true  {
+		if strings.Contains(context.OriginalTarget,runtime.ProxyDomain) &&  context.IsTLS == true  {
 
 			log.Warningf("Hijacked TLS URL %s%s [%s]",context.Target,req.URL.Path,req.Header.Get("User-Agent"))
 		}
 
-		if strings.Contains(context.OriginalTarget,runtime.PhishingDomain) &&  context.IsTLS == false  {
+		if strings.Contains(context.OriginalTarget,runtime.ProxyDomain) &&  context.IsTLS == false  {
 
 			log.Warningf("Hijacked clear-text URL %s%s [%s]",context.Target,req.URL.Path,req.Header.Get("User-Agent"))
 		}

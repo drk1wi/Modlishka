@@ -23,11 +23,11 @@ var (
 
 //runtime config
 var (
-	PhishingDomain string
+	ProxyDomain    string
 	TrackingCookie string
 	TrackingParam  string
 	TopLevelDomain string
-	Target string
+	Target         string
 
 	ReplaceStrings    map[string]string
 	JSInjectStrings   map[string]string
@@ -45,7 +45,7 @@ var (
 func SetCoreRuntimeConfig(conf config.Options) {
 
 	Target = *conf.Target
-	PhishingDomain = *conf.PhishingDomain
+	ProxyDomain = *conf.ProxyDomain
 
 	if len(*conf.TrackingCookie) > 0 {
 		TrackingCookie = *conf.TrackingCookie

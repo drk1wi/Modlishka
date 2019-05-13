@@ -24,7 +24,7 @@ import (
 )
 
 type Options struct {
-	PhishingDomain       *string `json:"phishingDomain"`
+	ProxyDomain          *string `json:"proxyDomain"`
 	ListeningAddress     *string `json:"listeningAddress"`
 	Target               *string `json:"target"`
 	TargetRes            *string `json:"targetResources"`
@@ -39,7 +39,7 @@ type Options struct {
 	ForceHTTP            *bool   `json:"forceHTTP"`
 	LogPostOnly          *bool   `json:"logPostOnly"`
 	DisableSecurity      *bool   `json:"disableSecurity"`
-	DynamicMode			 *bool   `json:"dynamicMode"`
+	DynamicMode          *bool   `json:"dynamicMode"`
 	LogFile              *string `json:"log"`
 	Plugins              *string `json:"plugins"`
 	*TLSConfig
@@ -53,7 +53,7 @@ type TLSConfig struct {
 
 var (
 	C = Options{
-		PhishingDomain:   flag.String("phishingDomain", "", "Proxy domain name that will be used - e.g.: proxy.tld"),
+		ProxyDomain:      flag.String("proxyDomain", "", "Proxy domain name that will be used - e.g.: proxy.tld"),
 		ListeningAddress: flag.String("listeningAddress", "127.0.0.1", "Listening address - e.g.: 0.0.0.0 "),
 		Target:           flag.String("target", "", "Target  domain name  - e.g.: target.tld"),
 		TargetRes: flag.String("targetRes", "",
@@ -163,7 +163,7 @@ func (c *Options) parseJSON(file string) {
 func (c *Options) VerifyConfiguration() {
 
 	if *c.ForceHTTP == true {
-		if len(*c.PhishingDomain) == 0 || len(*c.PhishingDomain) == 0 {
+		if len(*c.ProxyDomain) == 0 || len(*c.ProxyDomain) == 0 {
 			log.Warningf("Missing required parameters in oder start the proxy. Terminating.")
 			log.Warningf("TIP: You will need to specify at least the following parameters to serve the page over HTTP: phishing and target.")
 			flag.PrintDefaults()
@@ -171,7 +171,7 @@ func (c *Options) VerifyConfiguration() {
 		}
 	} else { 	// default + HTTPS wrapper
 
-			if len(*c.PhishingDomain) == 0 || len(*c.PhishingDomain) == 0 {
+			if len(*c.ProxyDomain) == 0 || len(*c.ProxyDomain) == 0 {
 				log.Warningf("Missing required parameters in oder start the proxy. Terminating.")
 				log.Warningf("TIP: You will need to specify at least the following parameters to serve the page over HTTP: phishing and target.")
 				flag.PrintDefaults()
@@ -185,7 +185,6 @@ func (c *Options) VerifyConfiguration() {
 	if *c.DynamicMode == true {
 		log.Warningf("Dynamic Mode enabled: Proxy will accept and hook all incoming HTTP requests.")
 	}
-
 
 
 	if *c.ForceHTTP == true {

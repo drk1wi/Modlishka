@@ -1,5 +1,5 @@
 {
-  "phishingDomain": "loopback.modlishka.io",
+  "proxyDomain": "loopback.modlishka.io",
   "listeningAddress": "0.0.0.0",
   "target": "microsoftonline.com",
   "targetResources": "",
@@ -11,7 +11,7 @@
   "jsRules":"",
   "forceHTTPS": false,
   "forceHTTP": false,
-  "DynamicMode": false,
+  "dynamicMode": false,
   "debug": false,
   "logPostOnly": false,
   "disableSecurity": false,

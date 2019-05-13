@@ -28,7 +28,7 @@ func MakeRegexes() {
 		log.Fatalf(err.Error() + "Terminating.")
 	}
 
-	regexpStr = `(?:([a-z0-9-]+|\*)\.)?` + PhishingDomain + `\b`
+	regexpStr = `(?:([a-z0-9-]+|\*)\.)?` + ProxyDomain + `\b`
 	RegexpPhishSubdomainUrlWithoutScheme, err = regexp.Compile(regexpStr)
 	if err != nil {
 		log.Fatalf(err.Error() + "Terminating.")
@@ -62,11 +62,11 @@ func TranslateRequestHost(host string) (string, bool, bool) {
 	newTls := false
 	tlsVal := false
 	// first HTTP request client domain hook
-	if DynamicMode == true && strings.Contains(host,PhishingDomain) == false{
+	if DynamicMode == true && strings.Contains(host, ProxyDomain) == false{
 		return host,newTls, tlsVal
 	}
 
-	sub := strings.Replace(host, PhishingDomain, "", -1)
+	sub := strings.Replace(host, ProxyDomain, "", -1)
 	if sub != "" {
 		log.Debugf("Subdomain: %s ", sub[:len(sub)-1])
 
@@ -123,14 +123,14 @@ func RealURLtoPhish(realURL string) string {
 
 	if ForceHTTPS == true || ForceHTTP == true {
 		encoded, _ :=  EncodeSubdomain(host,tls)
-		out = strings.Replace(out, host, encoded+"."+ PhishingDomain, 1)
+		out = strings.Replace(out, host, encoded+"."+ProxyDomain, 1)
 	} else {
 
 	if strings.Contains(realURL,  TopLevelDomain) { //subdomain in main domain
-		out = strings.Replace(out, string( TopLevelDomain),  PhishingDomain, 1)
+		out = strings.Replace(out, string( TopLevelDomain), ProxyDomain, 1)
 	} else if realURL != "" {
 		encoded, _ :=  EncodeSubdomain(host,tls)
-		out = strings.Replace(out, host, encoded+"."+ PhishingDomain, 1)
+		out = strings.Replace(out, host, encoded+"."+ProxyDomain, 1)
 	}}
 
 	return out
@@ -153,19 +153,19 @@ func PhishURLToRealURL(phishURL string) string {
 		host = phishURL
 	}
 
-	if strings.Contains(phishURL,  PhishingDomain) {
-		subdomain := strings.Replace(host, "."+ PhishingDomain, "", 1)
+	if strings.Contains(phishURL, ProxyDomain) {
+		subdomain := strings.Replace(host, "."+ProxyDomain, "", 1)
 		// has subdomain
 		if len(subdomain) > 0 {
 			decodedDomain, _, _, err :=  DecodeSubdomain(subdomain)
 			if err != nil {
-				return strings.Replace(out,  PhishingDomain, TopLevelDomain, 1)
+				return strings.Replace(out, ProxyDomain, TopLevelDomain, 1)
 			}
 
 			return string(decodedDomain)
 		}
 
-		return strings.Replace(out,  PhishingDomain,  TopLevelDomain, -1)
+		return strings.Replace(out, ProxyDomain,  TopLevelDomain, -1)
 	}
 
 	return out
