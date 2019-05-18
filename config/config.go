@@ -165,7 +165,7 @@ func (c *Options) VerifyConfiguration() {
 	if *c.ForceHTTP == true {
 		if len(*c.ProxyDomain) == 0 || len(*c.ProxyDomain) == 0 {
 			log.Warningf("Missing required parameters in oder start the proxy. Terminating.")
-			log.Warningf("TIP: You will need to specify at least the following parameters to serve the page over HTTP: phishing and target.")
+			log.Warningf("TIP: You will need to specify at least the following parameters to serve the page over HTTP: proxyDomain and target.")
 			flag.PrintDefaults()
 			os.Exit(1)
 		}
@@ -173,7 +173,7 @@ func (c *Options) VerifyConfiguration() {
 
 			if len(*c.ProxyDomain) == 0 || len(*c.ProxyDomain) == 0 {
 				log.Warningf("Missing required parameters in oder start the proxy. Terminating.")
-				log.Warningf("TIP: You will need to specify at least the following parameters to serve the page over HTTP: phishing and target.")
+				log.Warningf("TIP: You will need to specify at least the following parameters to serve the page over HTTP: proxyDomain and target.")
 				flag.PrintDefaults()
 				os.Exit(1)
 			}

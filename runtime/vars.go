@@ -26,6 +26,7 @@ var (
 	ProxyDomain    string
 	TrackingCookie string
 	TrackingParam  string
+
 	TopLevelDomain string
 	Target         string
 

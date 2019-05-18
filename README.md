@@ -1,44 +1,51 @@
 # ..Modlishka..
 
-Modlishka is a powerful and flexible HTTP reverse proxy. It implements a new approach of handling HTTP traffic flow, which allows transparent and automated proxying of multi-destination HTTP/S traffic over a single TLS certificate without additional configuration overhead. 
+Modlishka is a powerful and flexible HTTP reverse proxy. It implements an entirely new approach of handling HTTP traffic flow, which allows to transparently proxy multi-domain destination TLS traffic over a single domain TLS certificate in an automated manner. What does this exactly mean? In short, it simply has a lot of potential, that can be used in many interesting ways... 
 
-Modlishka was primarily written for ethical penetration tests. Nevertheless, it can be helpful in other, non-security related, usage scenarios.
+From the security perspective, Modlishka can be currently used to:
+-	Help penetration testers to carry out a modern ethical phishing campaign that requires a universal 2FA “bypass” support.
+-	Diagnose and exploit browser-based applications from the "[Client Domain Hooking](https://blog.duszynski.eu/hijacking-browser-tls-traffic-through-client-domain-hooking/)" attack perspective.  
+-   TBC
 
-From a security testing perspective, Modlishka can be used to:
--	Carry out a modern ethical phishing campaign that requires a universal 2FA “bypass” support.
--	Diagnose and exploit browser-based applications from a "[Client Domain Hooking](https://blog.duszynski.eu/hijacking-browser-tls-traffic-through-client-domain-hooking/)" attack perspective.  
-
-General aim of this release was to:
-- Highlight currently used two factor authentication ([2FA](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/)) scheme weaknesses, so adequate security solutions can be created and implemented soon. 
-- Create a diagnostic tool for the "Client Domain Hooking' attack.
-- Support projects that could benefit from a universal and automated HTTP reverse proxy.
-- Raise community awareness about modern phishing techniques and strategies.
-- Support penetration testers in their ethical phishing campaigns and help to reinforce the fact that serious threat can arise from modern phishing attacks.
+Modlishka was written as an attempt overcome standard reverse proxy limitations and as a personal challenge to see what is possible with sufficient motivation and devoted time. 
+The achieved results appeared to be very interesting and the tool was initially released and later updated with aim to:
+- Highlight currently used two factor authentication ([2FA](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/)) scheme weaknesses, so adequate security solutions can be created and implemented by the industry and raise user awareness.
+- Provide a diagnostic tool for the "Client Domain Hooking' attack.
+- Support open source projects that could benefit from a universal and transparent TLS HTTP reverse proxy.
+- Raise community awareness about modern phishing techniques and strategies and support penetration testers in their ethical phishing campaigns.
 
 
-Enjoy  :-)
+Modlishka was primarily written for security related tasks. Nevertheless, it can be helpful in other, non-security related, usage scenarios.
+
+Happy proxying !
 
 Features
 --------
 
 Some of the most important 'Modlishka' features :
 
--   Support for majority of 2FA authentication schemes (by design).
--   Practical implementation of the "Client Domain Hooking" attack.
--   No website templates (just point Modlishka to the target domain - in most cases, it will be handled automatically without any additional manual configuration).
--   Full control of "cross" origin TLS traffic flow from your users browsers (through custom new techniques).
--   Flexible and easily configurable phishing scenarios through configuration options.
+**General:**
+-   Point-and-click HTTP and HTTPS proxying of an arbitrary domain.
+-   Full control of "cross" origin TLS traffic flow from your users browses (through a set of new interesting techniques).
+-   Easy and fast configuration through command line options and JSON configuration files.
+-   Practical implementation of the "Client Domain Hooking" attack. Supported with a diagnostic plugin.
 -   Pattern based JavaScript payload injection.
--   Wrapping in-secure websites with TLS and additional security headers.
--   Striping website from all encryption and security headers (back to 90's MITM style). 
--   User credential harvesting (with context based on URL parameter passed identifiers).
+-   Wrapping websites with an extra "security": TLS wrapping, authentication, relevant security headers, etc. 
+-   Striping websites from all encryption and security headers (back to 90's MITM style). 
+-   Stateless design. Can be scaled up easily to handle an arbitrary amount of traffic  - e.g. through a DNS load balancer.
 -   Can be extended easily with your ideas through modular plugins.
--   Stateless design. Can be scaled up easily for an arbitrary number of users - ex. through a DNS load balancer.
--   Web panel with a summary of collected credentials and user session impersonation (beta POC).
--   Written in Go. 
+-   Automatic TLS certificate generation plugin for the proxy domain (requires a self-signed CA certificate)
+-   Written in Go, so it works basically on all platforms: Windows, Linux, BSD, ARM supported...
+
+**Security related:**
+- "Client Domain Hooking" attack in form of a diagnostic mode.
+-  Support for majority of 2FA authentication schemes (out of the box).
+-  User credential harvesting (with context based on URL parameter passed identifiers).
+-  Web panel plugin with a summary of automatically collected credentials and one-click user session impersonation module (beta POC).
+-  No website templates (just point Modlishka to the target domain - in most cases, it will be handled automatically without any additional manual configuration).
 
 
-Proxy In Action (2FA bypass)
+Proxying In Action (2FA bypass)
 ------
 _"A picture is worth a thousand words":_
 
@@ -64,7 +71,7 @@ Compile the binary and you are ready to go:
     $ make
     
     
-![alt text](https://raw.githubusercontent.com/drk1wi/assets/master/7d0426a133a85a46a76a424574bf5a2acf99815e.png)
+![alt text](https://github.com/drk1wi/assets/raw/master/0876a672f771046e833f2242f6be5d3cf01519efdbb9dad0e1ed2d33e33fecbc.png)
 
     # ./dist/proxy -h
   
@@ -145,20 +152,24 @@ Compile the binary and you are ready to go:
 References
 -----
 
- * [WIKI](https://github.com/drk1wi/Modlishka/wiki) pages with detailed description of the tool usage.
- * Modlishak introduction blog [post](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/).
- * Implemented technique described in detaild "[Client Domain Hooking](https://blog.duszynski.eu/hijacking-browser-tls-traffic-through-client-domain-hooking/)" - in case you are interested how this tool handles multiple domains over a single TLS certificate.
- * [FAQ](https://github.com/drk1wi/Modlishka/wiki/FAQ) (Frequently Asked Questions).
+ * [WIKI](https://github.com/drk1wi/Modlishka/wiki) pages:  with more details about the tool usage and configuration.
+ * [FAQ](https://github.com/drk1wi/Modlishka/wiki/FAQ)
+
+ Blog posts:
+ *  [Modlishka introduction](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/) blog post.
+ * "[Client Domain Hooking](https://blog.duszynski.eu/hijacking-browser-tls-traffic-through-client-domain-hooking/)" technical paper - in case you are interested about the implemented technique that is used to handle the traffic.
 
 License
 -------
-Modlishka was created by Piotr Duszyński ([@drk1wi](https://twitter.com/drk1wi)). You can find the license [here](https://github.com/drk1wi/Modlishka/blob/master/LICENSE). 
+Author: Modlishka was designed and implemented by Piotr Duszyński ([@drk1wi](https://twitter.com/drk1wi)) (this includes the technique described in the "Client Domain Hooking" paper) . You can find the relevant license [here](https://github.com/drk1wi/Modlishka/blob/master/LICENSE). All rights reserved.
 
-Credits
+The initial version of the tool was written as part of a bigger project that was dissolved and assets were distributed accordingly. 
+
+Credits 
 -------
-Thanks for helping with the code refactoring go to Giuseppe Trotta ([@Giutro](https://twitter.com/giutro)). 
+Kudos for helping with the final code optimization and great support go to Giuseppe Trotta ([@Giutro](https://twitter.com/giutro)). 
 
 Disclaimer
 ----------
-This tool is made only for educational purposes and can be used in legitimate penetration tests, that have all required legal approvals . Author does not take any responsibility for any actions taken by its users.
+This tool is made only for educational purposes and can be used in legitimate penetration tests or research only. Author does not take any responsibility for any actions taken by its users.
 

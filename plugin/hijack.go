@@ -46,7 +46,7 @@ func init() {
 
 		if strings.Contains(context.OriginalTarget,runtime.ProxyDomain) == false && context.IsTLS == false {
 
-			log.Infof("Clear-text URL %s%s [%s]",context.Target,req.URL.Path,req.Header.Get("User-Agent"))
+			log.Infof("Hijacking clear-text URL %s%s [%s] . ",context.Target,req.URL.Path,req.Header.Get("User-Agent"))
 		}
 
 		if strings.Contains(context.OriginalTarget,runtime.ProxyDomain) == false && context.IsTLS == true {

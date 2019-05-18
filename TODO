@@ -1,0 +1,11 @@
+# This is a TODO file with the most important long and short term tasks for this project.
+# Help always appreciated :-)
+
+- Create a logo image
+- Move all of the phishing related functionalities to a seperate plugin
+- Extend "Domain Client Hooking" plugin with more diagnosing features
+- Improve control plugin: session impersonation
+- Write support for NTLM authentication
+
+
+
