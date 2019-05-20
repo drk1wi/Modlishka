@@ -4,10 +4,10 @@ Modlishka is a powerful and flexible HTTP reverse proxy. It implements an entire
 
 From the security perspective, Modlishka can be currently used to:
 -	Help penetration testers to carry out a modern ethical phishing campaign that requires a universal 2FA “bypass” support.
--	Diagnose and exploit browser-based applications from the "[Client Domain Hooking](https://blog.duszynski.eu/hijacking-browser-tls-traffic-through-client-domain-hooking/)" attack perspective.  
+-   Hijack application HTTP TLS traffic flow and perform a HTTP 301 Cache poisoning attack.
 -   TBC
 
-Modlishka was written as an attempt overcome standard reverse proxy limitations and as a personal challenge to see what is possible with sufficient motivation and devoted time. 
+Modlishka was written as an attempt overcome standard reverse proxy limitations and as a personal challenge to see what is possible with sufficient motivation and a bit of extra research time. 
 The achieved results appeared to be very interesting and the tool was initially released and later updated with aim to:
 - Highlight currently used two factor authentication ([2FA](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/)) scheme weaknesses, so adequate security solutions can be created and implemented by the industry and raise user awareness.
 - Provide a diagnostic tool for the "Client Domain Hooking' attack.
@@ -25,7 +25,7 @@ Features
 Some of the most important 'Modlishka' features :
 
 **General:**
--   Point-and-click HTTP and HTTPS proxying of an arbitrary domain.
+-   Point-and-click HTTP and HTTPS reverse proxying of an arbitrary domain.
 -   Full control of "cross" origin TLS traffic flow from your users browses (through a set of new interesting techniques).
 -   Easy and fast configuration through command line options and JSON configuration files.
 -   Practical implementation of the "Client Domain Hooking" attack. Supported with a diagnostic plugin.
@@ -38,7 +38,7 @@ Some of the most important 'Modlishka' features :
 -   Written in Go, so it works basically on all platforms: Windows, Linux, BSD, ARM supported...
 
 **Security related:**
-- "Client Domain Hooking" attack in form of a diagnostic mode.
+- "[Client Domain Hooking](https://blog.duszynski.eu/hijacking-browser-tls-traffic-through-client-domain-hooking/)" attack in form of a diagnostic module.
 -  Support for majority of 2FA authentication schemes (out of the box).
 -  User credential harvesting (with context based on URL parameter passed identifiers).
 -  Web panel plugin with a summary of automatically collected credentials and one-click user session impersonation module (beta POC).
@@ -156,7 +156,7 @@ References
  * [FAQ](https://github.com/drk1wi/Modlishka/wiki/FAQ)
 
  Blog posts:
- *  [Modlishka introduction](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/) blog post.
+ *  ["Modlishka introduction"](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/) blog post.
  * "[Client Domain Hooking](https://blog.duszynski.eu/hijacking-browser-tls-traffic-through-client-domain-hooking/)" technical paper - in case you are interested about the implemented technique that is used to handle the traffic.
 
 License
