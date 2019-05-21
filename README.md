@@ -3,8 +3,9 @@
 Modlishka is a powerful and flexible HTTP reverse proxy. It implements an entirely new approach of handling HTTP traffic flow, which allows to transparently proxy multi-domain destination TLS traffic over a single domain TLS certificate in an automated manner. What does this exactly mean? In short, it simply has a lot of potential, that can be used in many interesting ways... 
 
 From the security perspective, Modlishka can be currently used to:
+-   Hijack application HTTP TLS traffic flow through the "Client Domain Hooking" attack.
 -	Help penetration testers to carry out a modern ethical phishing campaign that requires a universal 2FA “bypass” support.
--   Hijack application HTTP TLS traffic flow and perform a HTTP 301 Cache poisoning attack.
+-   Wrap legacy websites with TLS layer, confuse crawler bots and automated scanners, etc.
 -   TBC
 
 Modlishka was written as an attempt overcome standard reverse proxy limitations and as a personal challenge to see what is possible with sufficient motivation and a bit of extra research time. 
@@ -35,10 +36,10 @@ Some of the most important 'Modlishka' features :
 -   Stateless design. Can be scaled up easily to handle an arbitrary amount of traffic  - e.g. through a DNS load balancer.
 -   Can be extended easily with your ideas through modular plugins.
 -   Automatic TLS certificate generation plugin for the proxy domain (requires a self-signed CA certificate)
--   Written in Go, so it works basically on all platforms: Windows, Linux, BSD, ARM supported...
+-   Written in Go, so it works basically on all platforms and architectures: Windows, OSX, Linux, BSD supported...
 
 **Security related:**
-- "[Client Domain Hooking](https://blog.duszynski.eu/hijacking-browser-tls-traffic-through-client-domain-hooking/)" attack in form of a diagnostic module.
+- "[Client Domain Hooking](https://blog.duszynski.eu/client-domain-hooking-in-practice/)" attack in form of a diagnostic module.
 -  Support for majority of 2FA authentication schemes (out of the box).
 -  User credential harvesting (with context based on URL parameter passed identifiers).
 -  Web panel plugin with a summary of automatically collected credentials and one-click user session impersonation module (beta POC).
