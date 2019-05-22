@@ -17,8 +17,8 @@
   "logPostOnly": false,
   "disableSecurity": false,
   "log": "google.log",
-  "plugins": "autocert",
-  "credParams": "dHJ1ZVxdLCIoW15cV10rKSJd,XGJudWxsLFxbIihbYS16QS1aMC05IiEiIyQlJicoKSorLC0uLzo7PD0+P0BeX2B7fH1+XSspIixudWxsXGI=",
+  "plugins": "all",
+  "credParams": "dHJ1ZVxdLCIoKD86XHcrW1wuXC1cX10pezAsfVx3KykiXQ==,XGJudWxsLFxbIihbYS16QS1aMC05IiEiIyQlJicoKSorLC0uLzo7PD0+P0BeX2B7fH1+XSspIixudWxsXGI=",
   "cert": "",
   "certKey": "",
   "certPool": ""
