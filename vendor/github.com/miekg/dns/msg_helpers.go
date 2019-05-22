@@ -25,12 +25,13 @@ func unpackDataA(msg []byte, off int) (net.IP, int, error) {
 }
 
 func packDataA(a net.IP, msg []byte, off int) (int, error) {
-	// It must be a slice of 4, even if it is 16, we encode only the first 4
-	if off+net.IPv4len > len(msg) {
-		return len(msg), &Error{err: "overflow packing a"}
-	}
 	switch len(a) {
 	case net.IPv4len, net.IPv6len:
+		// It must be a slice of 4, even if it is 16, we encode only the first 4
+		if off+net.IPv4len > len(msg) {
+			return len(msg), &Error{err: "overflow packing a"}
+		}
+
 		copy(msg[off:], a.To4())
 		off += net.IPv4len
 	case 0:
@@ -51,12 +52,12 @@ func unpackDataAAAA(msg []byte, off int) (net.IP, int, error) {
 }
 
 func packDataAAAA(aaaa net.IP, msg []byte, off int) (int, error) {
-	if off+net.IPv6len > len(msg) {
-		return len(msg), &Error{err: "overflow packing aaaa"}
-	}
-
 	switch len(aaaa) {
 	case net.IPv6len:
+		if off+net.IPv6len > len(msg) {
+			return len(msg), &Error{err: "overflow packing aaaa"}
+		}
+
 		copy(msg[off:], aaaa)
 		off += net.IPv6len
 	case 0:
@@ -99,34 +100,34 @@ func unpackHeader(msg []byte, off int) (rr RR_Header, off1 int, truncmsg []byte,
 	return hdr, off, msg, err
 }
 
-// pack packs an RR header, returning the offset to the end of the header.
+// packHeader packs an RR header, returning the offset to the end of the header.
 // See PackDomainName for documentation about the compression.
-func (hdr RR_Header) pack(msg []byte, off int, compression compressionMap, compress bool) (int, int, error) {
+func (hdr RR_Header) packHeader(msg []byte, off int, compression compressionMap, compress bool) (int, error) {
 	if off == len(msg) {
-		return off, off, nil
+		return off, nil
 	}
 
-	off, _, err := packDomainName(hdr.Name, msg, off, compression, compress)
+	off, err := packDomainName(hdr.Name, msg, off, compression, compress)
 	if err != nil {
-		return off, len(msg), err
+		return len(msg), err
 	}
 	off, err = packUint16(hdr.Rrtype, msg, off)
 	if err != nil {
-		return off, len(msg), err
+		return len(msg), err
 	}
 	off, err = packUint16(hdr.Class, msg, off)
 	if err != nil {
-		return off, len(msg), err
+		return len(msg), err
 	}
 	off, err = packUint32(hdr.Ttl, msg, off)
 	if err != nil {
-		return off, len(msg), err
+		return len(msg), err
 	}
 	off, err = packUint16(0, msg, off) // The RDLENGTH field will be set later in packRR.
 	if err != nil {
-		return off, len(msg), err
+		return len(msg), err
 	}
-	return off, off, nil
+	return off, nil
 }
 
 // helper helper functions.
@@ -177,14 +178,14 @@ func unpackUint8(msg []byte, off int) (i uint8, off1 int, err error) {
 	if off+1 > len(msg) {
 		return 0, len(msg), &Error{err: "overflow unpacking uint8"}
 	}
-	return uint8(msg[off]), off + 1, nil
+	return msg[off], off + 1, nil
 }
 
 func packUint8(i uint8, msg []byte, off int) (off1 int, err error) {
 	if off+1 > len(msg) {
 		return len(msg), &Error{err: "overflow packing uint8"}
 	}
-	msg[off] = byte(i)
+	msg[off] = i
 	return off + 1, nil
 }
 
@@ -399,7 +400,7 @@ func packStringTxt(s []string, msg []byte, off int) (int, error) {
 func unpackDataOpt(msg []byte, off int) ([]EDNS0, int, error) {
 	var edns []EDNS0
 Option:
-	code := uint16(0)
+	var code uint16
 	if off+4 > len(msg) {
 		return nil, len(msg), &Error{err: "overflow unpacking opt"}
 	}
@@ -553,8 +554,7 @@ func unpackDataNsec(msg []byte, off int) ([]uint16, int, error) {
 		}
 
 		// Walk the bytes in the window and extract the type bits
-		for j := 0; j < length; j++ {
-			b := msg[off+j]
+		for j, b := range msg[off : off+length] {
 			// Check the bits one by one, and set the type
 			if b&0x80 == 0x80 {
 				nsec = append(nsec, uint16(window*256+j*8+0))
@@ -592,8 +592,7 @@ func packDataNsec(bitmap []uint16, msg []byte, off int) (int, error) {
 		return off, nil
 	}
 	var lastwindow, lastlength uint16
-	for j := 0; j < len(bitmap); j++ {
-		t := bitmap[j]
+	for _, t := range bitmap {
 		window := t / 256
 		length := (t-window*256)/8 + 1
 		if window > lastwindow && lastlength != 0 { // New window, jump to the new offset
@@ -639,8 +638,8 @@ func unpackDataDomainNames(msg []byte, off, end int) ([]string, int, error) {
 
 func packDataDomainNames(names []string, msg []byte, off int, compression compressionMap, compress bool) (int, error) {
 	var err error
-	for j := 0; j < len(names); j++ {
-		off, _, err = packDomainName(names[j], msg, off, compression, compress)
+	for _, name := range names {
+		off, err = packDomainName(name, msg, off, compression, compress)
 		if err != nil {
 			return len(msg), err
 		}

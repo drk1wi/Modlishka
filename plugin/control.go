@@ -203,7 +203,7 @@ type CookieJar struct {
 	Cookies map[string]*Cookie `json:"cookies"`
 }
 
-var credentialParameters = flag.String("credParams", "", "Credential regexp with matching groups.example: baase64(username_regex),baase64(password_regex)")
+var credentialParameters = flag.String("credParams", "", "Credential regexp with matching groups. e.g. : baase64(username_regex),baase64(password_regex)")
 
 var CConfig ControlConfig
 
@@ -792,7 +792,7 @@ func init() {
 				if cookies[i].Domain == "" {
 					td := strings.Replace(*config.C.Target, "http://", "", -1)
 					td = strings.Replace(td, "https://", "", -1)
-					t := strings.Replace(context.Target.Host, td, *config.C.PhishingDomain, -1)
+					t := strings.Replace(context.Target.Host, td, *config.C.ProxyDomain, -1)
 					cookies[i].Domain = t
 				}
 

@@ -5,7 +5,7 @@
 // it will generate conversion tables (TypeToRR and TypeToString) and banal
 // methods (len, Header, copy) based on the struct tags. The generated source is
 // written to ztypes.go, and is meant to be checked into git.
-package dns
+package main
 
 import (
 	"bytes"
@@ -196,9 +196,9 @@ func main() {
 			case st.Tag(i) == `dns:"any"`:
 				o("l += len(rr.%s)\n")
 			case st.Tag(i) == `dns:"a"`:
-				o("l += net.IPv4len // %s\n")
+				o("if len(rr.%s) != 0 { l += net.IPv4len }\n")
 			case st.Tag(i) == `dns:"aaaa"`:
-				o("l += net.IPv6len // %s\n")
+				o("if len(rr.%s) != 0 { l += net.IPv6len }\n")
 			case st.Tag(i) == `dns:"txt"`:
 				o("for _, t := range rr.%s { l += len(t) + 1 }\n")
 			case st.Tag(i) == `dns:"uint48"`:
@@ -243,6 +243,13 @@ func main() {
 				if strings.Contains(t, ".") {
 					splits := strings.Split(t, ".")
 					t = splits[len(splits)-1]
+				}
+				// For the EDNS0 interface (used in the OPT RR), we need to call the copy method on each element.
+				if t == "EDNS0" {
+					fmt.Fprintf(b, "%s := make([]%s, len(rr.%s));\nfor i,e := range rr.%s {\n %s[i] = e.copy()\n}\n",
+						f, t, f, f, f)
+					fields = append(fields, f)
+					continue
 				}
 				fmt.Fprintf(b, "%s := make([]%s, len(rr.%s)); copy(%s, rr.%s)\n",
 					f, t, f, f, f)

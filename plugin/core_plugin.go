@@ -46,8 +46,9 @@ type HTTPContext struct {
 	OriginalTarget string   // Original Host
 	Origin         string   // Origin before going through the proxy
 	PhishUser      string   // traced victim's identifier
+	JSPayload      string   // JS Payload
 	IP             string   // victim's IP address
-
+	IsTLS		   bool 	//TLS request
 }
 
 // Add the given Plugin to the list of loaded plugins
