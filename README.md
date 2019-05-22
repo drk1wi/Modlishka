@@ -3,10 +3,10 @@
 Modlishka is a powerful and flexible HTTP reverse proxy. It implements an entirely new approach of handling HTTP traffic flow, which allows to transparently proxy multi-domain destination TLS traffic over a single domain TLS certificate in an automated manner. What does this exactly mean? In short, it simply has a lot of potential, that can be used in many interesting ways... 
 
 From the security perspective, Modlishka can be currently used to:
--	  Help penetration testers to carry out a modern ethical phishing campaign that requires a universal 2FA “bypass” support.
--   Hijack application HTTP TLS traffic flow through the "Client Domain Hooking" attack.
--   Wrap legacy websites with TLS layer, confuse crawler bots and automated scanners, etc.
--   TBC
+-	 Help penetration testers to carry out a modern ethical phishing campaign that requires a universal 2FA “bypass” support.
+-  Hijack application HTTP TLS traffic flow through the "Client Domain Hooking" attack.
+-  Wrap legacy websites with TLS layer, confuse crawler bots and automated scanners, etc.
+-  TBC
 
 Modlishka was written as an attempt overcome standard reverse proxy limitations and as a personal challenge to see what is possible with sufficient motivation and a bit of extra research time. 
 The achieved results appeared to be very interesting and the tool was initially released and later updated with aim to:
