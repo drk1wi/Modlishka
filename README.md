@@ -3,8 +3,8 @@
 Modlishka is a powerful and flexible HTTP reverse proxy. It implements an entirely new approach of handling HTTP traffic flow, which allows to transparently proxy multi-domain destination TLS traffic over a single domain TLS certificate in an automated manner. What does this exactly mean? In short, it simply has a lot of potential, that can be used in many interesting ways... 
 
 From the security perspective, Modlishka can be currently used to:
+-	  Help penetration testers to carry out a modern ethical phishing campaign that requires a universal 2FA “bypass” support.
 -   Hijack application HTTP TLS traffic flow through the "Client Domain Hooking" attack.
--	Help penetration testers to carry out a modern ethical phishing campaign that requires a universal 2FA “bypass” support.
 -   Wrap legacy websites with TLS layer, confuse crawler bots and automated scanners, etc.
 -   TBC
 
@@ -18,7 +18,7 @@ The achieved results appeared to be very interesting and the tool was initially 
 
 Modlishka was primarily written for security related tasks. Nevertheless, it can be helpful in other, non-security related, usage scenarios.
 
-Happy proxying !
+Efficient proxying !
 
 Features
 --------
@@ -124,6 +124,9 @@ Compile the binary and you are ready to go:
       -plugins string
         	Comma seperated list of enabled plugin names (default "all")
       
+      -proxyAddress string
+    	    Proxy that should be used (socks/https/http) - e.g.: http://127.0.0.1:8080 
+      
       -postOnly
         	Log only HTTP POST requests
       
@@ -158,7 +161,7 @@ References
 
  Blog posts:
  *  ["Modlishka introduction"](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/) blog post.
- * "[Client Domain Hooking](https://blog.duszynski.eu/hijacking-browser-tls-traffic-through-client-domain-hooking/)" technical paper - in case you are interested about the implemented technique that is used to handle the traffic.
+ * "[Hijacking browser TLS traffic through Client Domain Hooking](https://blog.duszynski.eu/hijacking-browser-tls-traffic-through-client-domain-hooking/)" technical paper - in case you are interested about the approach that is used to handle the traffic.
 
 License
 -------
