@@ -29,6 +29,7 @@ var (
 
 	TopLevelDomain string
 	Target         string
+	ProxyAddress   string
 
 	ReplaceStrings    map[string]string
 	JSInjectStrings   map[string]string
@@ -47,6 +48,7 @@ func SetCoreRuntimeConfig(conf config.Options) {
 
 	Target = *conf.Target
 	ProxyDomain = *conf.ProxyDomain
+	ProxyAddress = *conf.ProxyAddress
 
 	if len(*conf.TrackingCookie) > 0 {
 		TrackingCookie = *conf.TrackingCookie

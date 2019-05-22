@@ -470,10 +470,9 @@ func (s *ReverseProxyFactorySettings) NewReverseProxy() *ReverseProxy {
 		OriginalTarget: s.originaltarget,
 	}
 
-	//url_proxy, _ := url.Parse("http://127.0.0.1:9090")
 
-	// Ignoring invalid target certificates
-	rp.Proxy.Transport = &http.Transport{
+
+	transport := &http.Transport{
 
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: true,
@@ -487,10 +486,15 @@ func (s *ReverseProxyFactorySettings) NewReverseProxy() *ReverseProxy {
 		ResponseHeaderTimeout: 10 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
 		IdleConnTimeout:       5 * time.Second,
-		//Proxy:http.ProxyURL(url_proxy),
-
-
 	}
+
+	if runtime.ProxyAddress != "" {
+		urlProxy, _ := url.Parse(runtime.ProxyAddress)
+		transport.Proxy = http.ProxyURL(urlProxy)
+	}
+
+	// Ignoring invalid target certificates
+	rp.Proxy.Transport = transport
 
 	// Handling: Request
 	director := rp.Proxy.Director

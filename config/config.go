@@ -26,6 +26,7 @@ import (
 type Options struct {
 	ProxyDomain          *string `json:"proxyDomain"`
 	ListeningAddress     *string `json:"listeningAddress"`
+	ProxyAddress     	 *string `json:"proxyAddress"`
 	Target               *string `json:"target"`
 	TargetRes            *string `json:"targetResources"`
 	TargetRules          *string `json:"targetRules"`
@@ -66,6 +67,8 @@ var (
 			"Comma separated list of 'string' patterns and their replacements - e.g.: base64(new):base64(old),"+
 				"base64(newer):base64(older)"),
 		JsRules: flag.String("jsRules", "", "Comma separated list of URL patterns and JS base64 encoded payloads that will be injected - e.g.: target.tld:base64(alert(1)),..,etc"),
+
+		ProxyAddress: flag.String("proxyAddress", "", "Proxy that should be used (socks/https/http) - e.g.: http://127.0.0.1:8080 "),
 
 		TrackingCookie: flag.String("trackingCookie", "id", "Name of the HTTP cookie used for track the client"),
 		TrackingParam:  flag.String("trackingParam", "id", "Name of the HTTP parameter used to set up the HTTP cookie tracking of the client"),

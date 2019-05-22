@@ -1,6 +1,7 @@
 {
   "proxyDomain": "loopback.modlishka.io",
   "listeningAddress": "0.0.0.0",
+  "proxyAddress": "",
   "target": "google.com",
   "targetResources": "content.googleapis.com,www.gstatic.com,ssl.gstatic.com,ogs.google.com,accounts.google.com,clients1.google.com,clients2.google.com,clients3.google.com,clients4.google.com,clients5.google.com,clients6.google.com",
   "targetRules": "",
@@ -10,7 +11,7 @@
   "trackingParam": "ident",
   "useTls": true,
   "jsRules":"",
-  "debug": false,
+  "debug": true,
   "forceHTTPS": false,
   "forceHTTP": false,
   "dynamicMode": false,
