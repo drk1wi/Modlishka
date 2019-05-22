@@ -21,6 +21,7 @@ import (
 	"github.com/drk1wi/Modlishka/log"
 	"io/ioutil"
 	"os"
+
 )
 
 type Options struct {
@@ -197,8 +198,5 @@ func (c *Options) VerifyConfiguration() {
 	if *c.ForceHTTPS == true {
 		log.Warningf("Force HTTPS wrapper enabled: Proxy will strip all clear-text traffic and handle requests over HTTPS only")
 	}
-
-
-
 
 }

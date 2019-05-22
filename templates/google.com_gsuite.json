@@ -11,7 +11,7 @@
   "trackingParam": "ident",
   "useTls": true,
   "jsRules":"",
-  "debug": true,
+  "debug": false,
   "forceHTTPS": false,
   "forceHTTP": false,
   "dynamicMode": false,

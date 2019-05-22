@@ -61,7 +61,9 @@ func SetCoreRuntimeConfig(conf config.Options) {
 	domain, _ := publicsuffix.EffectiveTLDPlusOne(*conf.Target)
 	TopLevelDomain = StripProtocol(domain)
 
-	TargetResources = strings.Split(string(*conf.TargetRes), ",")
+	if len(*conf.TargetRes) > 0 {
+		TargetResources = strings.Split(string(*conf.TargetRes), ",")
+	}
 
 	if len(*conf.TerminateTriggers) != 0 {
 		TerminateTriggers = strings.Split(string(*conf.TerminateTriggers), ",")
