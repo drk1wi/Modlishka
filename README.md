@@ -110,7 +110,7 @@ Compile the binary and you are ready to go:
          	Strip all clear-text from the traffic and proxy through HTTPS only
      
       -jsRules string
-        	Comma separated list of URL patterns and JS base64 encoded payloads that will be injected. 
+        	Comma separated list of URL patterns and JS base64 encoded payloads that will be injected - e.g.: target.tld:base64(alert(1)),..,etc
       
       -listeningAddress string
         	Listening address - e.g.: 0.0.0.0  (default "127.0.0.1")
@@ -118,14 +118,14 @@ Compile the binary and you are ready to go:
       -log string
         	Local file to which fetched requests will be written (appended)
       
-      -phishingDomain string
-        	Proxy domain name that will be used - e.g.: proxy.tld
-      
       -plugins string
         	Comma seperated list of enabled plugin names (default "all")
       
       -proxyAddress string
     	    Proxy that should be used (socks/https/http) - e.g.: http://127.0.0.1:8080 
+         
+      -proxyDomain string
+        	Proxy domain name that will be used - e.g.: proxy.tld
       
       -postOnly
         	Log only HTTP POST requests
