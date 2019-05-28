@@ -1,19 +1,19 @@
 # ..Modlishka..
 
-Modlishka is a powerful and flexible HTTP reverse proxy. It implements an entirely new approach of handling HTTP traffic flow, which allows to transparently proxy multi-domain destination TLS traffic over a single domain TLS certificate in an automated manner. What does this exactly mean? In short, it simply has a lot of potential, that can be used in many interesting ways... 
+Modlishka is a powerful and flexible HTTP reverse proxy. It implements an entirely new and interesting approach of handling browser-based HTTP traffic flow, which allows to transparently proxy multi-domain destination traffic, both TLS and non-TLS, over a single domain, without a requirement of installing any additional certificate on the client. What does this exactly mean? In short, it simply has a lot of potential, that can be used in many use case scenarios...
 
 From the security perspective, Modlishka can be currently used to:
--	 Help penetration testers to carry out a modern ethical phishing campaign that requires a universal 2FA “bypass” support.
--  Hijack application HTTP TLS traffic flow through the "Client Domain Hooking" attack.
+-	 Support ethical phishing penetration tests with a transparent and automated reverse proxy component that has a universal 2FA “bypass” support.
+-  Automatically poison HTTP 301 browsers cache and permanently hijack non-TLS URLS.
+-  Diagnose and hijack browser-based applications HTTP traffic from the "Client Domain Hooking" attack perspective.
 -  Wrap legacy websites with TLS layer, confuse crawler bots and automated scanners, etc.
 -  TBC
 
 Modlishka was written as an attempt overcome standard reverse proxy limitations and as a personal challenge to see what is possible with sufficient motivation and a bit of extra research time. 
 The achieved results appeared to be very interesting and the tool was initially released and later updated with aim to:
 - Highlight currently used two factor authentication ([2FA](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/)) scheme weaknesses, so adequate security solutions can be created and implemented by the industry and raise user awareness.
-- Provide a diagnostic tool for the "Client Domain Hooking' attack.
-- Support open source projects that could benefit from a universal and transparent TLS HTTP reverse proxy.
-- Raise community awareness about modern phishing techniques and strategies and support penetration testers in their ethical phishing campaigns.
+- Support other projects that could benefit from a universal and transparent reverse proxy.
+- Raise community awareness about modern phishing techniques and strategies and support penetration testers in their daily work.
 
 
 Modlishka was primarily written for security related tasks. Nevertheless, it can be helpful in other, non-security related, usage scenarios.
@@ -26,10 +26,9 @@ Features
 Some of the most important 'Modlishka' features :
 
 **General:**
--   Point-and-click HTTP and HTTPS reverse proxying of an arbitrary domain.
--   Full control of "cross" origin TLS traffic flow from your users browsers (without a requirement to install any CA certificate on the client).
+-   Point-and-click HTTP and HTTPS reverse proxying of an arbitrary domain/s.
+-   Full control of "cross" origin TLS traffic flow from your users browsers (without a requirement of installing any additional certificate on the client).
 -   Easy and fast configuration through command line options and JSON configuration files.
--   Practical implementation of the "Client Domain Hooking" attack. Supported with a diagnostic plugin.
 -   Pattern based JavaScript payload injection.
 -   Wrapping websites with an extra "security": TLS wrapping, authentication, relevant security headers, etc. 
 -   Striping websites from all encryption and security headers (back to 90's MITM style). 
@@ -39,10 +38,10 @@ Some of the most important 'Modlishka' features :
 -   Written in Go, so it works basically on all platforms and architectures: Windows, OSX, Linux, BSD supported...
 
 **Security related:**
-- "[Client Domain Hooking](https://blog.duszynski.eu/client-domain-hooking-in-practice/)" attack in form of a diagnostic module.
 -  Support for majority of 2FA authentication schemes (out of the box).
+-   Practical implementation of the "[Client Domain Hooking](https://blog.duszynski.eu/client-domain-hooking-in-practice/)" attack. Supported with a diagnostic plugin.
 -  User credential harvesting (with context based on URL parameter passed identifiers).
--  Web panel plugin with a summary of automatically collected credentials and one-click user session impersonation module (beta POC).
+-  Web panel plugin with a summary of automatically collected credentials and one-click user session impersonation module (proof-of-concept/beta).
 -  No website templates (just point Modlishka to the target domain - in most cases, it will be handled automatically without any additional manual configuration).
 
 
@@ -50,7 +49,7 @@ Proxying In Action (2FA bypass)
 ------
 _"A picture is worth a thousand words":_
 
- Modlishka in action against an example two factor authentication scheme (SMS based)  :
+ Modlishka in action against an example two factor authentication scheme (SMS based bypass proof-of-concept)  :
 
 [![Watch the video](https://i.vimeocdn.com/video/749353683.jpg)](https://vimeo.com/308709275)
 
