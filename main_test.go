@@ -53,6 +53,8 @@ var TestsTranslatePhishtoURL = []struct {
 	{"uc45bnjw1b6gyp4z7ab0.google.dev", "accounts.youtube.com"},
 	{"www.google.dev", "www.google.com"},
 	{"www.google.com", "www.google.com"},
+	{"www.google.com.google.dev", "www.google.com.google.com"},
+
 }
 
 var TestsTranslateURLtoPhish = []struct {
@@ -62,6 +64,7 @@ var TestsTranslateURLtoPhish = []struct {
 	{"assets-cdn.github.com", "assets-cdn.phish-github.dev"},
 	{"accounts.youtube.com", "uc45bnjw1b6gyp4z7ab0.phish-github.dev"},
 	{"github.com", "phish-github.dev"},
+
 }
 
 
@@ -125,6 +128,9 @@ func TestTranslatePhishtoURL(t *testing.T) {
 			t.Errorf("TestsTranslatePhishtoURL(%s): expected %s, actual %s", tt.input, tt.expected, actual)
 		}
 	}
+
+
+
 
 }
 

