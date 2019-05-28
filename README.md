@@ -27,7 +27,7 @@ Some of the most important 'Modlishka' features :
 
 **General:**
 -   Point-and-click HTTP and HTTPS reverse proxying of an arbitrary domain.
--   Full control of "cross" origin TLS traffic flow from your users browses (through a set of new interesting techniques) - without a requirement to install any CA certificate on the client.
+-   Full control of "cross" origin TLS traffic flow from your users browsers (without a requirement to install any CA certificate on the client).
 -   Easy and fast configuration through command line options and JSON configuration files.
 -   Practical implementation of the "Client Domain Hooking" attack. Supported with a diagnostic plugin.
 -   Pattern based JavaScript payload injection.
