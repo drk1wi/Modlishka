@@ -10,15 +10,16 @@
   "trackingCookie": "id",
   "trackingParam": "id",
   "jsRules":"",
+  "debug": false,
   "forceHTTPS": false,
   "forceHTTP": false,
   "dynamicMode": false,
-  "debug": false,
   "logPostOnly": false,
   "disableSecurity": false,
   "log": "ms.log",
   "plugins": "all",
-  "cert": "",
+  "credParams": "",
+  "cert",: "",
   "certKey": "",
   "certPool": ""
 }
