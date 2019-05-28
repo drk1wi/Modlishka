@@ -146,10 +146,10 @@ Compile the binary and you are ready to go:
         	URL to which a client will be redirected after Session Termination rules trigger
       
       -trackingCookie string
-        	Name of the HTTP cookie used to track the victim (default "id")
+        	Name of the HTTP cookie used to track the client (default "id")
       
       -trackingParam string
-        	Name of the HTTP parameter used to track the victim (default "id")
+        	Name of the HTTP parameter used to track the client (default "id")
 
 
 
