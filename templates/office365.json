@@ -19,7 +19,7 @@
   "log": "ms.log",
   "plugins": "all",
   "credParams": "",
-  "cert",: "",
+  "cert": "",
   "certKey": "",
   "certPool": ""
 }
