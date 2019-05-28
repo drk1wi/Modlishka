@@ -27,7 +27,7 @@ Some of the most important 'Modlishka' features :
 
 **General:**
 -   Point-and-click HTTP and HTTPS reverse proxying of an arbitrary domain.
--   Full control of "cross" origin TLS traffic flow from your users browses (through a set of new interesting techniques).
+-   Full control of "cross" origin TLS traffic flow from your users browses (through a set of new interesting techniques) - without a requirement to install any CA certificate on the client.
 -   Easy and fast configuration through command line options and JSON configuration files.
 -   Practical implementation of the "Client Domain Hooking" attack. Supported with a diagnostic plugin.
 -   Pattern based JavaScript payload injection.
@@ -35,7 +35,7 @@ Some of the most important 'Modlishka' features :
 -   Striping websites from all encryption and security headers (back to 90's MITM style). 
 -   Stateless design. Can be scaled up easily to handle an arbitrary amount of traffic  - e.g. through a DNS load balancer.
 -   Can be extended easily with your ideas through modular plugins.
--   Automatic TLS certificate generation plugin for the proxy domain (requires a self-signed CA certificate)
+-   Automatic test TLS certificate generation plugin for the proxy domain (requires a self-signed CA certificate)
 -   Written in Go, so it works basically on all platforms and architectures: Windows, OSX, Linux, BSD supported...
 
 **Security related:**
