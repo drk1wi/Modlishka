@@ -49,7 +49,7 @@ func (conf *ServerConfig) MainHandler(w http.ResponseWriter, r *http.Request) {
 	targetDomain,newTLS,TLSvalue := runtime.TranslateRequestHost(r.Host)
 
 	if !*conf.DisableSecurity && runtime.IsValidRequestHost(r.Host, runtime.ProxyDomain) == false {
-		log.Infof("Redirecting client to %s",runtime. TopLevelDomain)
+		log.Infof("Redirecting client to %s",runtime.TopLevelDomain)
 		Redirect(w, r, "")
 		return
 	}
