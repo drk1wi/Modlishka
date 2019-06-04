@@ -22,7 +22,9 @@ import (
 )
 
 
+
 func init() {
+
 
 	s := Property{}
 	s.Name = "hijack"
@@ -38,30 +40,31 @@ func init() {
 
 
 	//process HTTP request
-	s.HTTPRequest = func(req *http.Request, context HTTPContext) {
+	s.HTTPRequest = func(req *http.Request, context *HTTPContext) {
 
 		if runtime.DynamicMode == false {
 			return
 		}
 
-		if strings.Contains(context.OriginalTarget,runtime.ProxyDomain) == false && context.IsTLS == false {
 
-			log.Infof("Hijacking clear-text URL %s%s [%s] . ",context.Target,req.URL.Path,req.Header.Get("User-Agent"))
+		if strings.Contains(context.OriginalTarget,runtime.ProxyDomain) &&  context.IsTLS == false  {
+
+			log.Warningf("Hijack plugin: Hijacked clear-text [%s%s]\n\tID: [%s] \n\tIP: [%s] \n\tUser-Agent: [%s]\n",context.Target,req.URL.Path,context.UserID,context.IP,req.Header.Get("User-Agent"))
 		}
 
 		if strings.Contains(context.OriginalTarget,runtime.ProxyDomain) == false && context.IsTLS == true {
 
-			log.Warningf("TLS URL %s%s [%s]",context.Target,req.URL.Path,req.Header.Get("User-Agent"))
+			log.Warningf("Hijack plugin: TLS URL [%s%s]\n\tID: [%s] \n\tIP: [%s] \n\tUser-Agent: [%s]\n",context.Target,req.URL.Path,context.UserID,context.IP,req.Header.Get("User-Agent"))
 		}
 
 		if strings.Contains(context.OriginalTarget,runtime.ProxyDomain) &&  context.IsTLS == true  {
 
-			log.Warningf("Hijacked TLS URL %s%s [%s]",context.Target,req.URL.Path,req.Header.Get("User-Agent"))
+			log.Warningf("Hijack plugin: Hijacked TLS URL [%s%s]\n\tID: [%s] \n\tIP: [%s] \n\tUser-Agent: [%s]\n",context.Target,req.URL.Path,context.UserID,context.IP,req.Header.Get("User-Agent"))
 		}
 
 		if strings.Contains(context.OriginalTarget,runtime.ProxyDomain) &&  context.IsTLS == false  {
 
-			log.Warningf("Hijacked clear-text URL %s%s [%s]",context.Target,req.URL.Path,req.Header.Get("User-Agent"))
+			log.Warningf("Hijack plugin: Hijacked clear-text URL [%s%s]\n\tID: [%s] \n\tIP: [%s] \n\tUser-Agent: [%s]\n",context.Target,req.URL.Path,context.UserID,context.IP,req.Header.Get("User-Agent"))
 		}
 
 	}
@@ -69,7 +72,7 @@ func init() {
 
 
 	//process HTTP response (responses can arrive in random order)
-	s.HTTPResponse = func(resp *http.Response, context HTTPContext) {
+	s.HTTPResponse = func(resp *http.Response, context *HTTPContext,buffer *[]byte) {
 
 
 	}

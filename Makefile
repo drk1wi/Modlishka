@@ -47,8 +47,11 @@ windows:
 freebsd:
 	GOOS=freebsd GOARCH=amd64 $(GOBUILD) -ldflags "-s -w" -o $(DIST_DIR)/$(BINARY_BSD)  $(MAIN_FILE)
 
-linux_xgo:
+linux_amd64_xgo:
 	xgo --targets=linux/amd64  --dest $(DIST_DIR)/ ./
+
+linux_386_xgo:
+	xgo --targets=linux/386  --dest $(DIST_DIR)/ ./
 
 windows_xgo:
 	xgo --targets=windows/amd64  --dest $(DIST_DIR)/ ./

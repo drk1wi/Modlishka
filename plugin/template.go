@@ -62,10 +62,10 @@ func init() {
 	}
 
 	//process HTTP request
-	s.HTTPRequest = func(req *http.Request, context HTTPContext) {}
+	s.HTTPRequest = func(req *http.Request, context *HTTPContext) {}
 
 	//process HTTP response (responses can arrive in random order)
-	s.HTTPResponse = func(resp *http.Response, context HTTPContext) {}
+	s.HTTPResponse = func(resp *http.Response, context *HTTPContext,buffer *[]byte) {}
 
 	// Register your http handlers
 	s.RegisterHandler = func(handler *http.ServeMux) {
