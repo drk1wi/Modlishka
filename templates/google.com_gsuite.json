@@ -14,7 +14,7 @@
   "debug": false,
   "forceHTTPS": false,
   "forceHTTP": false,
-  "dynamicMode": true,
+  "dynamicMode": false,
   "logPostOnly": false,
   "disableSecurity": false,
   "log": "google.log",
