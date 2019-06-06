@@ -46,7 +46,8 @@ func (c *Configuration) initLogging() {
 	log.Options = log.LoggingOptions{
 		GET:      logGET,
 		POST:     *c.LogPostOnly,
-		FilePath: *c.LogFile,
+		LogRequestPath: *c.LogRequestFile,
+
 	}
 }
 

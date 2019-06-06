@@ -79,7 +79,8 @@ var (
 type LoggingOptions struct {
 	GET      bool
 	POST     bool
-	FilePath string
+	LogRequestPath string
+
 }
 
 func Wrap(s, effect string) string {

@@ -4,7 +4,7 @@
   "proxyAddress": "",
   "target": "google.com",
   "targetResources": "content.googleapis.com,www.gstatic.com,ssl.gstatic.com,ogs.google.com,accounts.google.com,clients1.google.com,clients2.google.com,clients3.google.com,clients4.google.com,clients5.google.com,clients6.google.com",
-  "targetRules": "",
+  "rules": "",
   "terminateTriggers": "",
   "terminateRedirectUrl": "",
   "trackingCookie": "ident",

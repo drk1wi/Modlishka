@@ -209,7 +209,7 @@ func TestCmdLineFlags(t *testing.T) {
 		"TargetRules":          "eHh4:eXl5", //xxx:yyy
 		"TrackingCookie":       "id",
 		"TrackingParam":        "id",
-		"LogFile":              "logfile",
+		"LogRequestFile":              "logfile",
 		"Plugins":              "plugin1,plugin2,plugin2",
 		}
 
@@ -235,7 +235,7 @@ func TestCmdLineFlags(t *testing.T) {
 		" -rules " + in["TargetRules"] +
 		" -trackingCookie " + in["TrackingCookie"] +
 		" -trackingParam " + in["TrackingParam"] +
-		" -log " + in["LogFile"] +
+		" -log " + in["LogRequestFile"] +
 		" -plugins " + in["Plugins"]
 
 	if in_bool["Debug"] {
@@ -386,7 +386,7 @@ func TestJSONConfig(t *testing.T) {
 		"TargetRules":          "eHh4:eXl5", //xxx:yyy
 		"TrackingCookie":       "id",
 		"TrackingParam":        "id",
-		"LogFile":              "logfile",
+		"LogRequestFile":              "logfile",
 		"Plugins":              "plugin1,plugin2,plugin2",
 		"TLSCertificate":       "-----BEGIN CERTIFICATE-----\nMIIDEDCCAfigAwIBAgIEKfekOzANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQKEwdB\nY21lIENvMB4XDTE4MTIwMjIwMTc1NloXDTI0MDUwNzE5MTc1NlowPTEOMAwGA1UE\nBhMFRWFydGgxFjAUBgNVBAoTDU1vdGhlciBOYXR1cmUxEzARBgNVBAMTCmdvb2ds\nZS5kZXYwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDBzp66XCX6iPGK\n3DSy2ZcvcyDzL263U6CGHqwkFGySr8J3qrNeh4NZcnlYoAnobUlna9OCUPXFqA4/\nHjL6BuBsrLE//8gnrqP5Bga0ZYaTcq00EQuYxEpNuHBPsX0VBev/5qmJGa20Rd2O\nXajNGyK5S2eJhSOEDYY14tIVocPD9DTXsZ8TkVUxXZ8UqEaBDPp23OHL/HAFY/rd\nOybt1e9SZWC2bqsFjeoVM/xHBpuNDfhjivHI5AMNJGYvOxGtiqfOVUFNDc3zE1TC\nnBCpsesrpG4jB/6Q1yWdYogy5/7aUtM69GiXDDD4wG3l5MMxGhVFaspfKSc28IFG\nfJjMxH37AgMBAAGjQzBBMAwGA1UdEwEB/wQCMAAwDAYDVR0OBAUEAwECAzAjBgNV\nHREEHDAaggpnb29nbGUuZGV2ggwqLmdvb2dsZS5kZXYwDQYJKoZIhvcNAQELBQAD\nggEBAKSaZ04Q+Pv00PpugEi3FQtQOBz6JK/Exz8BOW6zOeY0NhfGrXjfa9rTqGdx\n0yxU1LQZhcNrdLKgIN3GGY/lYN0GKqBJFqmyy9zRxdob19Lb5HcL8ZY4fvFdrXBK\nI6D8eJhRmVY2Mr+v8fc2mDYg7q/kmgrcAtANtx3KC5QLtIWRxWn6iu+NO7FDKcsZ\nmJmHRikPR4PrhKyzuU9S5llUi7MvkHyZ+Daxj4pCvigEAPSVRepmdF96rf63fLWb\n0t0Uc01pFkyGFOZEBo/XkdOhWE4MRiYT0wFyGZLwJ9YOWRT1KwYsWedEUD+w1Elt\nUp4TXBYFCvw7HY+CQI9HKHh1GkM=\n-----END CERTIFICATE-----\n",
 		"TLSKey":               "-----BEGIN PRIVATE KEY-----\nMIIEpQIBAAKCAQEAwc6eulwl+ojxitw0stmXL3Mg8y9ut1Oghh6sJBRskq/Cd6qz\nXoeDWXJ5WKAJ6G1JZ2vTglD1xagOPx4y+gbgbKyxP//IJ66j+QYGtGWGk3KtNBEL\nmMRKTbhwT7F9FQXr/+apiRmttEXdjl2ozRsiuUtniYUjhA2GNeLSFaHDw/Q017Gf\nE5FVMV2fFKhGgQz6dtzhy/xwBWP63Tsm7dXvUmVgtm6rBY3qFTP8RwabjQ34Y4rx\nyOQDDSRmLzsRrYqnzlVBTQ3N8xNUwpwQqbHrK6RuIwf+kNclnWKIMuf+2lLTOvRo\nlwww+MBt5eTDMRoVRWrKXyknNvCBRnyYzMR9+wIDAQABAoIBAQCj6+X3DA+XWxKp\nd10fVMj5+i+JYLoNVy8zoWfJ0HiQjRY3burtbkLbeeZG3n3i1+S5E8s+ssldl6oN\nGrbVINHbOSlmTyp03dKUwtMS67gqqFj06+HaIVQTboeX8DAyguK8e9UzP8Pa8SjW\nzEME0AnLnYqCF1kVzPaSRzmX0E2rQz4ezJkMOUdjiH0OmMVLnezlrLr7w6Q8Swp3\nfyD2hd8g3ieoPLYOEVxYA8AVERxAVdli8Jm6w/Xcng7UlMnA+RP6zXJzdZx1iY8S\nNW9Yt/BlL34+3iHUt6lMUBa0SSzGxcgpBNU1/f5aAQZFGJIN7tJ1e8700jRTzvu+\ntFz31D5RAoGBAOXc3N1MiMXD4Gz0aSfmzWYEuJkvBBCmLHBNV2aMa05F4bnF0oZf\nEDLYKqqDxYqzzHuy1ySTKV1Z1P10hx+jbmZgQY6R8Uehc0TGnRnuz7AF9qDijjIY\nGiAZ4HoW3GT4l0SBZfcdb2dJSIO/PEgWn4CCN9sjSD9OwGLM5hyKxWRzAoGBANfY\nNDbj+aPg7hRbDFm4ZV1n+nwIGWq4M77/EuOPZcppfVrYl8EfCGcuoG+k8Wld2SoS\nz2N4kT2mnowSFE5OW0hRBojhOyUOPR7hLx8VoOF8Ymjl4WFsahELvQuXP+1Apq7Q\nZ0h+Gb2NkpRrgTJK8cUQf+8uIQM4SYpgAGw2dqZZAoGBANjdSoeDOJsVFXzWDwv1\nRh4VIDBt2jD3BoAhh+8ZVffwGGnTyK67q6W8qmxbjBkzTx35ed9o9CK9qSRDN2TT\nJUpzUAZ5jKEfIohltjyMQef5iFj7xlpewO8+Wrn1LZQZsWWRi6jcXYmd60tZNj9x\nEKUGtjoKjJQl8X6FgCi3iEofAoGARYgoieY27UvwZi5OdDiqrsRoNLyHM5HTWZvi\nAdyX9fS1pSZQ/K16j4K9vDlua3sIEj2tAWY9o5ahTI4mbHNhhJJVgJLN8sn7do8k\nFudoxDrFmPU0/aVnJcaaR7mZplxFVdtc6kV1FVMd/SIEpKbv64O9MtexWtAvIJx8\nhl+lKUECgYEAu9sAdc0pbzmdTeNterIScCXnclpANW1jsfCQvOv3qWqvU0uBreyd\nhVW67M9XzMzn6baZ3jLi0RxmIkxnLwkfLUTpMcmQO+1WY77MkROXDBmDQ87sBIDP\nluG0g5iz09m0QIt8nFUAZlogqgUXoMsBTtNk/jY4jpdTSzoh1kUeZIw=\n-----END PRIVATE KEY-----\n",

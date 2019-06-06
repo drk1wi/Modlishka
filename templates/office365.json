@@ -4,7 +4,7 @@
   "proxyAddress": "",
   "target": "microsoftonline.com",
   "targetResources": "",
-  "targetRules": "by5zZXRBdHRyaWJ1dGUoImludGVncml0eSI=:by5zZXRBdHRyaWJ1dGUoImludGVnZHJpdHki,aW50ZWdyaXR5PQ==:aW50ZWdyaWN0eT0=,PC9oZWFkPg==:",
+  "rules": "by5zZXRBdHRyaWJ1dGUoImludGVncml0eSI=:by5zZXRBdHRyaWJ1dGUoImludGVnZHJpdHki,aW50ZWdyaXR5PQ==:aW50ZWdyaWN0eT0=,PC9oZWFkPg==:",
   "terminateTriggers": "",
   "terminateRedirectUrl": "",
   "trackingCookie": "id",

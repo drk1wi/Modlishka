@@ -33,11 +33,11 @@ func FunctionTracking(start time.Time, name string) {
 	}
 }
 
-func toFile(data string) {
+func LogRequestFile(data string) {
 
-	if Options.FilePath != "" {
+	if Options.LogRequestPath != "" {
 		if file == nil {
-			file, _ = os.OpenFile(Options.FilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+			file, _ = os.OpenFile(Options.LogRequestPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 
 		}
 
@@ -49,11 +49,12 @@ func toFile(data string) {
 
 }
 
+
 func Cookies(userID string, URL string, cookies []string, IP string) {
 
 	cookieString := strings.Join(cookies, "####")
 
-	toFile("\nCOOKIES" +
+	LogRequestFile("\nCOOKIES" +
 		"\n======\nTimestamp: " + time.Now().Format(time.RFC850) +
 		"\n======\nRemoteIP: " + IP +
 		"\n======\nUUID: " + userID +
@@ -63,7 +64,7 @@ func Cookies(userID string, URL string, cookies []string, IP string) {
 
 }
 
-func HTTPRequest(req *http.Request, phishUser string) {
+func HTTPRequest(req *http.Request, userID string) {
 
 	if Options.POST && req.Method != "POST" {
 		return
@@ -75,10 +76,10 @@ func HTTPRequest(req *http.Request, phishUser string) {
 		Errorf("Error dumping request: %s", err)
 	}
 
-	toFile("\nREQUEST" +
+	LogRequestFile("\nREQUEST" +
 		"\n======\nTimestamp: " + time.Now().Format(time.RFC850) +
 		"\n======\nRemoteIP: " + req.RemoteAddr +
-		"\n======\nUUID: " + phishUser +
+		"\n======\nUUID: " + userID +
 		"\n======\n" + string(requestDump) +
 		"\n======\n")
 

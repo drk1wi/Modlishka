@@ -42,7 +42,7 @@ type Options struct {
 	LogPostOnly          *bool   `json:"logPostOnly"`
 	DisableSecurity      *bool   `json:"disableSecurity"`
 	DynamicMode          *bool   `json:"dynamicMode"`
-	LogFile              *string `json:"log"`
+	LogRequestFile       *string `json:"log"`
 	Plugins              *string `json:"plugins"`
 	*TLSConfig
 }
@@ -80,7 +80,8 @@ var (
 		ForceHTTP:           flag.Bool("forceHTTP", false, "Strip all TLS from the traffic and proxy through HTTP only"),
 		ForceHTTPS:           flag.Bool("forceHTTPS", false, "Strip all clear-text from the traffic and proxy through HTTPS only"),
 
-		LogFile:     flag.String("log", "", "Local file to which fetched requests will be written (appended)"),
+		LogRequestFile: flag.String("log", "", "Local file to which fetched requests will be written (appended)"),
+
 		LogPostOnly: flag.Bool("postOnly", false, "Log only HTTP POST requests"),
 
 		Plugins: flag.String("plugins", "all", "Comma separated list of enabled plugin names"),
