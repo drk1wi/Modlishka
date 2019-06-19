@@ -264,7 +264,7 @@ type CookieJar struct {
 }
 
 var credentialParameters = flag.String("credParams", "", "Credential regexp with matching groups. e.g. : baase64(username_regex),baase64(password_regex)")
-var controlURL = flag.String("controlURL", "SayHello2Modlishka", "URL to view captured credentials and settings.  Defaults to SayHello2Modlishka")
+var controlURL = flag.String("controlURL", "SayHello2Modlishka", "URL to view captured credentials and settings.")
 var controlCredentials = flag.String("controlCreds", "", "Username and password to protect the credentials page.  user:pass format")
 
 var CConfig ControlConfig
