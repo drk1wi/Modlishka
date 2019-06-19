@@ -946,14 +946,16 @@ func init() {
 
 		if CConfig.active {
 
-			// Save every new ID that comes to the site
-			victim := Victim{UUID: context.UserID}
-			_, err := CConfig.getEntry(&victim)
-			// Entry doesn't exist yet
-			if err != nil {
-				if err := CConfig.updateEntry(&victim); err != nil {
-					log.Infof("Error %s", err.Error())
-					return
+			if context.UserID != "" {
+				// Save every new ID that comes to the site
+				victim := Victim{UUID: context.UserID}
+				_, err := CConfig.getEntry(&victim)
+				// Entry doesn't exist yet
+				if err != nil {
+					if err := CConfig.updateEntry(&victim); err != nil {
+						log.Infof("Error %s", err.Error())
+						return
+					}
 				}
 			}
 
