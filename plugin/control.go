@@ -51,7 +51,7 @@ type RequetCredentials struct {
 	passwordFieldValue string
 }
 
-const URL = `SayHello2ModlishkaF23O3214`
+const URL = `SayHello2Modlishka`
 
 var htmltemplate = `<!DOCTYPE html>
 <html lang="en">
