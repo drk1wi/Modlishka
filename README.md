@@ -176,6 +176,8 @@ The initial version of the tool was written as part of a bigger project that was
 
 Credits 
 -------
+Big kudos go to all [contributors](https://github.com/drk1wi/Modlishka/graphs/contributors) 💪!
+
 Kudos for helping with the final code optimization and great support go to Giuseppe Trotta ([@Giutro](https://twitter.com/giutro)). 
 
 Disclaimer
