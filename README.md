@@ -89,7 +89,13 @@ Compile the binary and you are ready to go:
       
       -config string
         	JSON configuration file. Convenient instead of using command line switches.
-      
+          
+      -controlCreds string
+          Username and password to protect the credentials page.  user:pass format
+          
+      -controlURL string
+          URL to view captured credentials and settings. (default "SayHello2Modlishka")
+          
       -credParams string
           	Credential regexp with matching groups. e.g. : baase64(username_regex),baase64(password_regex)
 

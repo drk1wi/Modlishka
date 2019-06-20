@@ -243,7 +243,8 @@ func (httpResponse *HTTPResponse) PatchHeaders(p *ReverseProxy) {
 	}
 
 	if p.Terminate {
-		log.Infof("Terminating session")
+		log.Infof("Terminating session for %s", p.RequestContext.UserID)
+		p.RequestContext.InvokeTerminateUserHooks(p.RequestContext.UserID)
 
 		// Set Terminator Cookie
 		value := runtime.TERMINATE_SESSION_COOKIE_NAME + "=" + runtime.TERMINATE_SESSION_COOKIE_VALUE +

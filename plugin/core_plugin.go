@@ -38,6 +38,7 @@ type Property struct {
 	Flags           func()
 	HTTPRequest     func(req *http.Request, context *HTTPContext)
 	HTTPResponse    func(resp *http.Response, context *HTTPContext,buffer *[]byte)
+	TerminateUser    func(userID string)
 	RegisterHandler func(handler *http.ServeMux)
 }
 
@@ -152,4 +153,14 @@ func (context *HTTPContext) InvokeHTTPResponseHooks(resp *http.Response, buffer 
 			p.HTTPResponse(resp, context,buffer)
 		}
 	}
+}
+
+// Execute plugin-defined Terminate User hooks
+func (context *HTTPContext) InvokeTerminateUserHooks(userID string) {
+	for _, p := range Plugins {
+		if p.Active && p.TerminateUser != nil {
+			p.TerminateUser(userID)
+		}
+	}
+
 }
