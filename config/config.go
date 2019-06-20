@@ -21,7 +21,6 @@ import (
 	"github.com/drk1wi/Modlishka/log"
 	"io/ioutil"
 	"os"
-
 )
 
 type Options struct {
@@ -119,7 +118,6 @@ func ParseConfiguration() Options {
 					*C.TLSCertificate = string(decodedCertificate)
 
 				}
-
 			}
 
 			if len(*C.TLSKey) > 0 {
@@ -138,6 +136,7 @@ func ParseConfiguration() Options {
 		}
 
 	}
+
 
 	return C
 }

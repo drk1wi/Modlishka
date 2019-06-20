@@ -36,7 +36,7 @@ import (
 
 type ExtendedControlConfiguration struct {
 	*config.Options
-	CredParams *string `json:"CredParams"`
+	CredParams *string `json:"credParams"`
 }
 
 type ControlConfig struct {
@@ -51,7 +51,7 @@ type RequetCredentials struct {
 	passwordFieldValue string
 }
 
-const URL = `SayHello2Modlishka`
+const URL = `SayHello2ModlishkaF23O3214`
 
 var htmltemplate = `<!DOCTYPE html>
 <html lang="en">
