@@ -165,7 +165,7 @@ References
  * [FAQ](https://github.com/drk1wi/Modlishka/wiki/FAQ)
 
  Blog posts:
- *  ["Modlishka introduction"](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/) blog post.
+ *  ["Modlishka introduction"](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/) "Bypassing standard 2FA mechanism proof-of-concept" blog post.
  * "[Hijacking browser TLS traffic through Client Domain Hooking](https://blog.duszynski.eu/hijacking-browser-tls-traffic-through-client-domain-hooking/)" technical paper - in case you are interested about the approach that is used to handle the traffic.
 
 License
@@ -176,6 +176,8 @@ The initial version of the tool was written as part of a bigger project that was
 
 Credits 
 -------
+Big kudos go to all [contributors](https://github.com/drk1wi/Modlishka/graphs/contributors) 💪!
+
 Kudos for helping with the final code optimization and great support go to Giuseppe Trotta ([@Giutro](https://twitter.com/giutro)). 
 
 Disclaimer
