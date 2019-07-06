@@ -11,7 +11,7 @@ From the security perspective, Modlishka can be currently used to:
 
 Modlishka was written as an attempt overcome standard reverse proxy limitations and as a personal challenge to see what is possible with sufficient motivation and a bit of extra research time. 
 The achieved results appeared to be very interesting and the tool was initially released and later updated with aim to:
-- Highlight currently used two factor authentication ([2FA](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/)) scheme weaknesses, so adequate security solutions can be created and implemented by the industry and raise user awareness.
+- Highlight currently used two factor authentication ([2FA](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/)) scheme weaknesses, so adequate security solutions can be created and implemented by the industry.
 - Support other projects that could benefit from a universal and transparent reverse proxy.
 - Raise community awareness about modern phishing techniques and strategies and support penetration testers in their daily work.
 
