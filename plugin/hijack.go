@@ -47,9 +47,9 @@ func init() {
 		}
 
 
-		if strings.Contains(context.OriginalTarget,runtime.ProxyDomain) &&  context.IsTLS == false  {
+		if strings.Contains(context.OriginalTarget,runtime.ProxyDomain) == false &&  context.IsTLS == false  {
 
-			log.Warningf("Hijack plugin: Hijacked clear-text [%s%s]\n\tID: [%s] \n\tIP: [%s] \n\tUser-Agent: [%s]\n",context.Target,req.URL.Path,context.UserID,context.IP,req.Header.Get("User-Agent"))
+			log.Warningf("Hijack plugin: Clear-text [%s%s]\n\tID: [%s] \n\tIP: [%s] \n\tUser-Agent: [%s]\n",context.Target,req.URL.Path,context.UserID,context.IP,req.Header.Get("User-Agent"))
 		}
 
 		if strings.Contains(context.OriginalTarget,runtime.ProxyDomain) == false && context.IsTLS == true {
