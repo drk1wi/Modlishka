@@ -1,5 +1,6 @@
-  <img src=".github/PRESS_KIT/LOGO/ModlishkaLogo.png">  
-# ..Modlishka..
+  <p align="center">
+    <img src=".github/PRESS_KIT/LOGO/ModlishkaLogo.png" width=512px>  
+  </p>
 
 Modlishka is a powerful and flexible HTTP reverse proxy. It implements an entirely new and interesting approach of handling browser-based HTTP traffic flow, which allows to transparently proxy multi-domain destination traffic, both TLS and non-TLS, over a single domain, without a requirement of installing any additional certificate on the client. What does this exactly mean? In short, it simply has a lot of potential, that can be used in many use case scenarios...
 
