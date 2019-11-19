@@ -5,6 +5,9 @@
 **Bug reports are welcome**!
 Please report all bugs on the [issue tracker](https://github.com/drk1wi/Modlishka/issues).
 
+### Warning
+All advertisements about paid support or off board discussions redirects can result in a ban. This is an open source projct, please share it with the community.
+
 ### Guidelines
 * Before you open a bug report, please check if no similar issue has been already opened [open](https://github.com/drk1wi/Modlishka/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen) or [closed](https://github.com/drk1wi/Modlishka/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aclosed). 
 * Ensure that you have reviewed the project [WIKI](https://github.com/drk1wi/Modlishka/wiki) and quickstart [tutorial](https://github.com/drk1wi/Modlishka/wiki/Quickstart-tutorial).
