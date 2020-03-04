@@ -26,6 +26,8 @@ import (
 type Options struct {
 	ProxyDomain          *string `json:"proxyDomain"`
 	ListeningAddress     *string `json:"listeningAddress"`
+	ListeningPortHTTP    *int    `json:"listeningPortHTTP"`
+	ListeningPortHTTPS   *int    `json:"listeningPortHTTPS"`
 	ProxyAddress     	 *string `json:"proxyAddress"`
 	Target               *string `json:"target"`
 	TargetRes            *string `json:"targetResources"`
@@ -56,6 +58,8 @@ var (
 	C = Options{
 		ProxyDomain:      flag.String("proxyDomain", "", "Proxy domain name that will be used - e.g.: proxy.tld"),
 		ListeningAddress: flag.String("listeningAddress", "127.0.0.1", "Listening address - e.g.: 0.0.0.0 "),
+		ListeningPortHTTP: flag.Int("listeningPortHTTP", 80, "Listening port for HTTP requests"),
+		ListeningPortHTTPS: flag.Int("listeningPortHTTPS", 443, "Listening port for HTTPS requests"),
 		Target:           flag.String("target", "", "Target  domain name  - e.g.: target.tld"),
 		TargetRes: flag.String("targetRes", "",
 			"Comma separated list of domains that were not translated automatically. Use this to force domain translation - e.g.: static.target.tld"),
