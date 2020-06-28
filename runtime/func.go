@@ -144,15 +144,20 @@ func PhishURLToRealURL(phishURL string) string {
 	var host string
 	var out string
 
-	u, _ := url.Parse(phishURL)
+    // url parse returns nil when phishURL does not have protocol
+    if strings.HasPrefix(phishURL, "https://") == false && strings.HasPrefix(phishURL, "http://") == false {
+            u, _ := url.Parse(fmt.Sprintf("https://%s", phishURL))
+            host = u.Host
+    } else {
+            u, _ := url.Parse(phishURL)
+            if u.Host != "" {
+                    host = u.Host
+            } else {
+                    host = phishURL
+            }
+    }
+    
 	out = phishURL
-
-	// Parse both cases with http url scheme and without
-	if u.Host != "" {
-		host = u.Host
-	} else {
-		host = phishURL
-	}
 
 	if strings.Contains(phishURL, ProxyDomain) {
 		subdomain := strings.Replace(host, "."+ProxyDomain, "", 1)
