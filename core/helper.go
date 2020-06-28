@@ -63,8 +63,8 @@ func deflateBuffer(input []byte) []byte {
 // Do a redirect
 func Redirect(w http.ResponseWriter, r *http.Request, url string) {
 	if len(url) > 0 {
-		http.Redirect(w, r, url, 301)
+		http.Redirect(w, r, url, 302)
 	} else {
-		http.Redirect(w, r, "http://"+runtime.TopLevelDomain, 301)
+		http.Redirect(w, r, "http://"+runtime.TopLevelDomain, 302)
 	}
 }
