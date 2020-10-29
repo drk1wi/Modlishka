@@ -27,6 +27,7 @@ import (
 	"net"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 var ServerRuntimeConfig *ServerConfig
@@ -271,6 +272,10 @@ Author: Piotr Duszynski @drk1wi
 			welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTP [%s] via [http://%s]", welcome, httplistener, runtime.Target, runtime.ProxyDomain)
 
 			log.Infof("%s", welcome)
+
+            if len(runtime.StaticLocations) > 0 {
+                log.Infof("Maintained Location Header Targets: %s",strings.Join(runtime.StaticLocations, ", "))
+            }
 
 			go func() {
 				server := &http.Server{Addr: httplistener, Handler: HTTPServerRuntimeConfig.Handler}

