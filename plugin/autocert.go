@@ -124,7 +124,7 @@ func init() {
 						CommonName:   *config.C.ProxyDomain,
 					},
 					NotBefore: time.Now(),
-					NotAfter:  time.Now().AddDate(5, 5, 5),
+					NotAfter:  time.Now().AddDate(1, 0, 0),
 				}
 
 				// generate private key
