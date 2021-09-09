@@ -1,10 +1,10 @@
 {
   "proxyDomain": "loopback.modlishka.io",
-  "listeningAddress": "0.0.0.0",
+  "listeningAddress": "127.0.0.1",
   "proxyAddress": "",
-  "target": "microsoftonline.com",
+  "target": "target-victim-domain.com",
   "targetResources": "",
-  "rules": "by5zZXRBdHRyaWJ1dGUoImludGVncml0eSI=:by5zZXRBdHRyaWJ1dGUoImludGVnZHJpdHki,aW50ZWdyaXR5PQ==:aW50ZWdyaWN0eT0=,PC9oZWFkPg==:",
+  "rules": "PC9oZWFkPg==:",
   "terminateTriggers": "",
   "terminateRedirectUrl": "",
   "trackingCookie": "id",
@@ -20,7 +20,8 @@
   "log": "ms.log",
   "plugins": "autocert,hijack",
   "credParams": "",
-  "cert": "",
-  "certKey": "",
+  "cert": "$ openssl genrsa -out MyRootCA.key 2048",
+  "certKey": "$ openssl req -x509 -new -nodes -key MyRootCA.key -sha256 -days 1024 -out MyRootCA.pem
+",
   "certPool": ""
 }
