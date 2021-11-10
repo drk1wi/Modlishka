@@ -49,9 +49,7 @@ Proxying In Action (2FA bypass)
 ------
 _"A picture is worth a thousand words":_
 
- Modlishka in action against an example two factor authentication scheme (SMS based bypass proof-of-concept)  :
-
-[![Watch the video](https://i.vimeocdn.com/video/749353683.jpg)](https://vimeo.com/308709275)
+Modlishka in action against an example two factor authentication scheme (SMS based bypass proof-of-concept)  :
 
 [https://vimeo.com/308709275](https://vimeo.com/308709275)
 
