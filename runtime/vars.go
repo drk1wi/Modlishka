@@ -20,7 +20,6 @@ var (
 	RegexpSetCookie                      *regexp.Regexp
 )
 
-
 //runtime config
 var (
 	ProxyDomain    string
@@ -35,9 +34,9 @@ var (
 	JSInjectStrings   map[string]string
 	TargetResources   []string
 	TerminateTriggers []string
-	DynamicMode		  bool
-	ForceHTTPS		  bool
-	ForceHTTP		  bool
+	DynamicMode       bool
+	ForceHTTPS        bool
+	ForceHTTP         bool
 
 	//openssl rand -hex 32
 	RC4_KEY = `1b293b681a3edbfe60dee4051e14eeb81b293b681a3edbfe60dee4051e14eeb8`
@@ -103,4 +102,3 @@ func SetCoreRuntimeConfig(conf config.Options) {
 	ForceHTTPS = *conf.ForceHTTPS
 	ForceHTTP = *conf.ForceHTTP
 }
-

