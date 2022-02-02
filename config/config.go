@@ -45,6 +45,7 @@ type Options struct {
 	DynamicMode          *bool   `json:"dynamicMode"`
 	LogRequestFile       *string `json:"log"`
 	Plugins              *string `json:"plugins"`
+	AllowSecureCookies   *bool   `json:"allowSecureCookies"`
 	*TLSConfig
 }
 
@@ -87,7 +88,8 @@ var (
 
 		LogPostOnly: flag.Bool("postOnly", false, "Log only HTTP POST requests"),
 
-		Plugins: flag.String("plugins", "all", "Comma separated list of enabled plugin names"),
+		Plugins:            flag.String("plugins", "all", "Comma separated list of enabled plugin names"),
+		AllowSecureCookies: flag.Bool("allowSecureCookies", false, "Allow secure cookies to be set. Useful for when you are using HTTPS and cookies have SameSite=None"),
 	}
 
 	s = TLSConfig{
