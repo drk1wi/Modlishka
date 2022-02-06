@@ -95,7 +95,7 @@ Compile the binary and you are ready to go:
           URL to view captured credentials and settings. (default "SayHello2Modlishka")
           
       -credParams string
-          	Credential regexp with matching groups. e.g. : baase64(username_regex),baase64(password_regex)
+          	Credential regexp with matching groups. e.g. : base64(username_regex),base64(password_regex)
 
       -debug
         	Print debug information
