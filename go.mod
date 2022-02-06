@@ -7,7 +7,7 @@ require (
 	github.com/drk1wi/Modlishka v0.0.0-20211110201316-a9027f2a7767
 	github.com/dsnet/compress v0.0.1
 	github.com/manifoldco/go-base32 v1.0.4
-	github.com/miekg/dns v1.1.9-0.20190410105521-cfee849963ab
+	github.com/miekg/dns v1.1.25
 	github.com/tidwall/buntdb v1.2.9
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd
 )

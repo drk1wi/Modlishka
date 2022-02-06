@@ -11,6 +11,8 @@ github.com/manifoldco/go-base32 v1.0.4 h1:lnBhqi+F1C4+PETGMX4Lf4vvkFr4cejbYm3DVH
 github.com/manifoldco/go-base32 v1.0.4/go.mod h1:GA524Bo+DrbSK/IJdfRINdQznHPQXwf0pDD3pkHJ6zo=
 github.com/miekg/dns v1.1.9-0.20190410105521-cfee849963ab h1:MQyzTyzLaTb45tixwBaPOJz71mImx/3+T+s9hNsTBlc=
 github.com/miekg/dns v1.1.9-0.20190410105521-cfee849963ab/go.mod h1:W1PPwlIAgtquWBMBEV9nkV9Cazfe8ScdGz/Lj7v3Nrg=
+github.com/miekg/dns v1.1.25 h1:dFwPR6SfLtrSwgDcIq2bcU/gVutB4sNApq2HBdqcakg=
+github.com/miekg/dns v1.1.25/go.mod h1:bPDLeHnStXmXAq1m/Ch/hvfNHr14JKNPMBo3VZKjuso=
 github.com/tidwall/assert v0.1.0 h1:aWcKyRBUAdLoVebxo95N7+YZVTFF/ASTr7BN4sLP6XI=
 github.com/tidwall/assert v0.1.0/go.mod h1:QLYtGyeqse53vuELQheYl9dngGCJQ+mTtlxcktb+Kj8=
 github.com/tidwall/btree v1.1.0 h1:5P+9WU8ui5uhmcg3SoPyTwoI0mVyZ1nps7YQzTZFkYM=
