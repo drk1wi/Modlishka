@@ -60,7 +60,7 @@ Latest source code version can be fetched from [here](https://github.com/drk1wi/
 
 Fetch the code with _'go get'_ :
 
-    $ go get -u github.com/drk1wi/Modlishka
+    $ go install github.com/drk1wi/Modlishka
 
 Compile the binary and you are ready to go:
 
