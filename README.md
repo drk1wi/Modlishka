@@ -7,7 +7,7 @@ From the security perspective, Modlishka can be currently used to:
 -  Automatically poison HTTP 301 browsers cache and permanently hijack non-TLS URLS.
 -  Diagnose and hijack browser-based applications HTTP traffic from the "Client Domain Hooking" attack perspective.
 -  Wrap legacy websites with TLS layer, confuse crawler bots and automated scanners, etc.
--  TBC
+
 
 Modlishka was written as an attempt overcome standard reverse proxy limitations and as a personal challenge to see what is possible with sufficient motivation and a bit of extra research time. 
 The achieved results appeared to be very interesting and the tool was initially released and later updated with aim to:
@@ -53,7 +53,6 @@ Modlishka in action against an example two factor authentication scheme (SMS bas
 
 [https://vimeo.com/308709275](https://vimeo.com/308709275)
 
-
 Installation
 ------------
 
@@ -65,7 +64,8 @@ Fetch the code with _'go get'_ :
 
 Compile the binary and you are ready to go:
 
-    $ cd $GOPATH/src/github.com/drk1wi/Modlishka/
+    $ git clone https://github.com/drk1wi/Modlishka.git
+    $ cd Modlishka
     $ make
     
     
