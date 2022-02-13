@@ -59,6 +59,11 @@ Installation
 Latest source code version can be fetched from [here](https://github.com/drk1wi/modlishka/zipball/master) (zip) or [here](https://github.com/drk1wi/modlishka/tarball/master) (tar).
 
 
+
+Fetch the code with _'go install'_ :
+
+    $ go install github.com/drk1wi/Modlishka
+
 Compile the binary and you are ready to go:
 
     $ git clone https://github.com/drk1wi/Modlishka.git
