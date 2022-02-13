@@ -1,10 +1,9 @@
-module main
+module github.com/drk1wi/Modlishka
 
 go 1.17
 
 require (
 	github.com/cespare/go-smaz v1.0.0
-	github.com/drk1wi/Modlishka v0.0.0-20211110201316-a9027f2a7767
 	github.com/dsnet/compress v0.0.1
 	github.com/manifoldco/go-base32 v1.0.4
 	github.com/miekg/dns v1.1.25

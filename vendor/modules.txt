@@ -1,13 +1,6 @@
 # github.com/cespare/go-smaz v1.0.0
 ## explicit; go 1.17
 github.com/cespare/go-smaz
-# github.com/drk1wi/Modlishka v0.0.0-20211110201316-a9027f2a7767
-## explicit
-github.com/drk1wi/Modlishka/config
-github.com/drk1wi/Modlishka/core
-github.com/drk1wi/Modlishka/log
-github.com/drk1wi/Modlishka/plugin
-github.com/drk1wi/Modlishka/runtime
 # github.com/dsnet/compress v0.0.1
 ## explicit; go 1.9
 github.com/dsnet/compress/brotli
