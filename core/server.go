@@ -20,13 +20,15 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
+	"net"
+	"net/http"
+	"strconv"
+	"strings"
+
 	"github.com/drk1wi/Modlishka/config"
 	"github.com/drk1wi/Modlishka/log"
 	"github.com/drk1wi/Modlishka/plugin"
 	"github.com/drk1wi/Modlishka/runtime"
-	"net"
-	"net/http"
-	"strconv"
 )
 
 var ServerRuntimeConfig *ServerConfig
@@ -266,6 +268,10 @@ Author: Piotr Duszynski @drk1wi
 		welcome = fmt.Sprintf("%s\nListening on [%s]\nProxying HTTP [%s] via [http://%s]", welcome, httplistener, runtime.Target, runtime.ProxyDomain)
 
 		log.Infof("%s", welcome)
+
+		if len(runtime.StaticLocations) > 0 {
+			log.Infof("Maintained Location Header Targets: %s", strings.Join(runtime.StaticLocations, ", "))
+		}
 
 		go func() {
 			server := &http.Server{Addr: httplistener, Handler: HTTPServerRuntimeConfig.Handler}
