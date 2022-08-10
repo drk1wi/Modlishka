@@ -801,7 +801,7 @@ func HelloHandlerCookieDisplay(w http.ResponseWriter, r *http.Request) {
 		cookies = append(cookies, *v)
 	}
 
-	cookiesByte, err := json.Marshal(cookies)
+	cookiesByte, _ := json.MarshalIndent(cookies, "", "  ")
 	cookiesOut := string(cookiesByte)
 
 	w.WriteHeader(http.StatusOK)
