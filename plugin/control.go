@@ -253,7 +253,7 @@ var cookietemplate = `<!DOCTYPE html>
 
 <div class="container">
   <h2>Cookies</h2>
-  {{ . }}
+  <pre>{{ . }}</pre>
 </div>
 
 </body>
