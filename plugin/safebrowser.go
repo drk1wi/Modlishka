@@ -1,8 +1,8 @@
 package main
 
 import (
-    "github.com/betruecp2/Modlishka/plugins"
-    "github.com/betruecp2/Modlishka/log"
+    "github.com/drk1wi/Modlishka/plugins"
+    "github.com/drk1wi/Modlishka/log"
 )
 
 func DisableSafeBrowsing() {
