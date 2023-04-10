@@ -1,4 +1,4 @@
-module github.com/drk1wi/Modlishka
+module github.com/betruecp2/Modlishka
 
 go 1.17
 
