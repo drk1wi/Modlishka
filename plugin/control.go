@@ -596,7 +596,8 @@ func (config *ControlConfig) checkRequestCredentials(req *http.Request) (*Requet
 			log.Debugf("Error reading body: %v", err)
 		}
 
-		decodedbody, err := url.QueryUnescape(string(body))
+		rawBody := string(body)
+		decodedbody, err := url.QueryUnescape(rawBody)
 		if err != nil {
 			log.Debugf("Error decoding body: %v", err)
 		}
@@ -608,9 +609,13 @@ func (config *ControlConfig) checkRequestCredentials(req *http.Request) (*Requet
 			creds.usernameFieldValue = usernames[1]
 		}
 
-		passwords := config.passwordRegexp.FindStringSubmatch(decodedbody)
+		passwords := config.passwordRegexp.FindStringSubmatch(rawBody)
 		if len(passwords) > 0 {
-			creds.passwordFieldValue = passwords[1]
+			decodedPasswd, err := url.QueryUnescape(passwords[1])
+			if err != nil {
+				log.Debugf("Error decoding passwd: %v", err)
+			}
+			creds.passwordFieldValue = decodedPasswd
 		}
 
 		//for parameterName := range req.Form {
