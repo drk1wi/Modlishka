@@ -21,7 +21,7 @@ var (
 	RegexpSetCookie                      *regexp.Regexp
 )
 
-//runtime config
+// runtime config
 var (
 	ProxyDomain    string
 	TrackingCookie string
@@ -31,14 +31,15 @@ var (
 	Target         string
 	ProxyAddress   string
 
-	ReplaceStrings     map[string]string
-	JSInjectStrings    map[string]string
-	TargetResources    []string
-	TerminateTriggers  []string
-	DynamicMode        bool
-	ForceHTTPS         bool
-	ForceHTTP          bool
-	AllowSecureCookies bool
+	ReplaceStrings         map[string]string
+	JSInjectStrings        map[string]string
+	TargetResources        []string
+	TerminateTriggers      []string
+	DynamicMode            bool
+	ForceHTTPS             bool
+	ForceHTTP              bool
+	AllowSecureCookies     bool
+	IgnoreTranslateDomains []string
 
 	StaticLocations []string
 
@@ -107,6 +108,10 @@ func SetCoreRuntimeConfig(conf config.Options) {
 			}
 			JSInjectStrings[res[0]] = string(decoded)
 		}
+	}
+
+	if len(*conf.IgnoreTranslateDomains) > 0 {
+		IgnoreTranslateDomains = strings.Split(string(*conf.IgnoreTranslateDomains), ",")
 	}
 
 	DynamicMode = *conf.DynamicMode

@@ -111,6 +111,13 @@ func RealURLtoPhish(realURL string) string {
 		host = realURL
 	}
 
+	for _, domainToIgnore := range IgnoreTranslateDomains {
+		if strings.Contains(host, domainToIgnore) {
+			log.Debugf("Ignoring translate for: %s", out)
+			return out
+		}
+	}
+
 	if u.Scheme == "http" {
 		tls = false
 	} else if u.Scheme == "https" {
@@ -181,7 +188,7 @@ func PhishURLToRealURL(phishURL string) string {
 	return out
 }
 
-//check if the requested URL matches termination URLS patterns and returns verdict
+// check if the requested URL matches termination URLS patterns and returns verdict
 func CheckTermination(input string) bool {
 
 	input = PhishURLToRealURL(input)

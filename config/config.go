@@ -25,29 +25,30 @@ import (
 )
 
 type Options struct {
-	ProxyDomain          *string `json:"proxyDomain"`
-	ListeningAddress     *string `json:"listeningAddress"`
-	ListeningPortHTTP    *int    `json:"listeningPortHTTP"`
-	ListeningPortHTTPS   *int    `json:"listeningPortHTTPS"`
-	ProxyAddress         *string `json:"proxyAddress"`
-	StaticLocations      *string `json:"staticLocations"`
-	Target               *string `json:"target"`
-	TargetRes            *string `json:"targetResources"`
-	TargetRules          *string `json:"rules"`
-	JsRules              *string `json:"jsRules"`
-	TerminateTriggers    *string `json:"terminateTriggers"`
-	TerminateRedirectUrl *string `json:"terminateRedirectUrl"`
-	TrackingCookie       *string `json:"trackingCookie"`
-	TrackingParam        *string `json:"trackingParam"`
-	Debug                *bool   `json:"debug"`
-	ForceHTTPS           *bool   `json:"forceHTTPS"`
-	ForceHTTP            *bool   `json:"forceHTTP"`
-	LogPostOnly          *bool   `json:"logPostOnly"`
-	DisableSecurity      *bool   `json:"disableSecurity"`
-	DynamicMode          *bool   `json:"dynamicMode"`
-	LogRequestFile       *string `json:"log"`
-	Plugins              *string `json:"plugins"`
-	AllowSecureCookies   *bool   `json:"allowSecureCookies"`
+	ProxyDomain            *string `json:"proxyDomain"`
+	ListeningAddress       *string `json:"listeningAddress"`
+	ListeningPortHTTP      *int    `json:"listeningPortHTTP"`
+	ListeningPortHTTPS     *int    `json:"listeningPortHTTPS"`
+	ProxyAddress           *string `json:"proxyAddress"`
+	StaticLocations        *string `json:"staticLocations"`
+	Target                 *string `json:"target"`
+	TargetRes              *string `json:"targetResources"`
+	TargetRules            *string `json:"rules"`
+	JsRules                *string `json:"jsRules"`
+	TerminateTriggers      *string `json:"terminateTriggers"`
+	TerminateRedirectUrl   *string `json:"terminateRedirectUrl"`
+	TrackingCookie         *string `json:"trackingCookie"`
+	TrackingParam          *string `json:"trackingParam"`
+	Debug                  *bool   `json:"debug"`
+	ForceHTTPS             *bool   `json:"forceHTTPS"`
+	ForceHTTP              *bool   `json:"forceHTTP"`
+	LogPostOnly            *bool   `json:"logPostOnly"`
+	DisableSecurity        *bool   `json:"disableSecurity"`
+	DynamicMode            *bool   `json:"dynamicMode"`
+	LogRequestFile         *string `json:"log"`
+	Plugins                *string `json:"plugins"`
+	AllowSecureCookies     *bool   `json:"allowSecureCookies"`
+	IgnoreTranslateDomains *string `json:"ignoreTranslateDomains"`
 	*TLSConfig
 }
 
@@ -91,8 +92,9 @@ var (
 
 		LogPostOnly: flag.Bool("postOnly", false, "Log only HTTP POST requests"),
 
-		Plugins:            flag.String("plugins", "all", "Comma separated list of enabled plugin names"),
-		AllowSecureCookies: flag.Bool("allowSecureCookies", false, "Allow secure cookies to be set. Useful for when you are using HTTPS and cookies have SameSite=None"),
+		Plugins:                flag.String("plugins", "all", "Comma separated list of enabled plugin names"),
+		AllowSecureCookies:     flag.Bool("allowSecureCookies", false, "Allow secure cookies to be set. Useful for when you are using HTTPS and cookies have SameSite=None"),
+		IgnoreTranslateDomains: flag.String("ignoreTranslateDomains", "", "Comma separated list of domains to never translate and proxy"),
 	}
 
 	s = TLSConfig{

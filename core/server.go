@@ -107,6 +107,7 @@ func (conf *ServerConfig) MainHandler(w http.ResponseWriter, r *http.Request) {
 	log.Debugf("[P] Proxying target [%s] via domain [%s]", targetURL, runtime.ProxyDomain)
 
 	origin := r.Header.Get("Origin")
+
 	settings := &ReverseProxyFactorySettings{
 		conf.Options,
 		targetURL,

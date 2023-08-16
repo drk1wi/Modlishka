@@ -88,6 +88,9 @@ func (p *ReverseProxy) rewriteResponse(r *http.Response) (err error) {
 		response.Header.Get("Content-Encoding"), len(buffer))
 
 	// Translate URLs
+	if strings.HasPrefix(r.Request.URL.String(), "https://accounts.google.com/v3/signin/_/AccountsSignInUi/data/batchexecute") {
+		log.Debugf("Before BatchURL: %s", buffer)
+	}
 	buffer = p.PatchURL(buffer)
 
 	// Inject Payloads
