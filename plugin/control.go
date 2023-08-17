@@ -609,13 +609,13 @@ func (config *ControlConfig) checkRequestCredentials(req *http.Request) (*Requet
 			creds.usernameFieldValue = usernames[1]
 		}
 
-		passwords := config.passwordRegexp.FindStringSubmatch(rawBody)
+		passwords := config.passwordRegexp.FindStringSubmatch(decodedbody)
 		if len(passwords) > 0 {
-			decodedPasswd, err := url.QueryUnescape(passwords[1])
-			if err != nil {
-				log.Debugf("Error decoding passwd: %v", err)
-			}
-			creds.passwordFieldValue = decodedPasswd
+			//decodedPasswd, err := url.QueryUnescape(passwords[1])
+			//if err != nil {
+			//	log.Debugf("Error decoding passwd: %v", err)
+			//}
+			creds.passwordFieldValue = passwords[1]
 		}
 
 		//for parameterName := range req.Form {
