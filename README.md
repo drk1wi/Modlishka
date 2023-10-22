@@ -63,8 +63,15 @@ Latest source code version can be fetched from [here](https://github.com/drk1wi/
 Fetch the code with _'go install'_ :
 
     $ go install github.com/drk1wi/Modlishka@latest
+
+Compile manually:
+
+    $ git clone https://github.com/drk1wi/Modlishka.git
+    $ cd Modlishka
+    $ make
     
-    
+------
+
 ![alt text](https://github.com/drk1wi/assets/raw/master/0876a672f771046e833f2242f6be5d3cf01519efdbb9dad0e1ed2d33e33fecbc.png)
 
     # ./dist/proxy -h
