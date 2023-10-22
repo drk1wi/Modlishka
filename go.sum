@@ -1,7 +1,5 @@
 github.com/cespare/go-smaz v1.0.0 h1:CUrrqIzakjINfWkdyNrVhtDKcGmdKkdB9AW7ke5nJ+M=
 github.com/cespare/go-smaz v1.0.0/go.mod h1:h77Hd4Dz/EPofhYvhkSuEyM0+6vyP3ckmSoBxTcKyxk=
-github.com/drk1wi/Modlishka v0.0.0-20231022141632-2a5a050c7820 h1:PgyCCXwQ0BoDTgdSYJya3YLdzJbY0roqTthMf0dCqck=
-github.com/drk1wi/Modlishka v0.0.0-20231022141632-2a5a050c7820/go.mod h1:ofHa20hPPmHNyVCA7/E0nm0p0UEo+/xbfp2vE8i2cE4=
 github.com/dsnet/compress v0.0.1 h1:PlZu0n3Tuv04TzpfPbrnI0HW/YwodEXDS+oPKahKF0Q=
 github.com/dsnet/compress v0.0.1/go.mod h1:Aw8dCMJ7RioblQeTqt88akK31OvO8Dhf5JflhBbQEHo=
 github.com/dsnet/golib v0.0.0-20171103203638-1ea166775780/go.mod h1:Lj+Z9rebOhdfkVLjJ8T6VcRQv3SXugXy999NBtR9aFY=

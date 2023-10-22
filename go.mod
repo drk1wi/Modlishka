@@ -1,10 +1,9 @@
-module deps
+module github.com/drk1wi/Modlishka
 
 go 1.21.3
 
 require (
 	github.com/cespare/go-smaz v1.0.0
-	github.com/drk1wi/Modlishka v0.0.0-20231022141632-2a5a050c7820
 	github.com/dsnet/compress v0.0.1
 	github.com/manifoldco/go-base32 v1.0.4
 	github.com/miekg/dns v1.1.56
