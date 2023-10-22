@@ -3,25 +3,17 @@
 // license that can be found in the LICENSE file.
 package btree
 
-import btree "github.com/tidwall/btree/internal"
-
 type BTree struct {
-	base *btree.BTree
+	base *BTreeG[any]
 }
 
-// PathHint is a utility type used with the *Hint() functions. Hints provide
-// faster operations for clustered keys.
-type PathHint = btree.PathHint
-
 // New returns a new BTree
-func New(less func(a, b interface{}) bool) *BTree {
+func New(less func(a, b any) bool) *BTree {
 	if less == nil {
 		panic("nil less")
 	}
 	return &BTree{
-		base: btree.NewOptions(btree.Options{
-			Context: less,
-		}),
+		base: NewBTreeG(less),
 	}
 }
 
@@ -30,31 +22,33 @@ func New(less func(a, b interface{}) bool) *BTree {
 //
 // This is useful for when you do not need the BTree to manage the locking,
 // but would rather do it yourself.
-func NewNonConcurrent(less func(a, b interface{}) bool) *BTree {
+func NewNonConcurrent(less func(a, b any) bool) *BTree {
 	if less == nil {
 		panic("nil less")
 	}
 	return &BTree{
-		base: btree.NewOptions(btree.Options{
-			Context: less,
-			NoLocks: true,
-		}),
+		base: NewBTreeGOptions(less,
+			Options{
+				NoLocks: true,
+			}),
 	}
 }
 
 // Less is a convenience function that performs a comparison of two items
 // using the same "less" function provided to New.
-func (tr *BTree) Less(a, b interface{}) bool {
+func (tr *BTree) Less(a, b any) bool {
 	return tr.base.Less(a, b)
 }
 
 // Set or replace a value for a key
-func (tr *BTree) Set(item interface{}) interface{} {
+// Returns the value for the replaced item or nil if the key was not found.
+func (tr *BTree) Set(item any) (prev any) {
 	return tr.SetHint(item, nil)
 }
 
 // SetHint sets or replace a value for a key using a path hint
-func (tr *BTree) SetHint(item interface{}, hint *PathHint) (prev interface{}) {
+// Returns the value for the replaced item or nil if the key was not found.
+func (tr *BTree) SetHint(item any, hint *PathHint) (prev any) {
 	if item == nil {
 		panic("nil item")
 	}
@@ -65,13 +59,15 @@ func (tr *BTree) SetHint(item interface{}, hint *PathHint) (prev interface{}) {
 	return v
 }
 
-// Get a value for key
-func (tr *BTree) Get(key interface{}) interface{} {
+// Get a value for key.
+// Returns nil if the key was not found.
+func (tr *BTree) Get(key any) any {
 	return tr.GetHint(key, nil)
 }
 
-// GetHint gets a value for key using a path hint
-func (tr *BTree) GetHint(key interface{}, hint *PathHint) interface{} {
+// GetHint gets a value for key using a path hint.
+// Returns nil if the item was not found.
+func (tr *BTree) GetHint(key any, hint *PathHint) (value any) {
 	if key == nil {
 		return nil
 	}
@@ -87,13 +83,15 @@ func (tr *BTree) Len() int {
 	return tr.base.Len()
 }
 
-// Delete a value for a key
-func (tr *BTree) Delete(key interface{}) interface{} {
+// Delete an item for a key.
+// Returns the deleted value or nil if the key was not found.
+func (tr *BTree) Delete(key any) (prev any) {
 	return tr.DeleteHint(key, nil)
 }
 
 // DeleteHint deletes a value for a key using a path hint
-func (tr *BTree) DeleteHint(key interface{}, hint *PathHint) interface{} {
+// Returns the deleted value or nil if the key was not found.
+func (tr *BTree) DeleteHint(key any, hint *PathHint) (prev any) {
 	if key == nil {
 		return nil
 	}
@@ -107,7 +105,7 @@ func (tr *BTree) DeleteHint(key interface{}, hint *PathHint) interface{} {
 // Ascend the tree within the range [pivot, last]
 // Pass nil for pivot to scan all item in ascending order
 // Return false to stop iterating
-func (tr *BTree) Ascend(pivot interface{}, iter func(item interface{}) bool) {
+func (tr *BTree) Ascend(pivot any, iter func(item any) bool) {
 	if pivot == nil {
 		tr.base.Scan(iter)
 	} else {
@@ -118,7 +116,7 @@ func (tr *BTree) Ascend(pivot interface{}, iter func(item interface{}) bool) {
 // Descend the tree within the range [pivot, first]
 // Pass nil for pivot to scan all item in descending order
 // Return false to stop iterating
-func (tr *BTree) Descend(pivot interface{}, iter func(item interface{}) bool) {
+func (tr *BTree) Descend(pivot any, iter func(item any) bool) {
 	if pivot == nil {
 		tr.base.Reverse(iter)
 	} else {
@@ -127,7 +125,9 @@ func (tr *BTree) Descend(pivot interface{}, iter func(item interface{}) bool) {
 }
 
 // Load is for bulk loading pre-sorted items
-func (tr *BTree) Load(item interface{}) interface{} {
+// If the load replaces and existing item then the value for the replaced item
+// is returned.
+func (tr *BTree) Load(item any) (prev any) {
 	if item == nil {
 		panic("nil item")
 	}
@@ -140,7 +140,7 @@ func (tr *BTree) Load(item interface{}) interface{} {
 
 // Min returns the minimum item in tree.
 // Returns nil if the tree has no items.
-func (tr *BTree) Min() interface{} {
+func (tr *BTree) Min() any {
 	v, ok := tr.base.Min()
 	if !ok {
 		return nil
@@ -150,7 +150,7 @@ func (tr *BTree) Min() interface{} {
 
 // Max returns the maximum item in tree.
 // Returns nil if the tree has no items.
-func (tr *BTree) Max() interface{} {
+func (tr *BTree) Max() any {
 	v, ok := tr.base.Max()
 	if !ok {
 		return nil
@@ -160,7 +160,7 @@ func (tr *BTree) Max() interface{} {
 
 // PopMin removes the minimum item in tree and returns it.
 // Returns nil if the tree has no items.
-func (tr *BTree) PopMin() interface{} {
+func (tr *BTree) PopMin() any {
 	v, ok := tr.base.PopMin()
 	if !ok {
 		return nil
@@ -168,9 +168,9 @@ func (tr *BTree) PopMin() interface{} {
 	return v
 }
 
-// PopMax removes the minimum item in tree and returns it.
+// PopMax removes the maximum item in tree and returns it.
 // Returns nil if the tree has no items.
-func (tr *BTree) PopMax() interface{} {
+func (tr *BTree) PopMax() any {
 	v, ok := tr.base.PopMax()
 	if !ok {
 		return nil
@@ -180,7 +180,7 @@ func (tr *BTree) PopMax() interface{} {
 
 // GetAt returns the value at index.
 // Return nil if the tree is empty or the index is out of bounds.
-func (tr *BTree) GetAt(index int) interface{} {
+func (tr *BTree) GetAt(index int) any {
 	v, ok := tr.base.GetAt(index)
 	if !ok {
 		return nil
@@ -190,7 +190,7 @@ func (tr *BTree) GetAt(index int) interface{} {
 
 // DeleteAt deletes the item at index.
 // Return nil if the tree is empty or the index is out of bounds.
-func (tr *BTree) DeleteAt(index int) interface{} {
+func (tr *BTree) DeleteAt(index int) any {
 	v, ok := tr.base.DeleteAt(index)
 	if !ok {
 		return nil
@@ -206,8 +206,8 @@ func (tr *BTree) Height() int {
 
 // Walk iterates over all items in tree, in order.
 // The items param will contain one or more items.
-func (tr *BTree) Walk(iter func(items []interface{})) {
-	tr.base.Walk(func(items []interface{}) bool {
+func (tr *BTree) Walk(iter func(items []any)) {
+	tr.base.Walk(func(items []any) bool {
 		iter(items)
 		return true
 	})
@@ -220,7 +220,7 @@ func (tr *BTree) Copy() *BTree {
 }
 
 type Iter struct {
-	base btree.Iter
+	base GenericIter[any]
 }
 
 // Iter returns a read-only iterator.
@@ -231,7 +231,7 @@ func (tr *BTree) Iter() Iter {
 
 // Seek to item greater-or-equal-to key.
 // Returns false if there was no item found.
-func (iter *Iter) Seek(key interface{}) bool {
+func (iter *Iter) Seek(key any) bool {
 	return iter.base.Seek(key)
 }
 
@@ -268,6 +268,6 @@ func (iter *Iter) Prev() bool {
 }
 
 // Item returns the current iterator item.
-func (iter *Iter) Item() interface{} {
+func (iter *Iter) Item() any {
 	return iter.base.Item()
 }

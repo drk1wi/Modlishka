@@ -1,0 +1,82 @@
+Modlishka Public Source License
+
+The Modlishka software (henceforth referred to simply as "Modlishka") is dual-licensed - Copyright 2018 Modlishka Team.
+
+Cases that include commercialization of Modlishka require a commercial, non-free license. Otherwise, Modlishka can be used without charge under the terms set out below.
+
+1. Definitions
+
+1.1 “License” means this document.
+1.2 “Contributor” means each individual or legal entity that creates, contributes to the creation of, or owns Modlishka.
+1.3 “Modlishka Team” means Modlishka’s core developer (Piotr Duszyński) and an updated list of whom can be found within the CREDITS file.
+
+2. Commercialization
+
+A commercial use is one intended for commercial advantage or monetary compensation.
+
+Example cases of commercialization are:
+
+ - Using Modlishka to provide commercial managed/Software-as-a-Service services.
+ - Distributing Modlishka as a commercial product or as part of one.
+ - Using Modlishka as a part of a commercial service or product.
+ - Promoting commercial services or products with Modlishka.
+
+Example cases which do not require a commercial license, and thus fall under the terms set out below, include (but are not limited to):
+
+ - Penetration testers (or penetration testing organizations) using Modlishka as part of their assessment toolkit.
+ - Penetration Testing Linux Distributions including but not limited to Kali Linux, SamuraiWTF, BackBox Linux.
+ - Using standalone Modlishka to test your own systems.
+ - Any non-commercial use of Modlishka.
+
+If you need to purchase a commercial license or are unsure whether you need to purchase a commercial license contact us -> piotr[\at]duszynski.eu.
+
+We may grant commercial licenses at no monetary cost at our own discretion if the commercial usage is deemed by the Modlishka Team to significantly benefit Modlishka.
+
+Free-use Terms and Conditions;
+
+3. Redistribution
+
+Redistribution is permitted under the following conditions:
+
+ - Does not conflict with the commercialization clause.
+ - Unmodified License is provided with Modlishka.
+ - Unmodified Copyright notices are provided with Modlishka.
+ - Work that is based or relies on Modlishka or its subcomponents (including modifications) is released as an open-source project.
+
+4. Copying
+
+Copying is permitted so long as it does not conflict with the Redistribution clause (all conditions apply).
+
+5. Modification
+
+Modification is permitted so long as it does not conflict with the Redistribution clause (all conditions apply).
+
+6. Contributions
+
+Any Contributions assume the Contributor grants the Modlishka Team the unlimited, non-exclusive right to reuse, modify and relicense the Contributor's content.
+
+7. Support
+
+Modlishka is provided under an AS-IS basis and without any support, updates or maintenance. Support, updates and maintenance may be given according to the sole discretion of the Modlishka Team.
+
+8. Disclaimer of Warranty
+
+Modlishka is provided under this License on an “as is” basis, without warranty of any kind, either expressed, implied, or statutory, including, without limitation, warranties that the Modlishka is free of defects, merchantable, fit for a particular purpose or non-infringing.
+
+9. Limitation of Liability
+
+To the extent permitted under Law, Modlishka is provided under an AS-IS basis. The Modlishka Team shall never, and without any limit, be liable for any damage, cost, expense or any other payment incurred as a result of Modlishka's actions, failure, bugs and/or any other interaction between Modlishka and end-equipment, computers, other software or any 3rd party, end-equipment, computer, people or services.
+
+10. Disclaimer
+
+Running Modlishka against websites without prior mutual consent may be illegal in your country. The Modlishka Team accept no liability and are not responsible for any misuse or damage caused by Modlishka.
+
+11. Trademark
+
+This License does not grant the use of the "Modlishka" trademark or the use of the Modlishka logo.
+
+
+Note:
+
+This License is based on the "WPScan" License, with the consent of the WPScan Team.
+This project is using MIT, BSD licensed libraries and libraries copyrighted by "The Go Authors" : "Copyright (c) 2009 The Go Authors. All rights reserved."
