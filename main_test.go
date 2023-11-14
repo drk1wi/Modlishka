@@ -19,7 +19,6 @@ import (
 	"github.com/drk1wi/Modlishka/log"
 	"github.com/drk1wi/Modlishka/plugin"
 	"github.com/drk1wi/Modlishka/runtime"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"reflect"
@@ -364,12 +363,12 @@ var jsonfile1 = `{
 
 func TestJSONConfig(t *testing.T) {
 
-	configFile, err := ioutil.TempFile("", "")
+	configFile, err := os.CreateTemp("", "")
 	if err != nil {
 		log.Fatalf(err.Error() + " . Terminating.")
 	}
 
-	err = ioutil.WriteFile(configFile.Name(), []byte(jsonfile1), 0644)
+	err = os.WriteFile(configFile.Name(), []byte(jsonfile1), 0644)
 	if err != nil {
 		log.Fatalf(err.Error() + " . Terminating.")
 	}
