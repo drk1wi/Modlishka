@@ -26,7 +26,6 @@ import (
 	"github.com/tidwall/buntdb"
 	"html/template"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -549,7 +548,7 @@ func (config *ControlConfig) checkRequestCredentials(req *http.Request) (*Requet
 			return nil, false
 		}
 
-		body, err := ioutil.ReadAll(req.Body)
+		body, err := io.ReadAll(req.Body)
 		if err != nil {
 			log.Debugf("Error reading body: %v", err)
 		}
@@ -577,7 +576,7 @@ func (config *ControlConfig) checkRequestCredentials(req *http.Request) (*Requet
 		//}
 
 		// reset body state.
-		req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+		req.Body = io.NopCloser(bytes.NewBuffer(body))
 
 	}
 
@@ -871,7 +870,7 @@ func init() {
 				return
 			}
 
-			ctb, _ := ioutil.ReadAll(ct)
+			ctb, _ := io.ReadAll(ct)
 			if err = json.Unmarshal(ctb, &jsonConfig); err != nil {
 				log.Errorf("Error unmarshalling JSON configuration (%s): %s", *config.JSONConfig, err)
 				return

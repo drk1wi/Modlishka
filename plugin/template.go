@@ -18,7 +18,7 @@ import (
 	"encoding/json"
 	"github.com/drk1wi/Modlishka/config"
 	"github.com/drk1wi/Modlishka/log"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 )
@@ -52,7 +52,7 @@ func init() {
 			}
 			defer ct.Close()
 
-			ctb, _ := ioutil.ReadAll(ct)
+			ctb, _ := io.ReadAll(ct)
 			err = json.Unmarshal(ctb, &jsonConfig)
 			if err != nil {
 				log.Errorf("Error unmarshalling JSON configuration (%s): %s", *config.JSONConfig, err)
