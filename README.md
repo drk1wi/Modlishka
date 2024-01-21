@@ -160,8 +160,7 @@ Compile manually:
 
 License
 -------
-Author: Modlishka was designed and implemented by Piotr Duszyński ([@drk1wi](https://twitter.com/drk1wi)) 
-All rights reserved.
+Author: Modlishka was designed and implemented by Piotr Duszyński ([@drk1wi](https://twitter.com/drk1wi)). All rights reserved.
 
 Credits 
 -------
