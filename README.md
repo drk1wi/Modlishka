@@ -156,11 +156,14 @@ Compile manually:
 
 Commercial Usage
 -------
-Modlishka is licensed under [this License](https://raw.githubusercontent.com/drk1wi/Modlishka/master/LICENSE). For commercial, legitimate applications, please contact the author for the appropriate licensing arrangements.
+Modlishka is licensed under [this License](https://raw.githubusercontent.com/drk1wi/Modlishka/master/LICENSE). 
+
+For commercial, legitimate applications, please contact the author for the appropriate licensing arrangements.
 
 Credits 
 -------
 Author: Modlishka was designed and implemented by Piotr Duszyński ([@drk1wi](https://twitter.com/drk1wi)). All rights reserved.
+
 Big kudos go to all [contributors](https://github.com/drk1wi/Modlishka/graphs/contributors) who participated in this project.
 
 Disclaimer
