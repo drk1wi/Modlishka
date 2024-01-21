@@ -21,10 +21,7 @@ import (
 	"strings"
 )
 
-
-
 func init() {
-
 
 	s := Property{}
 	s.Name = "hijack"
@@ -38,7 +35,6 @@ func init() {
 	s.Flags = func() {
 	}
 
-
 	//process HTTP request
 	s.HTTPRequest = func(req *http.Request, context *HTTPContext) {
 
@@ -46,34 +42,30 @@ func init() {
 			return
 		}
 
+		if strings.Contains(context.OriginalTarget, runtime.ProxyDomain) == false && context.IsTLS == false {
 
-		if strings.Contains(context.OriginalTarget,runtime.ProxyDomain) == false &&  context.IsTLS == false  {
-
-			log.Warningf("Hijack plugin: Clear-text [%s%s]\n\tID: [%s] \n\tIP: [%s] \n\tUser-Agent: [%s]\n",context.Target,req.URL.Path,context.UserID,context.IP,req.Header.Get("User-Agent"))
+			log.Warningf("Hijack plugin: Clear-text [%s%s]\n\tID: [%s] \n\tIP: [%s] \n\tUser-Agent: [%s]\n", context.Target, req.URL.Path, context.UserID, context.IP, req.Header.Get("User-Agent"))
 		}
 
-		if strings.Contains(context.OriginalTarget,runtime.ProxyDomain) == false && context.IsTLS == true {
+		if strings.Contains(context.OriginalTarget, runtime.ProxyDomain) == false && context.IsTLS == true {
 
-			log.Warningf("Hijack plugin: TLS URL [%s%s]\n\tID: [%s] \n\tIP: [%s] \n\tUser-Agent: [%s]\n",context.Target,req.URL.Path,context.UserID,context.IP,req.Header.Get("User-Agent"))
+			log.Warningf("Hijack plugin: TLS URL [%s%s]\n\tID: [%s] \n\tIP: [%s] \n\tUser-Agent: [%s]\n", context.Target, req.URL.Path, context.UserID, context.IP, req.Header.Get("User-Agent"))
 		}
 
-		if strings.Contains(context.OriginalTarget,runtime.ProxyDomain) &&  context.IsTLS == true  {
+		if strings.Contains(context.OriginalTarget, runtime.ProxyDomain) && context.IsTLS == true {
 
-			log.Warningf("Hijack plugin: Hijacked TLS URL [%s%s]\n\tID: [%s] \n\tIP: [%s] \n\tUser-Agent: [%s]\n",context.Target,req.URL.Path,context.UserID,context.IP,req.Header.Get("User-Agent"))
+			log.Warningf("Hijack plugin: Hijacked TLS URL [%s%s]\n\tID: [%s] \n\tIP: [%s] \n\tUser-Agent: [%s]\n", context.Target, req.URL.Path, context.UserID, context.IP, req.Header.Get("User-Agent"))
 		}
 
-		if strings.Contains(context.OriginalTarget,runtime.ProxyDomain) &&  context.IsTLS == false  {
+		if strings.Contains(context.OriginalTarget, runtime.ProxyDomain) && context.IsTLS == false {
 
-			log.Warningf("Hijack plugin: Hijacked clear-text URL [%s%s]\n\tID: [%s] \n\tIP: [%s] \n\tUser-Agent: [%s]\n",context.Target,req.URL.Path,context.UserID,context.IP,req.Header.Get("User-Agent"))
+			log.Warningf("Hijack plugin: Hijacked clear-text URL [%s%s]\n\tID: [%s] \n\tIP: [%s] \n\tUser-Agent: [%s]\n", context.Target, req.URL.Path, context.UserID, context.IP, req.Header.Get("User-Agent"))
 		}
 
 	}
 
-
-
 	//process HTTP response (responses can arrive in random order)
-	s.HTTPResponse = func(resp *http.Response, context *HTTPContext,buffer *[]byte) {
-
+	s.HTTPResponse = func(resp *http.Response, context *HTTPContext, buffer *[]byte) {
 
 	}
 

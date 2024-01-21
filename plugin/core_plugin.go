@@ -37,21 +37,21 @@ type Property struct {
 	Init            func()
 	Flags           func()
 	HTTPRequest     func(req *http.Request, context *HTTPContext)
-	HTTPResponse    func(resp *http.Response, context *HTTPContext,buffer *[]byte)
-	TerminateUser    func(userID string)
+	HTTPResponse    func(resp *http.Response, context *HTTPContext, buffer *[]byte)
+	TerminateUser   func(userID string)
 	RegisterHandler func(handler *http.ServeMux)
 }
 
 type HTTPContext struct {
-	Target         *url.URL // Target URL after going through the proxy
-	OriginalTarget string   // Original Host
-	Origin         string   // Origin before going through the proxy
-	UserID         string   // traced user identifier
-	InitUserID     string   // traced user id
-	JSPayload      string   // JS Payload
-	IP             string   // victim's IP address
-	IsTLS		   bool 	//TLS request
-	Extra 		   map[string]string //Extra Plugin Data
+	Target         *url.URL          // Target URL after going through the proxy
+	OriginalTarget string            // Original Host
+	Origin         string            // Origin before going through the proxy
+	UserID         string            // traced user identifier
+	InitUserID     string            // traced user id
+	JSPayload      string            // JS Payload
+	IP             string            // victim's IP address
+	IsTLS          bool              //TLS request
+	Extra          map[string]string //Extra Plugin Data
 }
 
 // Add the given Plugin to the list of loaded plugins
@@ -150,7 +150,7 @@ func (context *HTTPContext) InvokeHTTPRequestHooks(req *http.Request) {
 func (context *HTTPContext) InvokeHTTPResponseHooks(resp *http.Response, buffer *[]byte) {
 	for _, p := range Plugins {
 		if p.Active == true && p.HTTPResponse != nil {
-			p.HTTPResponse(resp, context,buffer)
+			p.HTTPResponse(resp, context, buffer)
 		}
 	}
 }

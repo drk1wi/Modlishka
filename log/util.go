@@ -49,7 +49,6 @@ func LogRequestFile(data string) {
 
 }
 
-
 func Cookies(userID string, URL string, cookies []string, IP string) {
 
 	cookieString := strings.Join(cookies, "####")
