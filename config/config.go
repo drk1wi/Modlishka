@@ -29,6 +29,7 @@ type Options struct {
 	ListeningPortHTTP    *int    `json:"listeningPortHTTP"`
 	ListeningPortHTTPS   *int    `json:"listeningPortHTTPS"`
 	ProxyAddress     	 *string `json:"proxyAddress"`
+    StaticLocations      *string `json:"staticLocations"`
 	Target               *string `json:"target"`
 	TargetRes            *string `json:"targetResources"`
 	TargetRules          *string `json:"rules"`
@@ -73,6 +74,7 @@ var (
 		JsRules: flag.String("jsRules", "", "Comma separated list of URL patterns and JS base64 encoded payloads that will be injected - e.g.: target.tld:base64(alert(1)),..,etc"),
 
 		ProxyAddress: flag.String("proxyAddress", "", "Proxy that should be used (socks/https/http) - e.g.: http://127.0.0.1:8080 "),
+		StaticLocations: flag.String("staticLocations", "", "FQDNs in location headers that should be preserved."),
 
 		TrackingCookie: flag.String("trackingCookie", "id", "Name of the HTTP cookie used for track the client"),
 		TrackingParam:  flag.String("trackingParam", "id", "Name of the HTTP parameter used to set up the HTTP cookie tracking of the client"),
