@@ -158,29 +158,14 @@ Compile manually:
         	Name of the HTTP parameter used to track the client (default "id")
 
 
-
-
-References
------
-
- * [WIKI](https://github.com/drk1wi/Modlishka/wiki) pages:  with more details about the tool usage and configuration.
- * [FAQ](https://github.com/drk1wi/Modlishka/wiki/FAQ)
-
- Blog posts:
- *  ["Modlishka introduction"](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/) "Bypassing standard 2FA mechanism proof-of-concept" blog post.
- * "[Hijacking browser TLS traffic through Client Domain Hooking](https://blog.duszynski.eu/hijacking-browser-tls-traffic-through-client-domain-hooking/)" technical paper - in case you are interested about the approach that is used to handle the traffic.
-
 License
 -------
-Author: Modlishka was designed and implemented by Piotr Duszyński ([@drk1wi](https://twitter.com/drk1wi)) (this includes the technique described in the "Client Domain Hooking" paper) . You can find the relevant license [here](https://github.com/drk1wi/Modlishka/blob/master/LICENSE). All rights reserved.
-
-The initial version of the tool was written as part of a bigger project that was dissolved and assets were distributed accordingly. 
+Author: Modlishka was designed and implemented by Piotr Duszyński ([@drk1wi](https://twitter.com/drk1wi)) 
+All rights reserved.
 
 Credits 
 -------
-Big kudos go to all [contributors](https://github.com/drk1wi/Modlishka/graphs/contributors) 💪!
-
-Kudos for helping with the final code optimization and great support go to Giuseppe Trotta ([@Giutro](https://twitter.com/giutro)). 
+Big kudos go to all [contributors](https://github.com/drk1wi/Modlishka/graphs/contributors) who participated in this project.
 
 Disclaimer
 ----------
