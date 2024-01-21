@@ -1,16 +1,14 @@
 # ..Modlishka..
 
-Modlishka is a powerful and flexible HTTP reverse proxy. It implements an entirely new and interesting approach of handling browser-based HTTP traffic flow, which allows to transparently proxy multi-domain destination traffic, both TLS and non-TLS, over a single domain, without a requirement of installing any additional certificate on the client. What does this exactly mean? In short, it simply has a lot of potential, that can be used in many use case scenarios...
+Modlishka is a powerful and flexible HTTP reverse proxy. It implements an entirely new and interesting approach of handling browser-based HTTP traffic flow, which allows it to transparently proxy multi-domain destination traffic, both TLS and non-TLS, over a single domain, without a requirement of installing any additional certificate on the client. What exactly does this mean? In short, it simply has a lot of potential, that can be used in many use case scenarios...
 
 From the security perspective, Modlishka can be currently used to:
--	 Support ethical phishing penetration tests with a transparent and automated reverse proxy component that has a universal 2FA “bypass” support.
--  Automatically poison HTTP 301 browsers cache and permanently hijack non-TLS URLS.
--  Diagnose and hijack browser-based applications HTTP traffic from the "Client Domain Hooking" attack perspective.
+-	Support ethical phishing penetration tests with a transparent and automated reverse proxy component that has a universal 2FA “bypass” support.
 -  Wrap legacy websites with TLS layer, confuse crawler bots and automated scanners, etc.
 
 
-Modlishka was written as an attempt overcome standard reverse proxy limitations and as a personal challenge to see what is possible with sufficient motivation and a bit of extra research time. 
-The achieved results appeared to be very interesting and the tool was initially released and later updated with aim to:
+Modlishka was written as an attempt to overcome standard reverse proxy limitations and as a personal challenge to see what is possible with sufficient motivation and a bit of extra research time. 
+The achieved results appeared to be very interesting and the tool was initially released and later updated with an aim to:
 - Highlight currently used two factor authentication ([2FA](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/)) scheme weaknesses, so adequate security solutions can be created and implemented by the industry.
 - Support other projects that could benefit from a universal and transparent reverse proxy.
 - Raise community awareness about modern phishing techniques and strategies and support penetration testers in their daily work.
@@ -18,12 +16,10 @@ The achieved results appeared to be very interesting and the tool was initially 
 
 Modlishka was primarily written for security related tasks. Nevertheless, it can be helpful in other, non-security related, usage scenarios.
 
-Efficient proxying !
-
 Features
 --------
 
-Some of the most important 'Modlishka' features :
+Key features of Modlishka include:
 
 **General:**
 -   Point-and-click HTTP and HTTPS reverse proxying of an arbitrary domain/s.
@@ -31,7 +27,7 @@ Some of the most important 'Modlishka' features :
 -   Easy and fast configuration through command line options and JSON configuration files.
 -   Pattern based JavaScript payload injection.
 -   Wrapping websites with an extra "security": TLS wrapping, authentication, relevant security headers, etc. 
--   Striping websites from all encryption and security headers (back to 90's MITM style). 
+-   Stripping websites of all encryption and security headers (back to 90's MITM style). 
 -   Stateless design. Can be scaled up easily to handle an arbitrary amount of traffic  - e.g. through a DNS load balancer.
 -   Can be extended easily with your ideas through modular plugins.
 -   Automatic test TLS certificate generation plugin for the proxy domain (requires a self-signed CA certificate)
@@ -158,12 +154,13 @@ Compile manually:
         	Name of the HTTP parameter used to track the client (default "id")
 
 
-License
+Commercial Usage
 -------
-Author: Modlishka was designed and implemented by Piotr Duszyński ([@drk1wi](https://twitter.com/drk1wi)). All rights reserved.
+Modlishka is licensed under [this License](https://raw.githubusercontent.com/drk1wi/Modlishka/master/LICENSE). For commercial, legitimate applications, please contact the author for the appropriate licensing arrangements.
 
 Credits 
 -------
+Author: Modlishka was designed and implemented by Piotr Duszyński ([@drk1wi](https://twitter.com/drk1wi)). All rights reserved.
 Big kudos go to all [contributors](https://github.com/drk1wi/Modlishka/graphs/contributors) who participated in this project.
 
 Disclaimer
