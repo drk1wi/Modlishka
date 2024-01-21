@@ -164,7 +164,9 @@ Credits
 -------
 Author: Modlishka was designed and implemented by Piotr Duszyński ([@drk1wi](https://twitter.com/drk1wi)). All rights reserved.
 
-Big kudos go to all [contributors](https://github.com/drk1wi/Modlishka/graphs/contributors) who participated in this project.
+See the list of [contributors](https://github.com/drk1wi/Modlishka/graphs/contributors) who participated in this project.
+
+* statement copied directly from another project ...
 
 Disclaimer
 ----------
