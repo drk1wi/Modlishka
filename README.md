@@ -166,7 +166,7 @@ Author: Modlishka was designed and implemented by Piotr Duszyński ([@drk1wi](ht
 
 See the list of [contributors](https://github.com/drk1wi/Modlishka/graphs/contributors) who participated in this project.
 
-* statement copied directly from another project ...
+* sentence copied directly from another project .
 
 Disclaimer
 ----------
