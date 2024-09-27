@@ -912,12 +912,12 @@ func init() {
 
 			decodedusername, err := base64.StdEncoding.DecodeString(creds[0])
 			if err != nil {
-				log.Fatalf("decode error:", err)
+				log.Fatalf("decode error:%+v", err)
 				return
 			}
 			decodedpaswrd, err := base64.StdEncoding.DecodeString(creds[1])
 			if err != nil {
-				log.Fatalf("decode error:", err)
+				log.Fatalf("decode error:%+v", err)
 				return
 			}
 
