@@ -2,11 +2,12 @@ package runtime
 
 import (
 	"fmt"
-	"github.com/drk1wi/Modlishka/log"
-	"github.com/miekg/dns"
 	"net/url"
 	"regexp"
 	"strings"
+
+	"github.com/drk1wi/Modlishka/log"
+	"github.com/miekg/dns"
 )
 
 //set up regexp upfront
@@ -110,6 +111,13 @@ func RealURLtoPhish(realURL string) string {
 		host = realURL
 	}
 
+	for _, domainToIgnore := range IgnoreTranslateDomains {
+		if strings.Contains(host, domainToIgnore) {
+			log.Debugf("Ignoring translate for: %s", out)
+			return out
+		}
+	}
+
 	if u.Scheme == "http" {
 		tls = false
 	} else if u.Scheme == "https" {
@@ -141,6 +149,8 @@ func PhishURLToRealURL(phishURL string) string {
 	var host string
 	var out string
 
+	log.Debugf("PhishURLToRealURL: phishURL = %s", phishURL)
+
 	// url parse returns nil when phishURL does not have protocol
 	if strings.HasPrefix(phishURL, "https://") == false && strings.HasPrefix(phishURL, "http://") == false {
 		u, _ := url.Parse(fmt.Sprintf("https://%s", phishURL))
@@ -154,12 +164,16 @@ func PhishURLToRealURL(phishURL string) string {
 		}
 	}
 
+	log.Debugf("PhishURLToRealURL: host = %s", host)
+
 	out = phishURL
 
 	if strings.Contains(phishURL, ProxyDomain) {
+		log.Debugf("PhishURLToRealURL: phishURL contains ProxyDomain '%s'", ProxyDomain)
 		subdomain := strings.Replace(host, "."+ProxyDomain, "", 1)
+
 		// has subdomain
-		if len(subdomain) > 0 {
+		if len(subdomain) > 0 && host != ProxyDomain {
 			decodedDomain, _, _, err := DecodeSubdomain(subdomain)
 			if err != nil {
 				return strings.Replace(out, ProxyDomain, TopLevelDomain, 1)
@@ -174,7 +188,7 @@ func PhishURLToRealURL(phishURL string) string {
 	return out
 }
 
-//check if the requested URL matches termination URLS patterns and returns verdict
+// check if the requested URL matches termination URLS patterns and returns verdict
 func CheckTermination(input string) bool {
 
 	input = PhishURLToRealURL(input)

@@ -21,7 +21,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
-	"encoding/binary"
 	"encoding/pem"
 	"math/big"
 	"time"
@@ -109,14 +108,16 @@ func init() {
 					panic(err)
 				}
 
-				var n int32
-				binary.Read(rand.Reader, binary.LittleEndian, &n)
+				crtSerial, err := rand.Int(rand.Reader, big.NewInt(9223372036854775807))
+				if err != nil {
+					panic(err)
+				}
 
 				template := &x509.Certificate{
 					IsCA:                  false,
 					BasicConstraintsValid: true,
 					SubjectKeyId:          []byte{1, 2, 3},
-					SerialNumber:          big.NewInt(int64(n)),
+					SerialNumber:          crtSerial,
 					DNSNames:              []string{*config.C.ProxyDomain, "*." + *config.C.ProxyDomain},
 					Subject: pkix.Name{
 						Country:      []string{"Earth"},

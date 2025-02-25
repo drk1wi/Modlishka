@@ -18,34 +18,37 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"flag"
-	"github.com/drk1wi/Modlishka/log"
 	"io/ioutil"
 	"os"
+
+	"github.com/drk1wi/Modlishka/log"
 )
 
 type Options struct {
-	ProxyDomain          *string `json:"proxyDomain"`
-	ListeningAddress     *string `json:"listeningAddress"`
-	ListeningPortHTTP    *int    `json:"listeningPortHTTP"`
-	ListeningPortHTTPS   *int    `json:"listeningPortHTTPS"`
-	ProxyAddress         *string `json:"proxyAddress"`
-	Target               *string `json:"target"`
-	TargetRes            *string `json:"targetResources"`
-	TargetRules          *string `json:"rules"`
-	JsRules              *string `json:"jsRules"`
-	TerminateTriggers    *string `json:"terminateTriggers"`
-	TerminateRedirectUrl *string `json:"terminateRedirectUrl"`
-	TrackingCookie       *string `json:"trackingCookie"`
-	TrackingParam        *string `json:"trackingParam"`
-	Debug                *bool   `json:"debug"`
-	ForceHTTPS           *bool   `json:"forceHTTPS"`
-	ForceHTTP            *bool   `json:"forceHTTP"`
-	LogPostOnly          *bool   `json:"logPostOnly"`
-	DisableSecurity      *bool   `json:"disableSecurity"`
-	DynamicMode          *bool   `json:"dynamicMode"`
-	LogRequestFile       *string `json:"log"`
-	Plugins              *string `json:"plugins"`
-	AllowSecureCookies   *bool   `json:"allowSecureCookies"`
+	ProxyDomain            *string `json:"proxyDomain"`
+	ListeningAddress       *string `json:"listeningAddress"`
+	ListeningPortHTTP      *int    `json:"listeningPortHTTP"`
+	ListeningPortHTTPS     *int    `json:"listeningPortHTTPS"`
+	ProxyAddress           *string `json:"proxyAddress"`
+	StaticLocations        *string `json:"staticLocations"`
+	Target                 *string `json:"target"`
+	TargetRes              *string `json:"targetResources"`
+	TargetRules            *string `json:"rules"`
+	JsRules                *string `json:"jsRules"`
+	TerminateTriggers      *string `json:"terminateTriggers"`
+	TerminateRedirectUrl   *string `json:"terminateRedirectUrl"`
+	TrackingCookie         *string `json:"trackingCookie"`
+	TrackingParam          *string `json:"trackingParam"`
+	Debug                  *bool   `json:"debug"`
+	ForceHTTPS             *bool   `json:"forceHTTPS"`
+	ForceHTTP              *bool   `json:"forceHTTP"`
+	LogPostOnly            *bool   `json:"logPostOnly"`
+	DisableSecurity        *bool   `json:"disableSecurity"`
+	DynamicMode            *bool   `json:"dynamicMode"`
+	LogRequestFile         *string `json:"log"`
+	Plugins                *string `json:"plugins"`
+	AllowSecureCookies     *bool   `json:"allowSecureCookies"`
+	IgnoreTranslateDomains *string `json:"ignoreTranslateDomains"`
 	*TLSConfig
 }
 
@@ -73,7 +76,8 @@ var (
 				"base64(newer):base64(older)"),
 		JsRules: flag.String("jsRules", "", "Comma separated list of URL patterns and JS base64 encoded payloads that will be injected - e.g.: target.tld:base64(alert(1)),..,etc"),
 
-		ProxyAddress: flag.String("proxyAddress", "", "Proxy that should be used (socks/https/http) - e.g.: http://127.0.0.1:8080 "),
+		ProxyAddress:    flag.String("proxyAddress", "", "Proxy that should be used (socks/https/http) - e.g.: http://127.0.0.1:8080 "),
+		StaticLocations: flag.String("staticLocations", "", "FQDNs in location headers that should be preserved."),
 
 		TrackingCookie:  flag.String("trackingCookie", "id", "Name of the HTTP cookie used for track the client"),
 		TrackingParam:   flag.String("trackingParam", "id", "Name of the HTTP parameter used to set up the HTTP cookie tracking of the client"),
@@ -88,8 +92,9 @@ var (
 
 		LogPostOnly: flag.Bool("postOnly", false, "Log only HTTP POST requests"),
 
-		Plugins:            flag.String("plugins", "all", "Comma separated list of enabled plugin names"),
-		AllowSecureCookies: flag.Bool("allowSecureCookies", false, "Allow secure cookies to be set. Useful for when you are using HTTPS and cookies have SameSite=None"),
+		Plugins:                flag.String("plugins", "all", "Comma separated list of enabled plugin names"),
+		AllowSecureCookies:     flag.Bool("allowSecureCookies", false, "Allow secure cookies to be set. Useful for when you are using HTTPS and cookies have SameSite=None"),
+		IgnoreTranslateDomains: flag.String("ignoreTranslateDomains", "", "Comma separated list of domains to never translate and proxy"),
 	}
 
 	s = TLSConfig{
