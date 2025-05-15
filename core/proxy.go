@@ -229,6 +229,9 @@ func (httpResponse *HTTPResponse) PatchHeaders(p *ReverseProxy) {
 				r := strings.NewReplacer("Secure", "", "secure", "")
 				cookie = r.Replace(cookie)
 			}
+			// patch cookie values according to provided rules
+			cookie = string(p.PatchURL([]byte(cookie)))
+			log.Debugf("Patched Cookie: from \n[%s]\n --> \n[%s]\n", httpResponse.Header["Set-Cookie"][i], cookie)
 			cookie = runtime.RegexpFindSetCookie.ReplaceAllStringFunc(cookie, runtime.TranslateSetCookie)
 			log.Debugf("Rewriting Set-Cookie Flags: from \n[%s]\n --> \n[%s]\n", httpResponse.Header["Set-Cookie"][i], cookie)
 			httpResponse.Header["Set-Cookie"][i] = cookie
