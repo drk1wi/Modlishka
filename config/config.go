@@ -18,7 +18,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"flag"
-	"io/ioutil"
 	"io"
 	"os"
 
@@ -50,6 +49,7 @@ type Options struct {
 	Plugins                *string `json:"plugins"`
 	AllowSecureCookies     *bool   `json:"allowSecureCookies"`
 	IgnoreTranslateDomains *string `json:"ignoreTranslateDomains"`
+	DisableDynamicSubdomains *bool `json:"disableDynamicSubdomains"`
 	*TLSConfig
 }
 
@@ -95,6 +95,7 @@ var (
 
 		Plugins:                flag.String("plugins", "all", "Comma separated list of enabled plugin names"),
 		AllowSecureCookies:     flag.Bool("allowSecureCookies", false, "Allow secure cookies to be set. Useful for when you are using HTTPS and cookies have SameSite=None"),
+		DisableDynamicSubdomains:    flag.Bool("disableDynamicSubdomains", false, "Translate URL domain names to be the proxy domain"),
 		IgnoreTranslateDomains: flag.String("ignoreTranslateDomains", "", "Comma separated list of domains to never translate and proxy"),
 	}
 

@@ -40,6 +40,7 @@ var (
 	ForceHTTP              bool
 	AllowSecureCookies     bool
 	IgnoreTranslateDomains []string
+	DisableDynamicSubdomains bool
 
 	StaticLocations []string
 
@@ -118,4 +119,5 @@ func SetCoreRuntimeConfig(conf config.Options) {
 	ForceHTTPS = *conf.ForceHTTPS
 	ForceHTTP = *conf.ForceHTTP
 	AllowSecureCookies = *conf.AllowSecureCookies
+	DisableDynamicSubdomains = *conf.DisableDynamicSubdomains
 }
