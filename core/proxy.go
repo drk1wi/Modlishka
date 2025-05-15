@@ -333,6 +333,19 @@ func (httpResponse *HTTPResponse) PatchHeaders(p *ReverseProxy) {
 
 	// ---- Finished handling 302 redirects ----
 
+	// Force the termination redirect to happen sooner rather than later
+	if p.Terminate {
+		httpResponse.StatusCode = 302
+		newLocation := *p.Config.TerminateRedirectUrl
+
+		if len(newLocation) == 0 {
+			newLocation = runtime.Target
+		}
+
+		log.Debugf("Setting Location Header to [%s]", newLocation)
+		httpResponse.Header.Set("Location", newLocation)
+	}
+
 	return
 }
 
