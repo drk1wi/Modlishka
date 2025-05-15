@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"flag"
 	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/drk1wi/Modlishka/log"
@@ -159,7 +160,7 @@ func (c *Options) parseJSON(file string) {
 		log.Fatalf("Error opening JSON configuration (%s): %s . Terminating.", file, err)
 	}
 
-	ctb, _ := ioutil.ReadAll(ct)
+	ctb, _ := io.ReadAll(ct)
 	err = json.Unmarshal(ctb, &c)
 	if err != nil {
 		log.Fatalf("Error unmarshalling JSON configuration (%s): %s . Terminating.", file, err)

