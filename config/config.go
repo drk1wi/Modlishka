@@ -18,7 +18,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"flag"
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/drk1wi/Modlishka/log"
@@ -49,6 +49,8 @@ type Options struct {
 	Plugins                *string `json:"plugins"`
 	AllowSecureCookies     *bool   `json:"allowSecureCookies"`
 	IgnoreTranslateDomains *string `json:"ignoreTranslateDomains"`
+	DisableDynamicSubdomains *bool `json:"disableDynamicSubdomains"`
+	PathHostRules          *string `json:"pathHostRules"`
 	*TLSConfig
 }
 
@@ -72,8 +74,7 @@ var (
 		TerminateRedirectUrl: flag.String("terminateUrl", "",
 			"URL to which a client will be redirected after Session Termination rules trigger"),
 		TargetRules: flag.String("rules", "",
-			"Comma separated list of 'string' patterns and their replacements - e.g.: base64(new):base64(old),"+
-				"base64(newer):base64(older)"),
+			"Comma separated list of 'string' patterns and their replacements - e.g.: base64(old):base64(new),base64(older):base64(newer)"),
 		JsRules: flag.String("jsRules", "", "Comma separated list of URL patterns and JS base64 encoded payloads that will be injected - e.g.: target.tld:base64(alert(1)),..,etc"),
 
 		ProxyAddress:    flag.String("proxyAddress", "", "Proxy that should be used (socks/https/http) - e.g.: http://127.0.0.1:8080 "),
@@ -95,6 +96,10 @@ var (
 		Plugins:                flag.String("plugins", "all", "Comma separated list of enabled plugin names"),
 		AllowSecureCookies:     flag.Bool("allowSecureCookies", false, "Allow secure cookies to be set. Useful for when you are using HTTPS and cookies have SameSite=None"),
 		IgnoreTranslateDomains: flag.String("ignoreTranslateDomains", "", "Comma separated list of domains to never translate and proxy"),
+
+		DisableDynamicSubdomains: flag.Bool("disableDynamicSubdomains", false, "Translate URL domain names to be the proxy domain"),
+		PathHostRules:            flag.String("pathHostRules", "",
+			"Comma separated list of URL path patterns and the target domains to send the requests to - e.g.: /path/:example.com,/path2:www.example.com"),
 	}
 
 	s = TLSConfig{
@@ -159,7 +164,7 @@ func (c *Options) parseJSON(file string) {
 		log.Fatalf("Error opening JSON configuration (%s): %s . Terminating.", file, err)
 	}
 
-	ctb, _ := ioutil.ReadAll(ct)
+	ctb, _ := io.ReadAll(ct)
 	err = json.Unmarshal(ctb, &c)
 	if err != nil {
 		log.Fatalf("Error unmarshalling JSON configuration (%s): %s . Terminating.", file, err)

@@ -40,6 +40,8 @@ var (
 	ForceHTTP              bool
 	AllowSecureCookies     bool
 	IgnoreTranslateDomains []string
+	DisableDynamicSubdomains bool
+	ReplacePathHosts       map[string]string
 
 	StaticLocations []string
 
@@ -110,6 +112,16 @@ func SetCoreRuntimeConfig(conf config.Options) {
 		}
 	}
 
+	if len(*conf.PathHostRules) != 0 {
+		ReplacePathHosts = make(map[string]string)
+		for _, val := range strings.Split(string(*conf.PathHostRules), ",") {
+			res := strings.Split(val, ":")
+			decodedKey := res[0]
+			decodedValue := res[1]
+			ReplacePathHosts[decodedKey] = decodedValue
+		}
+	}
+
 	if len(*conf.IgnoreTranslateDomains) > 0 {
 		IgnoreTranslateDomains = strings.Split(string(*conf.IgnoreTranslateDomains), ",")
 	}
@@ -118,4 +130,5 @@ func SetCoreRuntimeConfig(conf config.Options) {
 	ForceHTTPS = *conf.ForceHTTPS
 	ForceHTTP = *conf.ForceHTTP
 	AllowSecureCookies = *conf.AllowSecureCookies
+	DisableDynamicSubdomains = *conf.DisableDynamicSubdomains
 }

