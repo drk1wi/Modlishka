@@ -51,6 +51,14 @@ func (conf *ServerConfig) MainHandler(w http.ResponseWriter, r *http.Request) {
 	// Patch the FQDN
 	targetDomain, newTLS, TLSvalue := runtime.TranslateRequestHost(r.Host)
 
+	// Replace the target domain based on path rules
+	for path, domain := range runtime.ReplacePathHosts {
+		if strings.Contains(r.URL.Path, path) {
+			targetDomain = domain
+			break
+		}
+	}
+
 	if !*conf.DisableSecurity && runtime.IsValidRequestHost(r.Host, runtime.ProxyDomain) == false {
 		log.Infof("Redirecting client to %s", runtime.TopLevelDomain)
 		Redirect(w, r, "")

@@ -41,6 +41,7 @@ var (
 	AllowSecureCookies     bool
 	IgnoreTranslateDomains []string
 	DisableDynamicSubdomains bool
+	ReplacePathHosts       map[string]string
 
 	StaticLocations []string
 
@@ -108,6 +109,16 @@ func SetCoreRuntimeConfig(conf config.Options) {
 				log.Fatalf("Unable to decode parameter value %s", res[1])
 			}
 			JSInjectStrings[res[0]] = string(decoded)
+		}
+	}
+
+	if len(*conf.PathHostRules) != 0 {
+		ReplacePathHosts = make(map[string]string)
+		for _, val := range strings.Split(string(*conf.PathHostRules), ",") {
+			res := strings.Split(val, ":")
+			decodedKey := res[0]
+			decodedValue := res[1]
+			ReplacePathHosts[decodedKey] = decodedValue
 		}
 	}
 
