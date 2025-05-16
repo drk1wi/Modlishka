@@ -356,12 +356,12 @@ func TestJSONConfig(t *testing.T) {
 
 	configFile, err := os.CreateTemp("", "")
 	if err != nil {
-		log.Fatalf(err.Error() + " . Terminating.")
+		log.Fatalf("%s... Terminating.\n", err.Error())
 	}
 
 	err = os.WriteFile(configFile.Name(), []byte(jsonfile1), 0644)
 	if err != nil {
-		log.Fatalf(err.Error() + " . Terminating.")
+		log.Fatalf("%s... Terminating.\n", err.Error())
 	}
 
 	defer os.Remove(configFile.Name())
