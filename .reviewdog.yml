@@ -1,0 +1,7 @@
+runner:
+  govet:
+    cmd: go vet ./...
+    format: govet
+  gofmt:
+    cmd: test -z $(gofmt -l  .) || (gofmt -s -d  . && exit 1)
+    format: diff
