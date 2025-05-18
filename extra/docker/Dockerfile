@@ -17,6 +17,8 @@ RUN set -ex \
 		&& cp ${PROJECT_DIR}/dist/proxy ${MODLISHKA_BIN} \
 		&& apk del ${INSTALL_PACKAGES} && rm -rf /var/cache/apk/* && rm -rf ${GOPATH}/src/*
 		
+VOLUME [ "/data" ]
+WORKDIR /data
 CMD ["run-server.sh"]
 
 EXPOSE 80 443

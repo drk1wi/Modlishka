@@ -21,7 +21,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
-	"encoding/binary"
 	"encoding/pem"
 	"math/big"
 	"time"
@@ -95,7 +94,7 @@ func init() {
 		if *config.C.ForceHTTP == false {
 			if len(*config.C.TLSCertificate) == 0 && len(*config.C.TLSKey) == 0 {
 
-				log.Infof("Autocert plugin: Auto-generating %s domain TLS certificate",*config.C.ProxyDomain)
+				log.Infof("Autocert plugin: Auto-generating %s domain TLS certificate", *config.C.ProxyDomain)
 
 				CAcert := CA_CERT
 				CAkey := CA_CERT_KEY
@@ -109,14 +108,16 @@ func init() {
 					panic(err)
 				}
 
-				var n int32
-				binary.Read(rand.Reader, binary.LittleEndian, &n)
+				crtSerial, err := rand.Int(rand.Reader, big.NewInt(9223372036854775807))
+				if err != nil {
+					panic(err)
+				}
 
 				template := &x509.Certificate{
 					IsCA:                  false,
 					BasicConstraintsValid: true,
 					SubjectKeyId:          []byte{1, 2, 3},
-					SerialNumber:          big.NewInt(int64(n)),
+					SerialNumber:          crtSerial,
 					DNSNames:              []string{*config.C.ProxyDomain, "*." + *config.C.ProxyDomain},
 					Subject: pkix.Name{
 						Country:      []string{"Earth"},

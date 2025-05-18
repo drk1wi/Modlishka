@@ -44,10 +44,9 @@ func (c *Configuration) initLogging() {
 	}
 
 	log.Options = log.LoggingOptions{
-		GET:      logGET,
-		POST:     *c.LogPostOnly,
+		GET:            logGET,
+		POST:           *c.LogPostOnly,
 		LogRequestPath: *c.LogRequestFile,
-
 	}
 }
 
@@ -74,7 +73,6 @@ func main() {
 
 	// Set up runtime server config
 	core.SetServerRuntimeConfig(conf.Options)
-
 
 	// Set up regexp upfront
 	runtime.MakeRegexes()

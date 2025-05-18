@@ -2,11 +2,12 @@ package runtime
 
 import (
 	"encoding/base64"
-	"github.com/drk1wi/Modlishka/config"
-	"golang.org/x/net/publicsuffix"
 	"log"
 	"regexp"
 	"strings"
+
+	"github.com/drk1wi/Modlishka/config"
+	"golang.org/x/net/publicsuffix"
 )
 
 // compiled regexp
@@ -20,8 +21,7 @@ var (
 	RegexpSetCookie                      *regexp.Regexp
 )
 
-
-//runtime config
+// runtime config
 var (
 	ProxyDomain    string
 	TrackingCookie string
@@ -31,13 +31,19 @@ var (
 	Target         string
 	ProxyAddress   string
 
-	ReplaceStrings    map[string]string
-	JSInjectStrings   map[string]string
-	TargetResources   []string
-	TerminateTriggers []string
-	DynamicMode		  bool
-	ForceHTTPS		  bool
-	ForceHTTP		  bool
+	ReplaceStrings         map[string]string
+	JSInjectStrings        map[string]string
+	TargetResources        []string
+	TerminateTriggers      []string
+	DynamicMode            bool
+	ForceHTTPS             bool
+	ForceHTTP              bool
+	AllowSecureCookies     bool
+	IgnoreTranslateDomains []string
+	DisableDynamicSubdomains bool
+	ReplacePathHosts       map[string]string
+
+	StaticLocations []string
 
 	//openssl rand -hex 32
 	RC4_KEY = `1b293b681a3edbfe60dee4051e14eeb81b293b681a3edbfe60dee4051e14eeb8`
@@ -60,6 +66,9 @@ func SetCoreRuntimeConfig(conf config.Options) {
 
 	domain, _ := publicsuffix.EffectiveTLDPlusOne(*conf.Target)
 	TopLevelDomain = StripProtocol(domain)
+	if Target != TopLevelDomain {
+		TopLevelDomain = Target
+	}
 
 	if len(*conf.TargetRes) > 0 {
 		TargetResources = strings.Split(string(*conf.TargetRes), ",")
@@ -67,6 +76,10 @@ func SetCoreRuntimeConfig(conf config.Options) {
 
 	if len(*conf.TerminateTriggers) != 0 {
 		TerminateTriggers = strings.Split(string(*conf.TerminateTriggers), ",")
+	}
+
+	if len(*conf.StaticLocations) != 0 {
+		StaticLocations = strings.Split(string(*conf.StaticLocations), ",")
 	}
 
 	if len(*conf.TargetRules) != 0 {
@@ -99,8 +112,23 @@ func SetCoreRuntimeConfig(conf config.Options) {
 		}
 	}
 
+	if len(*conf.PathHostRules) != 0 {
+		ReplacePathHosts = make(map[string]string)
+		for _, val := range strings.Split(string(*conf.PathHostRules), ",") {
+			res := strings.Split(val, ":")
+			decodedKey := res[0]
+			decodedValue := res[1]
+			ReplacePathHosts[decodedKey] = decodedValue
+		}
+	}
+
+	if len(*conf.IgnoreTranslateDomains) > 0 {
+		IgnoreTranslateDomains = strings.Split(string(*conf.IgnoreTranslateDomains), ",")
+	}
+
 	DynamicMode = *conf.DynamicMode
 	ForceHTTPS = *conf.ForceHTTPS
 	ForceHTTP = *conf.ForceHTTP
+	AllowSecureCookies = *conf.AllowSecureCookies
+	DisableDynamicSubdomains = *conf.DisableDynamicSubdomains
 }
-
