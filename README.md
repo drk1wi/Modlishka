@@ -1,20 +1,25 @@
 # ..Modlishka..
 
-Modlishka is a powerful and flexible HTTP reverse proxy. It implements an entirely new and interesting approach of handling browser-based HTTP traffic flow, which allows it to transparently proxy multi-domain destination traffic, both TLS and non-TLS, over a single domain, without a requirement of installing any additional certificate on the client. What exactly does this mean? In short, it simply has a lot of potential, that can be used in many use case scenarios...
+Modlishka is an open-source penetration testing tool that acts as a man-in-the-middle proxy. It implements a novel technical approach to handling browser-based HTTP traffic flow, which allows it to transparently proxy multi-domain destination traffic, both TLS and non-TLS, over a single domain, without requiring the installation of any additional certificate on the client. This enables multiple practical use cases.
 
-From the security perspective, Modlishka can be currently used to:
+Modlishka was the first publicly released research tool, in 2019, to demonstrate automated Adversary-in-the-Middle (AitM) phishing techniques capable of bypassing many common 2FA implementations — with the goal of raising awareness and improving real-world defenses.
+
+The project was created to highlight authentication flaws and is intended strictly for authorized research and professional security testing.
+
+
+From a security perspective, Modlishka can currently be used to:
 -	Support ethical phishing penetration tests with a transparent and automated reverse proxy component that has a universal 2FA “bypass” support.
--  Wrap legacy websites with TLS layer, confuse crawler bots and automated scanners, etc.
+-  Wrap legacy websites with a TLS layer, confuse crawler bots and automated scanners, etc.
 
 
 Modlishka was written as an attempt to overcome standard reverse proxy limitations and as a personal challenge to see what is possible with sufficient motivation and a bit of extra research time. 
 The achieved results appeared to be very interesting and the tool was initially released and later updated with an aim to:
-- Highlight currently used two factor authentication ([2FA](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/)) scheme weaknesses, so adequate security solutions can be created and implemented by the industry.
+- Highlight currently used two-factor authentication ([2FA](https://blog.duszynski.eu/phishing-ng-bypassing-2fa-with-modlishka/)) scheme weaknesses, so adequate security solutions can be created and implemented by the industry.
 - Support other projects that could benefit from a universal and transparent reverse proxy.
 - Raise community awareness about modern phishing techniques and strategies and support penetration testers in their daily work.
 
 
-Modlishka was primarily written for security related tasks. Nevertheless, it can be helpful in other, non-security related, usage scenarios.
+Modlishka was primarily written for security-related tasks. Nevertheless, it can be helpful in other, non-security related, usage scenarios.
 
 Features
 --------
@@ -23,7 +28,7 @@ Key features of Modlishka include:
 
 **General:**
 -   Point-and-click HTTP and HTTPS reverse proxying of an arbitrary domain/s.
--   Full control of "cross" origin TLS traffic flow from your users browsers (without a requirement of installing any additional certificate on the client).
+-   Full control of "cross" origin TLS traffic flow from your users browsers (without the requirement of installing any additional certificate on the client).
 -   Easy and fast configuration through command line options and JSON configuration files.
 -   Pattern based JavaScript payload injection.
 -   Wrapping websites with an extra "security": TLS wrapping, authentication, relevant security headers, etc. 
@@ -171,4 +176,3 @@ See the list of [contributors](https://github.com/drk1wi/Modlishka/graphs/contri
 Disclaimer
 ----------
 This tool is made only for educational purposes and can be used in legitimate penetration tests or research only. Author does not take any responsibility for any actions taken by its users.
-
