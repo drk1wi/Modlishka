@@ -700,6 +700,12 @@ func HelloHandler(w http.ResponseWriter, r *http.Request) {
 			termCount += 1
 		}
 	}
+	credsPercent := 0.0
+	termPercent := 0.0
+	if len(victims) > 0 {
+		credsPercent = float64(credsCount) / float64(len(victims)) * 100
+		termPercent = float64(termCount) / float64(len(victims)) * 100
+	}
 	data := struct {
 		Victims      []Victim
 		CredsCount   int
@@ -711,8 +717,8 @@ func HelloHandler(w http.ResponseWriter, r *http.Request) {
 		victims,
 		credsCount,
 		termCount,
-		float64(credsCount) / float64(len(victims)) * 100,
-		float64(termCount) / float64(len(victims)) * 100,
+		credsPercent,
+		termPercent,
 		CConfig.url,
 	}
 	t := template.New("modlishka")

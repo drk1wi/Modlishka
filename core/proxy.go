@@ -242,7 +242,7 @@ func (httpResponse *HTTPResponse) PatchHeaders(p *ReverseProxy) {
 		// Add tracking cookie
 		value := runtime.TrackingCookie + "=" + p.RequestContext.InitUserID +
 			";Path=/;Domain=." + runtime.ProxyDomain +
-			";Expires=Sat, 26-Oct-2025 18:54:56 GMT;Priority=HIGH"
+			";Expires=" + time.Now().AddDate(1, 0, 0).UTC().Format("Mon, 02-Jan-2006 15:04:05 GMT") + ";Priority=HIGH"
 		httpResponse.Header.Add("Set-Cookie", value)
 	}
 
@@ -253,7 +253,7 @@ func (httpResponse *HTTPResponse) PatchHeaders(p *ReverseProxy) {
 		// Set Terminator Cookie
 		value := runtime.TERMINATE_SESSION_COOKIE_NAME + "=" + runtime.TERMINATE_SESSION_COOKIE_VALUE +
 			";Path=/;Domain=." + runtime.ProxyDomain +
-			";Expires=Sat, 26-Oct-2025 18:54:56 GMT;HttpOnly;Priority=HIGH"
+			";Expires=" + time.Now().AddDate(1, 0, 0).UTC().Format("Mon, 02-Jan-2006 15:04:05 GMT") + ";HttpOnly;Priority=HIGH"
 		httpResponse.Header.Add("Set-Cookie", value)
 	}
 
