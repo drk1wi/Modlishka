@@ -112,6 +112,7 @@ func init() {
 				if err != nil {
 					panic(err)
 				}
+				crtSerial.Add(crtSerial, big.NewInt(1)) // Ensure serial > 0 (RFC 5280)
 
 				template := &x509.Certificate{
 					IsCA:                  false,
