@@ -157,12 +157,13 @@ func (conf *ServerConfig) MainHandler(w http.ResponseWriter, r *http.Request) {
 
 func (es *EmbeddedServer) ListenAndServeTLS(addr string) error {
 
-	c := &tls.Config{
-		MinVersion: tls.VersionTLS10,
-	}
+	var c *tls.Config
 	if es.TLSConfig != nil {
-		*c = *es.TLSConfig
+		c = es.TLSConfig.Clone()
+	} else {
+		c = &tls.Config{}
 	}
+	c.MinVersion = tls.VersionTLS10
 	if c.NextProtos == nil {
 		c.NextProtos = []string{"http/1.1"}
 	}
@@ -175,7 +176,7 @@ func (es *EmbeddedServer) ListenAndServeTLS(addr string) error {
 		certpool := x509.NewCertPool()
 		if !certpool.AppendCertsFromPEM([]byte(es.WebServerCertificatePool)) {
 			err := errors.New("ListenAndServeTLS: can't parse client certificate authority")
-			log.Fatalf(err.Error() + " . Terminating.")
+			log.Fatalf("%v . Terminating.", err)
 		}
 		c.ClientCAs = certpool
 	}
@@ -250,7 +251,7 @@ Author: Piotr Duszynski @drk1wi
 
 		err := embeddedTLSServer.ListenAndServeTLS(httpslistener)
 		if err != nil {
-			log.Fatalf(err.Error() + " . Terminating.")
+			log.Fatalf("%v . Terminating.", err)
 		}
 
 	} else { //default mode
@@ -290,7 +291,7 @@ Author: Piotr Duszynski @drk1wi
 
 		err := embeddedTLSServer.ListenAndServeTLS(httpslistener)
 		if err != nil {
-			log.Fatalf(err.Error() + " . Terminating.")
+			log.Fatalf("%v . Terminating.", err)
 		}
 
 	}

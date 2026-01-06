@@ -1,5 +1,10 @@
 # ..Modlishka..
 
+![License](https://img.shields.io/badge/license-Author-blue.svg)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20BSD-lightgrey.svg)
+![Build Status](https://github.com/drk1wi/Modlishka/actions/workflows/reviewdog.yml/badge.svg)
+![Go Version](https://img.shields.io/badge/go-1.24%2B-00ADD8.svg)
+
 Modlishka is an open-source penetration testing tool that acts as a man-in-the-middle proxy. It introduced a new technical approach to handling browser-based HTTP traffic flow, which allows it to transparently proxy multi-domain destination traffic, both TLS and non-TLS, over a single domain, without requiring the installation of any additional certificate on the client. This enables multiple practical use cases.
 
 Modlishka was the first publicly released research tool, in 2019, to demonstrate a novel Adversary-in-the-Middle (AitM) technique capable of bypassing many common 2FA implementations — with the goal of raising awareness and improving real-world defenses.
@@ -106,7 +111,10 @@ Compile manually:
       
       -disableSecurity
         	Disable proxy security features like anti-SSRF. 'Here be dragons' - disable at your own risk.
-      
+
+      -disableDynamicSubdomains
+        	Translate URL domain names to be the proxy domain
+
       -dynamicMode
           	Enable dynamic mode for 'Client Domain Hooking'
       
@@ -115,19 +123,34 @@ Compile manually:
     
       -forceHTTPS
          	Strip all clear-text from the traffic and proxy through HTTPS only
-     
+
+      -allowSecureCookies
+        	Allow secure cookies to be set. Useful for when you are using HTTPS and cookies have SameSite=None
+
+      -ignoreTranslateDomains string
+        	Comma separated list of domains to never translate and proxy
+
       -jsRules string
         	Comma separated list of URL patterns and JS base64 encoded payloads that will be injected - e.g.: target.tld:base64(alert(1)),..,etc
       
       -listeningAddress string
         	Listening address - e.g.: 0.0.0.0  (default "127.0.0.1")
-      
+
+      -listeningPortHTTP int
+        	Listening port for HTTP requests (default 80)
+
+      -listeningPortHTTPS int
+        	Listening port for HTTPS requests (default 443)
+
       -log string
         	Local file to which fetched requests will be written (appended)
       
       -plugins string
         	Comma seperated list of enabled plugin names (default "all")
-      
+
+      -pathHostRules string
+        	Comma separated list of URL path patterns and the target domains to send the requests to - e.g.: /path/:example.com,/path2:www.example.com
+
       -proxyAddress string
     	    Proxy that should be used (socks/https/http) - e.g.: http://127.0.0.1:8080 
          
@@ -138,7 +161,10 @@ Compile manually:
         	Log only HTTP POST requests
       
       -rules string
-          	Comma separated list of 'string' patterns and their replacements - e.g.: base64(new):base64(old),base64(newer):base64(older)
+          	Comma separated list of 'string' patterns and their replacements - e.g.: base64(old):base64(new),base64(older):base64(newer)
+
+      -staticLocations string
+        	Comma separated list of FQDNs in location headers that should be preserved
 
       -target string
         	Target domain name  - e.g.: target.tld
@@ -170,8 +196,6 @@ Credits
 Author: Modlishka was designed and implemented by Piotr Duszyński ([@drk1wi](https://twitter.com/drk1wi)). All rights reserved.
 
 See the list of [contributors](https://github.com/drk1wi/Modlishka/graphs/contributors) who participated in this project.
-
-* sentence copied directly from another project .
 
 Disclaimer
 ----------

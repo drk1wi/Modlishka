@@ -31,17 +31,17 @@ var (
 	Target         string
 	ProxyAddress   string
 
-	ReplaceStrings         map[string]string
-	JSInjectStrings        map[string]string
-	TargetResources        []string
-	TerminateTriggers      []string
-	DynamicMode            bool
-	ForceHTTPS             bool
-	ForceHTTP              bool
-	AllowSecureCookies     bool
-	IgnoreTranslateDomains []string
+	ReplaceStrings           map[string]string
+	JSInjectStrings          map[string]string
+	TargetResources          []string
+	TerminateTriggers        []string
+	DynamicMode              bool
+	ForceHTTPS               bool
+	ForceHTTP                bool
+	AllowSecureCookies       bool
+	IgnoreTranslateDomains   []string
 	DisableDynamicSubdomains bool
-	ReplacePathHosts       map[string]string
+	ReplacePathHosts         map[string]string
 
 	StaticLocations []string
 
@@ -86,6 +86,9 @@ func SetCoreRuntimeConfig(conf config.Options) {
 		ReplaceStrings = make(map[string]string)
 		for _, val := range strings.Split(string(*conf.TargetRules), ",") {
 			res := strings.Split(val, ":")
+			if len(res) < 2 {
+				log.Fatalf("Invalid rules format: %s. Expected base64(old):base64(new) format. Terminating.", val)
+			}
 			decodedKey, err := base64.StdEncoding.DecodeString(res[0])
 			if err != nil {
 				log.Fatalf("Unable to decode parameter value %s . Terminating.", res[0])
@@ -103,10 +106,13 @@ func SetCoreRuntimeConfig(conf config.Options) {
 	if len(*conf.JsRules) != 0 {
 		JSInjectStrings = make(map[string]string)
 		for _, val := range strings.Split(string(*conf.JsRules), ",") {
-			res := strings.Split(val, ":")
+			res := strings.SplitN(val, ":", 2)
+			if len(res) < 2 {
+				log.Fatalf("Invalid jsRules format: %s. Expected pattern:base64(payload) format. Terminating.", val)
+			}
 			decoded, err := base64.StdEncoding.DecodeString(res[1])
 			if err != nil {
-				log.Fatalf("Unable to decode parameter value %s", res[1])
+				log.Fatalf("Unable to decode parameter value %s. Terminating.", res[1])
 			}
 			JSInjectStrings[res[0]] = string(decoded)
 		}
@@ -115,7 +121,10 @@ func SetCoreRuntimeConfig(conf config.Options) {
 	if len(*conf.PathHostRules) != 0 {
 		ReplacePathHosts = make(map[string]string)
 		for _, val := range strings.Split(string(*conf.PathHostRules), ",") {
-			res := strings.Split(val, ":")
+			res := strings.SplitN(val, ":", 2)
+			if len(res) < 2 {
+				log.Fatalf("Invalid pathHostRules format: %s. Expected path:domain format. Terminating.", val)
+			}
 			decodedKey := res[0]
 			decodedValue := res[1]
 			ReplacePathHosts[decodedKey] = decodedValue

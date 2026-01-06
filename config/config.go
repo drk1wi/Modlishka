@@ -25,32 +25,32 @@ import (
 )
 
 type Options struct {
-	ProxyDomain            *string `json:"proxyDomain"`
-	ListeningAddress       *string `json:"listeningAddress"`
-	ListeningPortHTTP      *int    `json:"listeningPortHTTP"`
-	ListeningPortHTTPS     *int    `json:"listeningPortHTTPS"`
-	ProxyAddress           *string `json:"proxyAddress"`
-	StaticLocations        *string `json:"staticLocations"`
-	Target                 *string `json:"target"`
-	TargetRes              *string `json:"targetResources"`
-	TargetRules            *string `json:"rules"`
-	JsRules                *string `json:"jsRules"`
-	TerminateTriggers      *string `json:"terminateTriggers"`
-	TerminateRedirectUrl   *string `json:"terminateRedirectUrl"`
-	TrackingCookie         *string `json:"trackingCookie"`
-	TrackingParam          *string `json:"trackingParam"`
-	Debug                  *bool   `json:"debug"`
-	ForceHTTPS             *bool   `json:"forceHTTPS"`
-	ForceHTTP              *bool   `json:"forceHTTP"`
-	LogPostOnly            *bool   `json:"logPostOnly"`
-	DisableSecurity        *bool   `json:"disableSecurity"`
-	DynamicMode            *bool   `json:"dynamicMode"`
-	LogRequestFile         *string `json:"log"`
-	Plugins                *string `json:"plugins"`
-	AllowSecureCookies     *bool   `json:"allowSecureCookies"`
-	IgnoreTranslateDomains *string `json:"ignoreTranslateDomains"`
-	DisableDynamicSubdomains *bool `json:"disableDynamicSubdomains"`
-	PathHostRules          *string `json:"pathHostRules"`
+	ProxyDomain              *string `json:"proxyDomain"`
+	ListeningAddress         *string `json:"listeningAddress"`
+	ListeningPortHTTP        *int    `json:"listeningPortHTTP"`
+	ListeningPortHTTPS       *int    `json:"listeningPortHTTPS"`
+	ProxyAddress             *string `json:"proxyAddress"`
+	StaticLocations          *string `json:"staticLocations"`
+	Target                   *string `json:"target"`
+	TargetRes                *string `json:"targetResources"`
+	TargetRules              *string `json:"rules"`
+	JsRules                  *string `json:"jsRules"`
+	TerminateTriggers        *string `json:"terminateTriggers"`
+	TerminateRedirectUrl     *string `json:"terminateRedirectUrl"`
+	TrackingCookie           *string `json:"trackingCookie"`
+	TrackingParam            *string `json:"trackingParam"`
+	Debug                    *bool   `json:"debug"`
+	ForceHTTPS               *bool   `json:"forceHTTPS"`
+	ForceHTTP                *bool   `json:"forceHTTP"`
+	LogPostOnly              *bool   `json:"logPostOnly"`
+	DisableSecurity          *bool   `json:"disableSecurity"`
+	DynamicMode              *bool   `json:"dynamicMode"`
+	LogRequestFile           *string `json:"log"`
+	Plugins                  *string `json:"plugins"`
+	AllowSecureCookies       *bool   `json:"allowSecureCookies"`
+	IgnoreTranslateDomains   *string `json:"ignoreTranslateDomains"`
+	DisableDynamicSubdomains *bool   `json:"disableDynamicSubdomains"`
+	PathHostRules            *string `json:"pathHostRules"`
 	*TLSConfig
 }
 
@@ -98,7 +98,7 @@ var (
 		IgnoreTranslateDomains: flag.String("ignoreTranslateDomains", "", "Comma separated list of domains to never translate and proxy"),
 
 		DisableDynamicSubdomains: flag.Bool("disableDynamicSubdomains", false, "Translate URL domain names to be the proxy domain"),
-		PathHostRules:            flag.String("pathHostRules", "",
+		PathHostRules: flag.String("pathHostRules", "",
 			"Comma separated list of URL path patterns and the target domains to send the requests to - e.g.: /path/:example.com,/path2:www.example.com"),
 	}
 
@@ -182,16 +182,16 @@ func (c *Options) parseJSON(file string) {
 func (c *Options) VerifyConfiguration() {
 
 	if *c.ForceHTTP == true {
-		if len(*c.ProxyDomain) == 0 || len(*c.ProxyDomain) == 0 {
-			log.Warningf("Missing required parameters in oder start the proxy. Terminating.")
+		if len(*c.ProxyDomain) == 0 || len(*c.Target) == 0 {
+			log.Warningf("Missing required parameters in order to start the proxy. Terminating.")
 			log.Warningf("TIP: You will need to specify at least the following parameters to serve the page over HTTP: proxyDomain and target.")
 			flag.PrintDefaults()
 			os.Exit(1)
 		}
 	} else { // default + HTTPS wrapper
 
-		if len(*c.ProxyDomain) == 0 || len(*c.ProxyDomain) == 0 {
-			log.Warningf("Missing required parameters in oder start the proxy. Terminating.")
+		if len(*c.ProxyDomain) == 0 || len(*c.Target) == 0 {
+			log.Warningf("Missing required parameters in order to start the proxy. Terminating.")
 			log.Warningf("TIP: You will need to specify at least the following parameters to serve the page over HTTP: proxyDomain and target.")
 			flag.PrintDefaults()
 			os.Exit(1)

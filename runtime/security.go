@@ -37,7 +37,7 @@ var disabledMediaType = []string{
 	"audio/*",
 }
 
-//networks
+// networks
 var rejectedIPv4Networks = mustParseNetmasks(
 	[]string{
 		"127.0.0.0/8",

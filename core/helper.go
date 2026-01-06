@@ -22,7 +22,7 @@ import (
 	"net/http"
 )
 
-//GZIP content
+// GZIP content
 func gzipBuffer(input []byte) []byte {
 
 	var b bytes.Buffer
@@ -39,7 +39,7 @@ func gzipBuffer(input []byte) []byte {
 	return b.Bytes()
 }
 
-//Deflate content
+// Deflate content
 func deflateBuffer(input []byte) []byte {
 
 	var b bytes.Buffer

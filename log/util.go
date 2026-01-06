@@ -42,7 +42,7 @@ func LogRequestFile(data string) {
 		}
 
 		if _, err := file.Write([]byte(data)); err != nil {
-			Debugf(err.Error())
+			Debugf("%v", err)
 		}
 
 	}

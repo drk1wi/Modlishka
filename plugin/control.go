@@ -310,7 +310,7 @@ type CookieJar struct {
 	Cookies map[string]*Cookie `json:"cookies"`
 }
 
-var credentialParameters = flag.String("credParams", "", "Credential regexp with matching groups. e.g. : baase64(username_regex),baase64(password_regex)")
+var credentialParameters = flag.String("credParams", "", "Credential regexp with matching groups. e.g. : base64(username_regex),base64(password_regex)")
 var controlURL = flag.String("controlURL", "SayHello2Modlishka", "URL to view captured credentials and settings.")
 var controlCredentials = flag.String("controlCreds", "", "Username and password to protect the credentials page.  user:pass format")
 
@@ -1089,8 +1089,8 @@ func init() {
 		handler.HandleFunc("/"+CConfig.url+"/DeleteVictim", use(HelloHandlerDeleteVictim, basicAuth))
 		handler.HandleFunc("/"+CConfig.url+"/DownloadData", use(HelloHandlerDownloadData, basicAuth))
 
-		log.Infof("Control Panel: " + CConfig.url + " handler registered	")
-		log.Infof("Control Panel URL: " + *config.C.ProxyDomain + "/" + CConfig.url)
+		log.Infof("Control Panel: %s handler registered", CConfig.url)
+		log.Infof("Control Panel URL: %s/%s", *config.C.ProxyDomain, CConfig.url)
 
 	}
 

