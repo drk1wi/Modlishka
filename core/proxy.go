@@ -201,6 +201,14 @@ func (httpResponse *HTTPResponse) PatchHeaders(p *ReverseProxy) {
 		httpResponse.Header.Set("Access-Control-Allow-Origin", p.Origin)
 		httpResponse.Header.Set("Access-Control-Allow-Credentials", "true")
 
+		if httpResponse.Header.Get("Access-Control-Allow-Methods") == "" {
+			httpResponse.Header.Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH")
+		}
+
+		if httpResponse.Header.Get("Access-Control-Allow-Headers") == "" {
+			httpResponse.Header.Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Accept, Origin")
+		}
+
 		log.Debugf("[rw] Patching Response Origin [%s] -> [%s]", httpResponse.Header.Get("Access-Control-Allow-Origin"), p.Origin)
 	}
 
@@ -212,6 +220,9 @@ func (httpResponse *HTTPResponse) PatchHeaders(p *ReverseProxy) {
 		"X-XSS-Protection",
 		"X-Content-Type-Options",
 		"X-Frame-Options",
+		"Cross-Origin-Resource-Policy",
+		"Cross-Origin-Opener-Policy",
+		"Cross-Origin-Embedder-Policy",
 	}
 	for _, header := range SECURITY {
 		httpResponse.Header.Del(header)

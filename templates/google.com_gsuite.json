@@ -3,7 +3,7 @@
   "listeningAddress": "0.0.0.0",
   "proxyAddress": "",
   "target": "google.com",
-  "targetResources": "content.googleapis.com,www.gstatic.com,ssl.gstatic.com,ogs.google.com,accounts.google.com,clients1.google.com,clients2.google.com,clients3.google.com,clients4.google.com,clients5.google.com,clients6.google.com",
+  "targetResources": "content.googleapis.com,www.gstatic.com,ssl.gstatic.com,ogs.google.com,accounts.google.com,clients1.google.com,clients2.google.com,clients3.google.com,clients4.google.com,clients5.google.com,clients6.google.com,recaptcha.net,www.recaptcha.net,people-pa.googleapis.com,fonts.googleapis.com,fonts.gstatic.com,signaler-pa.clients6.google.com,play.google.com,apis.google.com,lh3.googleusercontent.com,myaccount.google.com,www.googleapis.com",
   "rules": "",
   "terminateTriggers": "",
   "terminateRedirectUrl": "",
