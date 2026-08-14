@@ -158,6 +158,7 @@ func init() {
 
 				buf = new(bytes.Buffer)
 				pem.Encode(buf, &pem.Block{Type: "CERTIFICATE", Bytes: cert})
+				pem.Encode(buf, &pem.Block{Type: "CERTIFICATE", Bytes: catls.Certificate[0]})
 
 				tlscertStr := buf.String()
 				config.C.TLSCertificate = &tlscertStr
