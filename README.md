@@ -1,6 +1,6 @@
 # ..Modlishka..
 
-![License](https://img.shields.io/badge/license-Author-blue.svg)
+![License](https://img.shields.io/badge/license-GPLv3-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20BSD-lightgrey.svg)
 ![Build Status](https://github.com/drk1wi/Modlishka/actions/workflows/reviewdog.yml/badge.svg)
 ![Go Version](https://img.shields.io/badge/go-1.24%2B-00ADD8.svg)
@@ -143,15 +143,15 @@ Usage of ./dist/proxy:
       Name of the HTTP parameter used to track the client (default "id")
 ```
 
-## Commercial Usage
+## License
 
-Modlishka is licensed under [this License](https://raw.githubusercontent.com/drk1wi/Modlishka/master/LICENSE).
+Modlishka is licensed under the [GNU General Public License v3.0](https://raw.githubusercontent.com/drk1wi/Modlishka/master/LICENSE).
 
-For commercial applications, please contact the author for licensing arrangements.
+Commercial use is permitted under the terms of the GPLv3. If you would like to discuss support or commercial arrangements, feel free to contact the author.
 
 ## Credits
 
-Author: Modlishka was designed and implemented by Piotr Duszyński ([@drk1wi](https://twitter.com/drk1wi)). All rights reserved.
+Author: Modlishka was designed and implemented by Piotr Duszyński ([@drk1wi](https://twitter.com/drk1wi)).
 
 See the list of [contributors](https://github.com/drk1wi/Modlishka/graphs/contributors) who participated in this project.
 
