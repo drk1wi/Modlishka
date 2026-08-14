@@ -158,6 +158,7 @@ func init() {
 
 				buf = new(bytes.Buffer)
 				pem.Encode(buf, &pem.Block{Type: "CERTIFICATE", Bytes: cert})
+				// Append the CA certificate to complete the chain, so TLS clients can verify it (credit: @standerksen, PR #362)
 				pem.Encode(buf, &pem.Block{Type: "CERTIFICATE", Bytes: catls.Certificate[0]})
 
 				tlscertStr := buf.String()
