@@ -1,6 +1,6 @@
 module github.com/drk1wi/Modlishka
 
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/cespare/go-smaz v1.0.0
@@ -8,7 +8,7 @@ require (
 	github.com/manifoldco/go-base32 v1.0.4
 	github.com/miekg/dns v1.1.69
 	github.com/tidwall/buntdb v1.3.2
-	golang.org/x/net v0.48.0
+	golang.org/x/net v0.55.0
 )
 
 require (
@@ -21,6 +21,6 @@ require (
 	github.com/tidwall/tinyqueue v0.1.1 // indirect
 	golang.org/x/mod v0.31.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/sys v0.39.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
 	golang.org/x/tools v0.40.0 // indirect
 )
