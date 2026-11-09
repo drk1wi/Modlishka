@@ -1,0 +1,18 @@
+services:
+  modlishka:
+    image: modlishka
+    build:
+      context: .
+      dockerfile: extra/docker/Dockerfile
+    
+    # The second port must match the configured port in JSON
+    ports:
+      - 80:80
+      - 443:443
+
+    # Place the volume containing the JSON config
+    volumes:
+      - ./templates/:/data/:ro
+
+    # Adapt the command, basic example
+    command: ["/bin/proxy", "-config", "/data/office365.json"]
