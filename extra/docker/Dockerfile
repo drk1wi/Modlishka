@@ -1,22 +1,42 @@
-FROM golang:alpine
+# Build from the repository root folder:
+#   docker build -f extra/docker/Dockerfile -t modlishka .
 
-MAINTAINER Krzysztof Bednarczyk <admin@bordeux.net>
+###############################################################################
+# Build stage
+###############################################################################
+FROM golang:alpine AS builder
 
-ENV MODLISHKA_REPOSITORY="github.com/drk1wi/Modlishka"
-ENV INSTALL_PACKAGES="git make gcc musl-dev"
-ENV PROJECT_DIR="${GOPATH}/src/${MODLISHKA_REPOSITORY}"
+# Cross-compile Go static binary
+ENV CGO_ENABLED=0
+
+RUN apk add --no-cache make git
+
+WORKDIR /src
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy the source tree and build
+COPY . ./
+RUN make build
+
+###############################################################################
+# Runtime stage
+#
+# Alpine's supplies everything run-server.sh needs: sh, env, sed, awk, cut and tr
+###############################################################################
+FROM alpine
+
+# Keep outbound TLS working if upstream verification is enabled.
+RUN apk add --no-cache ca-certificates
+
 ENV MODLISHKA_BIN="/bin/proxy"
 
-COPY ./run-server.sh /bin/run-server.sh
-ADD . ${PROJECT_DIR}
+COPY --from=builder /src/dist/proxy ${MODLISHKA_BIN}
+COPY --from=builder /src/extra/docker/run-server.sh /bin/run-server.sh
 
-RUN set -ex \
-		&& chmod +x /bin/run-server.sh \
-		&& apk add --no-cache ${INSTALL_PACKAGES}\
-        && cd ${PROJECT_DIR}/ && make \
-		&& cp ${PROJECT_DIR}/dist/proxy ${MODLISHKA_BIN} \
-		&& apk del ${INSTALL_PACKAGES} && rm -rf /var/cache/apk/* && rm -rf ${GOPATH}/src/*
-		
+RUN chmod +x /bin/run-server.sh
+
 VOLUME [ "/data" ]
 WORKDIR /data
 CMD ["run-server.sh"]
